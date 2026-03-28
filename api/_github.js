@@ -61,4 +61,16 @@ async function deleteFile(path, sha, message) {
   return r.ok;
 }
 
-module.exports = { getJSON, putJSON, putBinary, getSha, deleteFile };
+// Append an entry to a JSON array file, retrying on SHA conflict.
+async function appendToManifest(path, entry, message, maxRetries = 4) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    if (attempt > 0) await new Promise(r => setTimeout(r, 600 * attempt));
+    const { data, sha } = await getJSON(path);
+    data.push(entry);
+    const ok = await putJSON(path, data, message, sha);
+    if (ok) return true;
+  }
+  return false;
+}
+
+module.exports = { getJSON, putJSON, putBinary, getSha, deleteFile, appendToManifest };

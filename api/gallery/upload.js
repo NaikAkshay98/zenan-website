@@ -1,4 +1,4 @@
-const { getJSON, putJSON, putBinary } = require('../_github');
+const { putBinary, appendToManifest } = require('../_github');
 
 const OWNER  = process.env.GITHUB_OWNER;
 const REPO   = process.env.GITHUB_REPO;
@@ -17,18 +17,15 @@ module.exports = async function handler(req, res) {
 
     await putBinary(filePath, data, `Add gallery image: ${name}`);
 
-    const { data: manifest, sha } = await getJSON('images/gallery/manifest.json');
     const entry = {
-      id,
-      filename,
+      id, filename,
       name:       name || filename,
       src:        `${RAW}/${filePath}`,
       category:   category || 'glassware',
       uploadedAt: new Date().toISOString()
     };
-    manifest.push(entry);
-    await putJSON('images/gallery/manifest.json', manifest, 'Update gallery manifest', sha);
 
+    await appendToManifest('images/gallery/manifest.json', entry, 'Update gallery manifest');
     res.json({ success: true, image: entry });
   } catch (err) {
     console.error(err);
