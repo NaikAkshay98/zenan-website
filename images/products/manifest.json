@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "1774736761998y8r9z9xod2j",
+    "filename": "1774736761998y8r9z9xod2j.jpg",
+    "name": "Zombie_96_12oz-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774736761998y8r9z9xod2j.jpg",
+    "variants": [
+      {
+        "id": "1774736761998y8r9z9xod2j_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-28T22:26:02.498Z"
+  }
+]
