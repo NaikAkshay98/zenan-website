@@ -1,6 +1,6 @@
 const { getJSON, putJSON, getSha, deleteFile } = require('../_github');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'DELETE') return res.status(405).end();
   try {
     const { id } = req.query;
@@ -12,11 +12,9 @@ export default async function handler(req, res) {
       if (fileSha) await deleteFile(`images/products/${img.filename}`, fileSha, `Delete product image: ${img.name}`);
     }
 
-    const updated = manifest.filter(i => i.id !== id);
-    await putJSON('images/products/manifest.json', updated, 'Update products manifest', manifestSha);
-
+    await putJSON('images/products/manifest.json', manifest.filter(i => i.id !== id), 'Update products manifest', manifestSha);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
-}
+};

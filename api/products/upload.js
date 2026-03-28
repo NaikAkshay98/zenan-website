@@ -1,8 +1,11 @@
 const { getJSON, putJSON, putBinary } = require('../_github');
 
-export const config = { api: { bodyParser: { sizeLimit: '10mb' } } };
+const OWNER  = process.env.GITHUB_OWNER;
+const REPO   = process.env.GITHUB_REPO;
+const BRANCH = process.env.GITHUB_BRANCH || 'main';
+const RAW    = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}`;
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   try {
     const { name, data } = req.body;
@@ -19,7 +22,7 @@ export default async function handler(req, res) {
       id,
       filename,
       name:       name || filename,
-      src:        '/' + filePath,
+      src:        `${RAW}/${filePath}`,
       variants:   [{ id: id + '_v0', itemNumber: '', oz: '' }],
       categories: [],
       enabled:    true,
@@ -33,4 +36,6 @@ export default async function handler(req, res) {
     console.error(err);
     res.status(500).json({ success: false, error: err.message });
   }
-}
+};
+
+module.exports.config = { api: { bodyParser: { sizeLimit: '10mb' } } };

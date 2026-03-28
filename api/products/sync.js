@@ -1,8 +1,6 @@
 const { getJSON, putJSON } = require('../_github');
 
-export const config = { api: { bodyParser: { sizeLimit: '2mb' } } };
-
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   try {
     const { sha } = await getJSON('images/products/manifest.json');
@@ -11,4 +9,6 @@ export default async function handler(req, res) {
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
-}
+};
+
+module.exports.config = { api: { bodyParser: { sizeLimit: '2mb' } } };
