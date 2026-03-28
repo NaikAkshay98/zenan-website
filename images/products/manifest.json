@@ -14,5 +14,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-28T22:26:02.498Z"
+  },
+  {
+    "id": "1774737174880y7hrd1jd8we",
+    "filename": "1774737174880y7hrd1jd8we.jpg",
+    "name": "Perfection_C8304_21oz-1-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774737174880y7hrd1jd8we.jpg",
+    "variants": [
+      {
+        "id": "1774737174880y7hrd1jd8we_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-28T22:32:55.318Z"
   }
 ]
