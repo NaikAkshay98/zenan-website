@@ -1,0 +1,36 @@
+const { getJSON, putJSON, putBinary } = require('../_github');
+
+export const config = { api: { bodyParser: { sizeLimit: '10mb' } } };
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).end();
+  try {
+    const { name, data } = req.body;
+    if (!data) return res.status(400).json({ success: false, error: 'No image data' });
+
+    const id       = Date.now().toString() + Math.random().toString(36).slice(2);
+    const filename = id + '.jpg';
+    const filePath = `images/products/${filename}`;
+
+    await putBinary(filePath, data, `Add product image: ${name}`);
+
+    const { data: manifest, sha } = await getJSON('images/products/manifest.json');
+    const entry = {
+      id,
+      filename,
+      name:       name || filename,
+      src:        '/' + filePath,
+      variants:   [{ id: id + '_v0', itemNumber: '', oz: '' }],
+      categories: [],
+      enabled:    true,
+      uploadedAt: new Date().toISOString()
+    };
+    manifest.push(entry);
+    await putJSON('images/products/manifest.json', manifest, 'Update products manifest', sha);
+
+    res.json({ success: true, image: entry });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+}
