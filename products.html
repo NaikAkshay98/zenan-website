@@ -985,8 +985,8 @@
 
   // ── Product detail panel
   async function openDetail(imgId) {
-    const imgs = (await ProdIDB.getAll()).filter(i => i.enabled !== false);
-    const cats = JSON.parse(localStorage.getItem('zenan_categories') || '[]');
+    const imgs = (await fetch('/api/products').then(r=>r.json())).filter(i => i.enabled !== false);
+    const cats = await fetch('/api/categories').then(r=>r.json());
     const img = imgs.find(i => i.id === imgId);
     if (!img) return;
 
@@ -1284,32 +1284,13 @@
     update.call(minEl);
   }
 
-  // ── Product IndexedDB reader
-  const ProdIDB = {
-    _db: null,
-    open() {
-      return new Promise((res, rej) => {
-        const req = indexedDB.open('zenan_products_db', 1);
-        req.onupgradeneeded = e => e.target.result.createObjectStore('images', { keyPath: 'id' });
-        req.onsuccess = e => { this._db = e.target.result; res(this._db); };
-        req.onerror = rej;
-      });
-    },
-    async getAll() {
-      const db = this._db || await this.open();
-      return new Promise((res, rej) => {
-        const req = db.transaction('images', 'readonly').objectStore('images').getAll();
-        req.onsuccess = () => res(req.result || []);
-        req.onerror = rej;
-      });
-    }
-  };
-
   async function loadAdminProducts() {
     let imgs, cats;
     try {
-      imgs = await ProdIDB.getAll();
-      cats = JSON.parse(localStorage.getItem('zenan_categories') || '[]');
+      [imgs, cats] = await Promise.all([
+        fetch('/api/products').then(r => r.json()),
+        fetch('/api/categories').then(r => r.json())
+      ]);
     } catch { return; }
 
     // Only show enabled images
@@ -1387,11 +1368,7 @@
     }
   }
 
-  // Load on start and on storage changes (real-time cross-tab updates)
   loadAdminProducts();
-  window.addEventListener('storage', e => {
-    if (e.key === 'zenan_products_v' || e.key === 'zenan_categories') loadAdminProducts();
-  });
 
 
   // ── DRINK EASTER EGGS ──
