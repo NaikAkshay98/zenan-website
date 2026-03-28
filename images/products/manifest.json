@@ -16,23 +16,5 @@
     ],
     "enabled": true,
     "uploadedAt": "2026-03-28T21:46:21.380Z"
-  },
-  {
-    "id": "1774735201431ysgdytebdos",
-    "filename": "1774735201431ysgdytebdos.jpg",
-    "name": "VINA FLUTE",
-    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774735201431ysgdytebdos.jpg",
-    "variants": [
-      {
-        "id": "1774735201431ysgdytebdos_v0",
-        "itemNumber": "7500",
-        "oz": "8"
-      }
-    ],
-    "categories": [
-      "1774735221904"
-    ],
-    "enabled": true,
-    "uploadedAt": "2026-03-28T22:00:02.045Z"
   }
 ]
