@@ -818,56 +818,31 @@ function closeConfirm() {
   document.getElementById('confirmBackdrop').classList.remove('open');
 }
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('confirmDeleteBtn').onclick = () => {
-    if (_pendingDeleteId) { saveImages(getImages().filter(i => i.id !== _pendingDeleteId)); renderAll(); toast('Image deleted.'); }
+  document.getElementById('confirmDeleteBtn').onclick = async () => {
+    if (_pendingDeleteId) {
+      await API.del('/api/products/' + _pendingDeleteId);
+      _imgs = _imgs.filter(i => i.id !== _pendingDeleteId);
+      renderAll();
+      toast('Image deleted.');
+    }
     closeConfirm();
   };
 });
 
-// ── DB helpers
-const DB = {
-  get: (key, def) => { try { return JSON.parse(localStorage.getItem(key)) ?? def; } catch { return def; } },
-  set: (key, val) => { try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch(e) { toast('Storage full.', 'red'); return false; } }
+// ── API helpers
+const API = {
+  async get(url)        { return fetch(url).then(r => r.json()); },
+  async post(url, body) { return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json()); },
+  async del(url)        { return fetch(url, { method: 'DELETE' }).then(r => r.json()); }
 };
 
-// ── Product IndexedDB (no size limit)
-const ProdIDB = {
-  _db: null,
-  open() {
-    return new Promise((res, rej) => {
-      const req = indexedDB.open('zenan_products_db', 1);
-      req.onupgradeneeded = e => e.target.result.createObjectStore('images', { keyPath: 'id' });
-      req.onsuccess = e => { this._db = e.target.result; res(this._db); };
-      req.onerror = rej;
-    });
-  },
-  async getAll() {
-    const db = this._db || await this.open();
-    return new Promise((res, rej) => {
-      const req = db.transaction('images', 'readonly').objectStore('images').getAll();
-      req.onsuccess = () => res(req.result || []);
-      req.onerror = rej;
-    });
-  },
-  async saveAll(imgs) {
-    const db = this._db || await this.open();
-    return new Promise((res, rej) => {
-      const tx = db.transaction('images', 'readwrite');
-      const store = tx.objectStore('images');
-      store.clear();
-      imgs.forEach(img => store.put(img));
-      tx.oncomplete = () => { localStorage.setItem('zenan_products_v', Date.now()); res(true); };
-      tx.onerror = rej;
-    });
-  }
-};
-
-// ── In-memory cache so all existing sync calls work unchanged
+// ── In-memory caches
 let _imgs = [];
+let _cats = [];
 const getImages  = () => _imgs;
-const saveImages = (v) => { _imgs = v; ProdIDB.saveAll(v); };
-const getCats    = () => DB.get('zenan_categories', []);
-const saveCats   = v  => DB.set('zenan_categories', v);
+const saveImages = (v) => { _imgs = v; API.post('/api/products/sync', v); };
+const getCats    = () => _cats;
+const saveCats   = (v) => { _cats = v; API.post('/api/categories/sync', v); };
 
 // ── Image compression
 function compressImage(file, maxW = 1400, quality = 0.82) {
@@ -1181,38 +1156,6 @@ function switchSection(section) {
 }
 
 // ── Gallery: IndexedDB storage (no size limit)
-const GalIDB = {
-  _db: null,
-  open() {
-    if (this._db) return Promise.resolve(this._db);
-    return new Promise((res, rej) => {
-      const req = indexedDB.open('zenan_gallery_db', 1);
-      req.onupgradeneeded = e => e.target.result.createObjectStore('images', { keyPath: 'id' });
-      req.onsuccess = e => { this._db = e.target.result; res(this._db); };
-      req.onerror = e => rej(e);
-    });
-  },
-  async getAll() {
-    const db = await this.open();
-    return new Promise((res, rej) => {
-      const req = db.transaction('images', 'readonly').objectStore('images').getAll();
-      req.onsuccess = () => res(req.result);
-      req.onerror = rej;
-    });
-  },
-  async saveAll(imgs) {
-    const db = await this.open();
-    return new Promise((res, rej) => {
-      const tx = db.transaction('images', 'readwrite');
-      const store = tx.objectStore('images');
-      store.clear();
-      imgs.forEach(img => store.put(img));
-      tx.oncomplete = () => { localStorage.setItem('zenan_gallery_v', Date.now()); res(true); };
-      tx.onerror = rej;
-    });
-  }
-};
-
 // ── Gallery: upload
 async function handleGalUpload(e) {
   try {
@@ -1246,22 +1189,21 @@ async function handleGalUpload(e) {
 // ── Gallery: delete
 async function deleteGalImage(id) {
   if (!confirm('Remove this image from the gallery?')) return;
-  const imgs = await GalIDB.getAll();
-  await GalIDB.saveAll(imgs.filter(i => i.id !== id));
+  await API.del('/api/gallery/' + id);
   renderGallery();
   toast('Image removed from gallery.');
 }
 
 // ── Gallery: change category
 async function updateGalCategory(id, cat) {
-  const imgs = await GalIDB.getAll();
+  const imgs = await API.get('/api/gallery');
   const img = imgs.find(i => i.id === id);
-  if (img) { img.category = cat; await GalIDB.saveAll(imgs); renderGallery(); }
+  if (img) { img.category = cat; await API.post('/api/gallery/sync', imgs); renderGallery(); }
 }
 
 // ── Gallery: render grid
 async function renderGallery() {
-  const imgs = await GalIDB.getAll();
+  const imgs = await API.get('/api/gallery');
   const grid = document.getElementById('galGrid');
   const catColor = { glassware: '#2558B0', apparel: '#7c3aed' };
   const catName  = { glassware: 'Glassware', apparel: 'Apparel' };
@@ -1359,21 +1301,15 @@ function logout() {
   if (!localStorage.getItem('zenan_users')) {
     localStorage.setItem('zenan_users', JSON.stringify([{ id: 'admin', username: 'admin', password: 'admin', role: 'admin' }]));
   }
-  // Load products from IndexedDB; migrate from localStorage if first time
-  await ProdIDB.open();
-  let stored = await ProdIDB.getAll();
-  if (!stored.length) {
-    const lsData = DB.get('zenan_images', []);
-    if (lsData.length) {
-      await ProdIDB.saveAll(lsData);
-      stored = lsData;
-      try { localStorage.removeItem('zenan_images'); } catch(e) {}
-      toast('Products moved to expanded storage — space freed up!', 'green');
-    }
-  }
-  _imgs = stored;
+  // Load products and categories from server
+  try {
+    [_imgs, _cats] = await Promise.all([
+      API.get('/api/products'),
+      API.get('/api/categories')
+    ]);
+  } catch(e) { toast('Could not connect to server.', 'red'); }
   renderAll();
-  restoreProjectFolder(); // reconnect project folder if previously linked
+  restoreProjectFolder();
 })();
 
 // ══════════════════════════════════════════
