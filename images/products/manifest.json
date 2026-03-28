@@ -14,21 +14,5 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-28T22:18:45.220Z"
-  },
-  {
-    "id": "1774736469279q2gm03rllhd",
-    "filename": "1774736469279q2gm03rllhd.jpg",
-    "name": "Zombie",
-    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774736469279q2gm03rllhd.jpg",
-    "variants": [
-      {
-        "id": "1774736469279q2gm03rllhd_v0",
-        "itemNumber": "96",
-        "oz": "12"
-      }
-    ],
-    "categories": [],
-    "enabled": true,
-    "uploadedAt": "2026-03-28T22:21:09.938Z"
   }
 ]
