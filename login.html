@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Zenan Glass</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scrollbar-width: thin; scrollbar-color: rgba(37,88,176,.3) transparent; }
+    html::-webkit-scrollbar { width: 4px; }
+    html::-webkit-scrollbar-track { background: transparent; }
+    html::-webkit-scrollbar-thumb { background: rgba(37,88,176,.25); border-radius: 10px; }
+    html::-webkit-scrollbar-thumb:hover { background: rgba(37,88,176,.45); }
+    :root {
+      --blue: #2558B0; --blue-d: #1a4490; --blue-l: #3a6ec8;
+      --dark: #0f1e36; --body: #2d3d52; --muted: #6b7a90;
+      --white: #ffffff; --off: #f5f7fa; --border: #dde3ed;
+      --radius: 10px; --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    body { font-family: var(--font); background: var(--off); min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+    .card {
+      background: var(--white); border: 1.5px solid var(--border); border-radius: 16px;
+      width: 100%; max-width: 420px; padding: 40px 36px;
+      box-shadow: 0 8px 40px rgba(15,30,54,.10);
+    }
+    .logo { text-align: center; margin-bottom: 22px; }
+    .logo img { height: 42px; }
+    .card-title { font-size: 1.15rem; font-weight: 800; color: var(--dark); text-align: center; margin-bottom: 4px; }
+    .card-sub { font-size: .83rem; color: var(--muted); text-align: center; margin-bottom: 26px; }
+
+
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: .8rem; font-weight: 600; color: var(--dark); margin-bottom: 5px; }
+    .form-group input {
+      width: 100%; padding: 11px 13px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: .93rem; font-family: var(--font); color: var(--dark); background: var(--white);
+      outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    .form-group input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,88,176,.10); }
+
+    .btn-submit {
+      width: 100%; padding: 13px; background: #fff; color: #2558B0;
+      border: 2px solid #2558B0; border-radius: 10px; font-size: .97rem; font-weight: 700;
+      font-family: var(--font); cursor: pointer; margin-top: 4px;
+      box-shadow: 5px 5px 0 #FFD700;
+      transition: transform .18s, box-shadow .18s;
+    }
+    .btn-submit:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #FFD700; }
+
+    .error-msg { color: #dc2626; font-size: .82rem; margin-top: 12px; text-align: center; min-height: 18px; font-weight: 500; }
+    .success-msg { color: #16a34a; font-size: .82rem; margin-top: 12px; text-align: center; }
+
+    .hint {
+      background: var(--off); border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 14px; margin-top: 16px; font-size: .8rem; color: var(--muted); text-align: center;
+    }
+    .hint code { background: var(--white); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; font-size: .8rem; color: var(--dark); font-weight: 600; }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+    .back-link { display: block; text-align: center; font-size: .83rem; color: var(--muted); text-decoration: none; transition: color .2s; }
+    .back-link:hover { color: var(--blue); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <img src="brand_assets/Zenan logo.png" alt="Zenan Glass" />
+    </div>
+
+    <!-- LOGIN -->
+    <form onsubmit="doLogin(event)" autocomplete="on">
+      <div class="form-group">
+        <label for="lUser">Username</label>
+        <input type="text" id="lUser" placeholder="Enter username" autocomplete="username" required />
+      </div>
+      <div class="form-group">
+        <label for="lPass">Password</label>
+        <input type="password" id="lPass" placeholder="Enter password" autocomplete="current-password" required />
+      </div>
+      <button type="submit" class="btn-submit">Login →</button>
+    </form>
+
+    <div class="error-msg" id="errMsg"></div>
+
+    <!-- Hints -->
+    <div class="hint" style="margin-top:16px;">
+      <div style="font-weight:700;color:var(--dark);margin-bottom:6px;">Admin</div>
+      <code>admin</code> / <code>admin</code>
+    </div>
+    <div class="hint" id="clientHints" style="margin-top:8px;">
+      <div style="font-weight:700;color:var(--dark);margin-bottom:6px;">Clients</div>
+      <div id="clientHintList" style="display:flex;flex-direction:column;gap:4px;"></div>
+    </div>
+
+    <hr class="divider" />
+    <a href="index.html" class="back-link">← Back to website</a>
+  </div>
+
+  <script>
+    // ── Bootstrap default data
+    (function init() {
+      if (!localStorage.getItem('zenan_users')) {
+        localStorage.setItem('zenan_users', JSON.stringify([
+          { id: 'admin', username: 'admin', password: 'admin', role: 'admin' }
+        ]));
+      }
+      if (!localStorage.getItem('zenan_categories')) localStorage.setItem('zenan_categories', '[]');
+      if (!localStorage.getItem('zenan_images')) localStorage.setItem('zenan_images', '[]');
+
+      // Redirect if already logged in (admin)
+      if (localStorage.getItem('zenan_session')) { window.location.href = 'admin.html'; return; }
+      // Redirect if already logged in (client)
+      if (sessionStorage.getItem('zenan_client_session')) { window.location.href = 'client-portal.html'; return; }
+
+      // Show client credentials hint
+      renderClientHints();
+    })();
+
+    function renderClientHints() {
+      const clients = JSON.parse(localStorage.getItem('zenan_clients') || '[]');
+      const list = document.getElementById('clientHintList');
+      const box  = document.getElementById('clientHints');
+      if (!clients.length || !clients.some(c => c.loginUser)) {
+        box.style.display = 'none'; return;
+      }
+      list.innerHTML = clients
+        .filter(c => c.loginUser)
+        .map(c => `<span><strong style="color:var(--dark)">${c.name}:</strong> <code>${c.loginUser}</code> / <code>${c.loginPass || '—'}</code></span>`)
+        .join('');
+    }
+
+    function showErr(msg) { document.getElementById('errMsg').textContent = msg; }
+
+    function doLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('lUser').value.trim();
+      const p = document.getElementById('lPass').value;
+
+      // 1. Check admin users
+      const users = JSON.parse(localStorage.getItem('zenan_users') || '[]');
+      const admin = users.find(x => x.username === u && x.password === p);
+      if (admin) {
+        localStorage.setItem('zenan_session', JSON.stringify({ id: admin.id, username: admin.username, role: admin.role }));
+        window.location.href = 'admin.html';
+        return;
+      }
+
+      // 2. Check clients
+      const clients = JSON.parse(localStorage.getItem('zenan_clients') || '[]');
+      const client = clients.find(c => c.loginUser === u && c.loginPass === p);
+      if (client) {
+        sessionStorage.setItem('zenan_client_session', JSON.stringify({ clientId: client.id }));
+        window.location.href = 'client-portal.html';
+        return;
+      }
+
+      showErr('Incorrect username or password.');
+    }
+  </script>
+</body>
+</html>

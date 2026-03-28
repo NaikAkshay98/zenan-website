@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us — Zenan Glass</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    .pour-wrap { position: relative; display: flex; }
+    .pour-tip {
+      position: absolute; right: calc(100% + 12px); top: 50%;
+      transform: translateY(-50%) translateX(4px); opacity: 0;
+      background: rgba(15,25,55,.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      color: #e8efff; font-size: .72rem; font-weight: 500; letter-spacing: .02em;
+      white-space: nowrap; padding: 6px 12px; border-radius: 8px;
+      pointer-events: none; transition: opacity .2s, transform .2s;
+      box-shadow: 0 4px 18px rgba(0,0,0,.18);
+    }
+    .pour-tip::after {
+      content: ''; position: absolute; left: 100%; top: 50%; transform: translateY(-50%);
+      border: 5px solid transparent; border-left-color: rgba(15,25,55,.72);
+    }
+    .pour-wrap:hover .pour-tip { opacity: 1; transform: translateY(-50%) translateX(0); }
+    html { scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+
+    :root {
+      --blue:   #2558B0;
+      --blue2:  #3b82f6;
+      --blue3:  #60a5fa;
+      --aqua:   #0891b2;
+      --silver: #94a3b8;
+      --dark:   #0f172a;
+      --body:   #334155;
+      --muted:  #64748b;
+      --glass:  rgba(255,255,255,.68);
+      --glass-border: rgba(255,255,255,.85);
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font); color: var(--body); line-height: 1.6;
+      background: transparent;
+      min-height: 100vh; overflow-x: hidden;
+    }
+
+    /* ── FIXED BACKGROUND CANVAS ── */
+    #bgCanvas {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
+    }
+
+    /* Everything above the canvas */
+    nav, main, footer { position: relative; z-index: 1; }
+
+    .grad-text {
+      background: linear-gradient(135deg, #2558B0 0%, #3b82f6 55%, #0891b2 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal       { opacity: 0; transform: translateY(28px); transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1); }
+    .reveal-left  { opacity: 0; transform: translateX(-28px); transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1); }
+    .reveal-right { opacity: 0; transform: translateX(28px);  transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1); }
+    .reveal.in, .reveal-left.in, .reveal-right.in { opacity: 1; transform: translate(0); }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(5px) saturate(180%); -webkit-backdrop-filter: blur(5px) saturate(180%);
+      border-bottom: 1px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 6vw; height: 68px;
+      box-shadow: 0 2px 16px rgba(37,88,176,.06);
+    }
+    .logo-wrap { display: flex; align-items: center; text-decoration: none; }
+    .logo-wrap img { height: 52px; width: auto; display: block; }
+    .nav-links { display: flex; gap: 2px; list-style: none; margin-left: auto; }
+    .nav-links a {
+      color: #1e3a6e; text-decoration: none; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      padding: 8px 16px; border-radius: 7px; transition: background .2s, color .2s;
+    }
+    .nav-links a:hover { background: rgba(37,88,176,.08); color: #2558B0; }
+    .nav-links a.active { color: var(--blue); font-weight: 700; }
+    #navLoginBtn { color: #1e3a6e; text-decoration: none; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 8px 16px; border-radius: 8px; transition: background .2s, color .2s; flex-shrink: 0; margin-left: 4px; }
+    #navLoginBtn:hover { background: rgba(37,88,176,.08); color: #2558B0; }
+    .nav-insta { display: flex !important; align-items: center; gap: 5px; }
+    .nav-insta svg { flex-shrink: 0; }
+    .nav-hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      cursor: pointer; padding: 4px; border: none; background: none;
+    }
+    .nav-hamburger span { display: block; width: 24px; height: 2px; background: var(--dark); border-radius: 2px; }
+    @media (max-width: 640px) {
+      .nav-hamburger { display: flex; }
+      .nav-links {
+        display: none; flex-direction: column; gap: 0;
+        position: absolute; top: 68px; left: 0; right: 0;
+        background: rgba(255,255,255,.96); backdrop-filter: blur(24px);
+        padding: 8px 0 16px;
+        box-shadow: 0 8px 30px rgba(37,88,176,.09);
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { border-radius: 0; padding: 12px 6vw; }
+    }
+
+    /* ── MAIN FLOW WRAPPER ── */
+    main { overflow: visible; }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 100px 6vw 350px; text-align: center;
+      background: transparent;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg-img {
+      position: absolute; inset: 0;
+      background: url('brand_assets/about us photo.png') 80% 80% / cover no-repeat;
+      filter: brightness(.55) saturate(.85);
+      z-index: 0;
+    }
+    .hero-bg-img::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom,
+        rgba(15,30,70,.45) 0%,
+        rgba(15,30,70,.25) 50%,
+        rgba(255,255,255,.18) 100%);
+    }
+    .hero-content { position: relative; z-index: 1; }
+    .hero h1 { color: #fff !important; }
+    .hero p { color: rgba(255,255,255,.88) !important; }
+    .hero .btn-primary { background: #fff; color: var(--blue); }
+    .hero-content { max-width: 700px; margin: 0 auto; }
+    .breadcrumb-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.75); border: 1px solid rgba(37,88,176,.14);
+      backdrop-filter: blur(12px); padding: 5px 16px; border-radius: 20px;
+      font-size: .78rem; color: var(--muted); margin-bottom: 28px;
+      box-shadow: 0 2px 16px rgba(37,88,176,.07);
+    }
+    .breadcrumb-pill a { color: var(--blue2); text-decoration: none; font-weight: 600; }
+    .hero h1 {
+      font-size: clamp(2.6rem, 6vw, 4.2rem); font-weight: 800;
+      color: var(--dark); line-height: 1.1; margin-bottom: 22px;
+    }
+    .hero p { font-size: 1.08rem; color: #0f172a; max-width: 520px; margin: 0 auto; line-height: 1.82; }
+
+    /* ── STORY ── */
+    .story { padding: 100px 6vw 80px; background: transparent; }
+    .story-inner {
+      max-width: 100%; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1.4fr; gap: 20px; align-items: center;
+    }
+    @media (max-width: 768px) { .story-inner { grid-template-columns: 1fr; gap: 40px; } }
+    .story-label { font-size: .72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--blue2); margin-bottom: 10px; }
+    .story-title { font-size: clamp(1.6rem, 3vw, 2.3rem); font-weight: 800; color: var(--dark); margin-bottom: 28px; line-height: 1.2; }
+    .story-text { border-left: 2px solid rgba(37,88,176,.18); padding-left: 28px; }
+    .story-text p { color: #0f172a; font-size: .98rem; line-height: 1.85; margin-bottom: 16px; }
+    .story-text p:last-child { margin-bottom: 0; }
+    .story-visual {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.38);
+      backdrop-filter: blur(28px) saturate(180%); -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border-radius: 26px; aspect-ratio: 4/3;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+      box-shadow: 0 20px 60px rgba(37,88,176,.1), inset 0 1px 0 rgba(255,255,255,1);
+    }
+    .story-visual::before {
+      content: ''; position: absolute; top: -80px; right: -80px;
+      width: 260px; height: 260px;
+      background: radial-gradient(circle, rgba(37,88,176,.1) 0%, transparent 70%);
+    }
+    .story-visual::after {
+      content: ''; position: absolute; bottom: -60px; left: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(8,145,178,.09) 0%, transparent 70%);
+    }
+    .story-visual-inner { position: relative; z-index: 1; text-align: center; }
+    .story-visual-icon {
+      width: 80px; height: 80px; margin: 0 auto 14px;
+      background: linear-gradient(135deg, rgba(37,88,176,.1) 0%, rgba(8,145,178,.09) 100%);
+      border-radius: 20px; display: grid; place-items: center;
+      border: 1px solid rgba(37,88,176,.14);
+      box-shadow: 0 4px 20px rgba(37,88,176,.1);
+    }
+    .story-visual-sub { font-size: .8rem; color: var(--silver); font-weight: 500; }
+
+    /* ── STATS ── */
+    @keyframes mapReveal {
+      0%   { opacity: 0; transform: scale(0.08); filter: sepia(1) saturate(4) hue-rotate(300deg) brightness(.95) blur(8px); }
+      40%  { opacity: .3; transform: scale(0.5);  filter: sepia(1) saturate(4) hue-rotate(300deg) brightness(.95) blur(3px); }
+      100% { opacity: .55; transform: scale(1);   filter: sepia(1) saturate(4) hue-rotate(300deg) brightness(.95) blur(0); }
+    }
+    @keyframes leafPulse {
+      0%   { transform: scale(1); }
+      30%  { transform: scale(1.18); filter: drop-shadow(0 8px 24px rgba(220,50,50,.5)); }
+      100% { transform: scale(1); filter: drop-shadow(0 6px 18px rgba(220,50,50,.3)); }
+    }
+    .map-revealed { animation: mapReveal 1.4s cubic-bezier(.22,1,.36,1) forwards; }
+    .leaf-pulse   { animation: leafPulse .8s cubic-bezier(.22,1,.36,1) forwards; }
+    @keyframes statFadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    .stats-strip {
+      padding: 13px 6vw;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      background: transparent;
+    }
+    .stats-strip::before { display: none; }
+    .stats-grid {
+      display: flex; justify-content: space-evenly; align-items: center;
+      gap: 0; max-width: 100%; margin: 0; flex-wrap: wrap;
+      position: relative; z-index: 1;
+    }
+    @media (max-width: 600px) { .stats-grid { gap: 40px 0; } }
+    .stat-card {
+      background: none; border: none; box-shadow: none;
+      padding: 20px 48px; text-align: center; position: relative; flex: 1;
+      opacity: 0;
+    }
+    .stat-card.counted {
+      animation: statFadeUp .65s cubic-bezier(.22,1,.36,1) both;
+    }
+    .stat-card.counted:nth-child(1) { animation-delay: .0s; }
+    .stat-card.counted:nth-child(2) { animation-delay: .12s; }
+    .stat-card.counted:nth-child(3) { animation-delay: .24s; }
+    .stat-card.counted:nth-child(4) { animation-delay: .36s; }
+    .stat-card:not(:last-child)::after { display: none; }
+    .stat-card .num {
+      font-size: 2.2rem; font-weight: 800; line-height: 1; letter-spacing: -1px;
+      color: #2558B0; -webkit-text-fill-color: #2558B0;
+      background: none; -webkit-background-clip: unset; background-clip: unset;
+    }
+    .stat-card .lbl {
+      font-size: .75rem; color: var(--muted); margin-top: 10px;
+      font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase;
+    }
+
+    /* ── SECTION HEADER ── */
+    .section-header { text-align: center; margin-bottom: 52px; }
+    .section-eyebrow { font-size: .72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--blue2); margin-bottom: 10px; }
+    .section-heading { font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 800; color: var(--dark); line-height: 1.2; }
+
+    /* ── SERVICES ── */
+    .services { padding: 80px 6vw; background: transparent; }
+    .services-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 0; max-width: 1060px; margin: 0 auto;
+    }
+    @media (max-width: 768px) { .services-grid { grid-template-columns: 1fr 1fr; gap: 40px 16px; } }
+    @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } }
+    .service-card {
+      background: none; border: none; box-shadow: none;
+      padding: 12px 32px 32px; text-align: center; position: relative;
+    }
+    .service-card:not(:nth-child(3n))::after {
+      content: ''; position: absolute; right: 0; top: 10%; height: 80%; width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(37,88,176,.12) 40%, rgba(37,88,176,.12) 60%, transparent);
+    }
+    .service-icon {
+      display: block; margin: 0 auto 20px;
+      width: 64px; height: 64px;
+      transition: transform .4s cubic-bezier(.22,1,.36,1), filter .4s;
+      filter: drop-shadow(0 6px 14px rgba(37,88,176,.18));
+    }
+    .service-card:hover .service-icon {
+      transform: translateY(-6px) scale(1.08);
+      filter: drop-shadow(0 12px 22px rgba(37,88,176,.28));
+    }
+    .service-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .service-card p { font-size: .83rem; color: #0f172a; line-height: 1.65; }
+
+    /* ── VALUES ── */
+    .values { padding: 80px 6vw; background: transparent; }
+    .values-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 0; max-width: 1060px; margin: 0 auto;
+    }
+    @media (max-width: 700px) { .values-grid { grid-template-columns: 1fr 1fr; gap: 40px 16px; } }
+    .value-card {
+      background: none; border: none; box-shadow: none;
+      padding: 12px 32px 24px; text-align: center; position: relative;
+    }
+    .value-card:not(:last-child)::after {
+      content: ''; position: absolute; right: 0; top: 10%; height: 80%; width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(37,88,176,.12) 40%, rgba(37,88,176,.12) 60%, transparent);
+    }
+    .value-icon-art {
+      display: block; margin: 0 auto 20px;
+      width: 64px; height: 64px;
+      transition: transform .4s cubic-bezier(.22,1,.36,1), filter .4s;
+      filter: drop-shadow(0 6px 14px rgba(37,88,176,.18));
+    }
+    .value-card:hover .value-icon-art {
+      transform: translateY(-6px) scale(1.08);
+      filter: drop-shadow(0 12px 22px rgba(37,88,176,.28));
+    }
+    .value-card h3 { font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+    .value-card p { font-size: .83rem; color: #0f172a; line-height: 1.65; }
+
+    /* ── TEAM ── */
+    .team { padding: 80px 6vw; background: transparent; }
+    .team-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 20px; max-width: 1100px; margin: 0 auto;
+    }
+    @media (max-width: 900px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .team-grid { grid-template-columns: 1fr; } }
+    .team-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+      border-radius: 22px; padding: 36px 24px; text-align: center;
+      transition: box-shadow .35s, transform .35s;
+      position: relative; overflow: hidden;
+      box-shadow: 0 8px 40px rgba(37,88,176,.07), inset 0 1px 0 rgba(255,255,255,1);
+    }
+    .team-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(37,88,176,.3), transparent);
+    }
+    .team-card:hover { box-shadow: 0 22px 55px rgba(37,88,176,.14); transform: translateY(-8px); }
+    .team-avatar {
+      width: 120px; height: 120px; border-radius: 22px;
+      background: #f0f2f8;
+      border: 2px solid rgba(37,88,176,.1);
+      display: grid; place-items: center; margin: 0 auto 18px;
+      overflow: hidden;
+      box-shadow: 4px 4px 0 #FFD700;
+    }
+    .team-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .team-card h3 { font-size: 1.02rem; font-weight: 700; color: var(--dark); margin-bottom: 5px; }
+    .team-card .role {
+      font-size: .78rem; font-weight: 600; margin-bottom: 13px;
+      background: linear-gradient(135deg, #2558B0, #0891b2);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .team-card p { font-size: .84rem; color: #0f172a; line-height: 1.6; }
+
+    /* ── CTA ── */
+    .cta-band {
+      padding: 110px 6vw; text-align: center; background: transparent;
+      position: relative;
+    }
+    .cta-band::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, transparent 0%, rgba(37,88,176,.04) 50%, transparent 100%);
+      pointer-events: none;
+    }
+    .cta-band h2 { font-size: clamp(1.7rem, 3.5vw, 2.4rem); font-weight: 800; color: var(--dark); margin-bottom: 14px; position: relative; }
+    .cta-band > p { color: #0f172a; margin-bottom: 38px; max-width: 420px; margin-left: auto; margin-right: auto; position: relative; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 32px; border-radius: 10px;
+      font-size: .97rem; font-weight: 700; text-decoration: none;
+      background: #2558B0; color: #fff; border: 2px solid #2558B0; cursor: pointer;
+      box-shadow: 5px 5px 0 #FFD700;
+      transition: transform .18s, box-shadow .18s;
+    }
+    .btn-primary:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #FFD700; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(5px) saturate(180%); -webkit-backdrop-filter: blur(5px) saturate(180%);
+      border-top: 1px solid rgba(255,255,255,.2);
+      box-shadow: 0 -2px 16px rgba(37,88,176,.06);
+      color: #0f172a; padding: 14px 6vw 12px; position: relative;
+    }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+      padding-bottom: 36px; border-bottom: 1px solid rgba(37,88,176,.1);
+    }
+    .footer-logo { display: inline-flex; margin-bottom: 14px; }
+    .footer-logo img { height: 46px; width: auto; display: block; }
+    .footer-brand p { font-size: .88rem; line-height: 1.7; max-width: 280px; color: #0f172a; }
+    .footer-col h4 { color: #0f172a; font-size: .83rem; font-weight: 700; margin-bottom: 14px; letter-spacing: .08em; text-transform: uppercase; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 9px; font-size: .88rem; color: #0f172a; }
+    .footer-col a { color: #0f172a; text-decoration: none; transition: color .2s; }
+    .footer-col a:hover { color: #2558B0; }
+    .footer-contact li { display: flex; gap: 8px; align-items: flex-start; }
+    .footer-contact .ic { display: flex; align-items: center; margin-top: 3px; flex-shrink: 0; opacity: .5; }
+    .footer-bottom {
+      max-width: 1100px; margin: 22px auto 0;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+      font-size: .8rem; color: #0f172a;
+    }
+    @media (max-width: 700px) {
+      .footer-inner { grid-template-columns: 1fr; gap: 28px; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+
+    /* ── PARALLAX TARGETS ── */
+    .parallax-slow  { will-change: transform; }
+    .parallax-mid   { will-change: transform; }
+    .parallax-fast  { will-change: transform; }
+  </style>
+</head>
+<body>
+
+<!-- GLOBAL BACKGROUND CANVAS -->
+<canvas id="bgCanvas"></canvas>
+
+<nav>
+  <a href="index.html" class="logo-wrap">
+    <img src="brand_assets/Zenan logo.png" alt="Zenan Glass" />
+  </a>
+  <button class="nav-hamburger" aria-label="Toggle menu" onclick="toggleNav()">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="products.html">Products</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="about.html" class="active">About Us</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <a id="navLoginBtn" href="login.html">Log In</a>
+<script>
+(function(){
+  var btn = document.getElementById('navLoginBtn');
+  if (!btn) return;
+  if (localStorage.getItem('zenan_session')) {
+    btn.textContent = 'My Account'; btn.href = 'admin.html';
+  } else if (sessionStorage.getItem('zenan_client_session')) {
+    btn.textContent = 'My Account'; btn.href = 'client-portal.html';
+  }
+})();
+</script>
+</nav>
+<div style="position:fixed;top:84px;right:20px;z-index:199;display:flex;flex-direction:column;gap:8px;">
+  <div class="pour-wrap">
+    <button onclick="pourBeer()" style="padding:0;border:none;background:none;cursor:pointer;transition:transform .2s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img src="brand_assets/Beer screen icon.png" style="height:30px;width:auto;display:block;"></button>
+    <span class="pour-tip">Pour yourself a cold one ✦</span>
+  </div>
+  <div class="pour-wrap">
+    <button onclick="pourWine()" style="padding:0;border:none;background:none;cursor:pointer;transition:transform .2s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img src="brand_assets/Wine screen icon.png" style="height:30px;width:auto;display:block;"></button>
+    <span class="pour-tip">A glass of something fine ✦</span>
+  </div>
+</div>
+
+<main>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-img"></div>
+  <div class="hero-content reveal parallax-slow" data-parallax="0.18">
+    <h1>About <span class="grad-text">Zenan Glass</span></h1>
+    <p>We've been helping businesses make a lasting impression through custom glass products and branded merchandise for over a decade.</p>
+    <a href="gallery.html" class="btn-primary" style="margin-top:28px;display:inline-block;">See Our Gallery ›</a>
+  </div>
+</section>
+
+<!-- STORY -->
+<section class="story">
+  <div class="story-inner">
+    <div class="story-text reveal-left">
+      <div class="story-label">Our Story</div>
+      <div class="story-title">Built on Quality<br>and Trust</div>
+      <p>Zenan Glass was founded with a simple idea: that every brand deserves premium products that truly represent who they are. What started as a small custom glassware operation has grown into a full-service branded merchandise company serving clients across Canada and the United States.</p>
+      <p>Over the years we've developed deep expertise in custom etching, printing, embroidery, and sourcing. Our team understands that when you put your logo on something, it reflects your company's standards — so we hold ours to the highest level.</p>
+      <p>From boutique wineries to Fortune 500 companies, we've helped hundreds of businesses create branded products they're proud of. We're small enough to give every client personal attention, and experienced enough to handle any scale of order.</p>
+    </div>
+    <div class="reveal-right parallax-slow" data-parallax="-0.06" style="display:flex;align-items:center;justify-content:center;">
+      <div style="position:relative;width:640px;height:490px;display:flex;align-items:center;justify-content:center;">
+        <img id="canadaMap" src="brand_assets/Canada map.webp" alt="Canada"
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transform:scale(0.08);pointer-events:none;transform-origin:center center;"/>
+        <div id="mapleLeaf" style="font-size:7rem;line-height:1;position:relative;z-index:1;filter:drop-shadow(0 6px 18px rgba(220,50,50,.3));">🍁</div>
+      </div>
+    </div>
+  </div>
+  <div class="stats-strip">
+    <div class="stats-grid">
+      <div class="stat-card reveal">
+        <div class="num" data-count="1500" data-suffix="+">0</div>
+        <div class="lbl">Clients Served</div>
+      </div>
+      <div class="stat-card reveal">
+        <div class="num" data-count="20" data-suffix="+">0</div>
+        <div class="lbl">Years in Business</div>
+      </div>
+      <div class="stat-card reveal">
+        <div class="num" data-count="98" data-suffix="%">0</div>
+        <div class="lbl">Satisfaction Rate</div>
+      </div>
+      <div class="stat-card reveal">
+        <div class="num" data-count="300" data-suffix="+">0</div>
+        <div class="lbl">Products</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">What We Do</div>
+    <div class="section-heading">Our Specialties</div>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal">
+      <h3 style="color:#E8365D;">UV Printing</h3>
+      <p>Ultra-vivid full-colour UV printing directly onto any surface. Sharp detail, fade-resistant, and works on virtually any material.</p>
+    </div>
+    <div class="service-card reveal">
+      <h3 style="color:#D4145A;">Screen Printing</h3>
+      <p>Classic, durable screen printing for high-volume orders. Bold ink coverage on apparel, bags, and promotional products.</p>
+    </div>
+    <div class="service-card reveal">
+      <h3 style="color:#F05E78;">Decal Printing</h3>
+      <p>Custom cut decals and stickers for branding, packaging, and product labelling. Waterproof and built to last.</p>
+    </div>
+    <div class="service-card reveal">
+      <h3 style="color:#C0134A;">Nucleation</h3>
+      <p>Laser-etched nucleation points in glassware for superior carbonation and a perfect pour — ideal for beer and sparkling beverage brands.</p>
+    </div>
+    <div class="service-card reveal">
+      <h3 style="color:#F2436A;">Embroidery</h3>
+      <p>Premium thread embroidery for uniforms, hats, bags, and apparel. Consistent stitch quality that holds up wash after wash.</p>
+    </div>
+    <div class="service-card reveal">
+      <h3 style="color:#B81048;">Custom Boxes</h3>
+      <p>Branded packaging and custom boxes designed to impress. Perfect for gifting, kitting, retail, and product launches.</p>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES -->
+<section class="values">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">What We Stand For</div>
+    <div class="section-heading">Our Core Values</div>
+  </div>
+  <div class="values-grid">
+    <div class="value-card reveal">
+      <span class="value-icon-art">
+        <!-- Precision: bold target -->
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="32" cy="32" r="28" fill="#EEF3FB" stroke="#1a3a8f" stroke-width="3.5"/>
+          <circle cx="32" cy="32" r="18" fill="#fff" stroke="#2558B0" stroke-width="3"/>
+          <circle cx="32" cy="32" r="8" fill="#2558B0"/>
+          <circle cx="32" cy="32" r="3" fill="#FFD600"/>
+          <line x1="32" y1="4" x2="32" y2="14" stroke="#FFD600" stroke-width="3.5" stroke-linecap="round"/>
+          <line x1="32" y1="50" x2="32" y2="60" stroke="#FFD600" stroke-width="3.5" stroke-linecap="round"/>
+          <line x1="4" y1="32" x2="14" y2="32" stroke="#FFD600" stroke-width="3.5" stroke-linecap="round"/>
+          <line x1="50" y1="32" x2="60" y2="32" stroke="#FFD600" stroke-width="3.5" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <h3>Precision</h3>
+      <p>Every detail matters. We verify proofs, check production quality, and don't ship anything we wouldn't be proud to put our own name on.</p>
+    </div>
+    <div class="value-card reveal">
+      <span class="value-icon-art">
+        <!-- Partnership: bold handshake -->
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="32" cy="32" r="30" fill="#EEF3FB"/>
+          <path d="M10 34 C14 28, 20 26, 26 30 L32 35 C35 37, 38 37, 40 35 L54 26" stroke="#2558B0" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M10 30 L18 38 C22 42, 28 42, 32 38 L40 30" stroke="#1a3a8f" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+          <circle cx="18" cy="22" r="7" fill="#2558B0" stroke="#1a3a8f" stroke-width="2.5"/>
+          <circle cx="46" cy="22" r="7" fill="#2558B0" stroke="#1a3a8f" stroke-width="2.5"/>
+          <path d="M15 22 C15 18, 21 18, 21 22" stroke="#FFD600" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M43 22 C43 18, 49 18, 49 22" stroke="#FFD600" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="32" cy="44" r="5" fill="#FFD600" stroke="#1a3a8f" stroke-width="2"/>
+        </svg>
+      </span>
+      <h3>Partnership</h3>
+      <p>We treat every client like a long-term partner, not a transaction. We're invested in your success and work to earn your repeat business.</p>
+    </div>
+    <div class="value-card reveal">
+      <span class="value-icon-art">
+        <!-- Transparency: crystal diamond -->
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="32" cy="32" r="30" fill="#EEF3FB"/>
+          <polygon points="32,10 52,26 32,54 12,26" fill="#dbeafe" stroke="#2558B0" stroke-width="3" stroke-linejoin="round"/>
+          <polygon points="32,10 52,26 32,26 12,26" fill="#FFD600" stroke="#1a3a8f" stroke-width="2.5" stroke-linejoin="round"/>
+          <line x1="12" y1="26" x2="52" y2="26" stroke="#1a3a8f" stroke-width="2.5"/>
+          <line x1="32" y1="10" x2="32" y2="26" stroke="#1a3a8f" stroke-width="2" stroke-dasharray="3,2"/>
+        </svg>
+      </span>
+      <h3>Transparency</h3>
+      <p>Clear pricing, honest timelines, and no surprises. You'll always know where your order stands and exactly what you're getting.</p>
+    </div>
+    <div class="value-card reveal">
+      <span class="value-icon-art">
+        <!-- Reliability: bold shield with check -->
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="32" cy="32" r="30" fill="#EEF3FB"/>
+          <path d="M32 10 L50 18 L50 34 C50 44 32 54 32 54 C32 54 14 44 14 34 L14 18 Z" fill="#FFD600" stroke="#1a3a8f" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M32 13 L48 20 L48 34 C48 43 32 52 32 52 C32 52 16 43 16 34 L16 20 Z" fill="#2558B0"/>
+          <polyline points="23,33 29,40 41,26" stroke="#FFD600" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <h3>Reliability</h3>
+      <p>We understand that deadlines matter. Our production and fulfillment process is built around getting your order to you on time, every time.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">The People Behind Zenan</div>
+    <div class="section-heading">Meet Our Team</div>
+    <p style="color:var(--muted);margin-top:12px;font-size:.98rem;">A small, dedicated group of specialists who care about getting your order right.</p>
+  </div>
+  <div class="team-grid">
+    <div class="team-card reveal">
+      <div class="team-avatar"><img src="https://api.dicebear.com/9.x/notionists/svg?seed=DanielMercer77&backgroundColor=dbeafe" alt="Founder" /></div>
+      <h3>Daniel Mercer</h3>
+      <div class="role">Founder &amp; CEO</div>
+      <p>Over 15 years of experience in branded merchandise and custom manufacturing. Leads client strategy and key accounts.</p>
+    </div>
+    <div class="team-card reveal">
+      <div class="team-avatar"><img src="https://api.dicebear.com/9.x/notionists/svg?seed=MarcusHolloway42&backgroundColor=e0e7ff" alt="Head of Production" /></div>
+      <h3>Marcus Holloway</h3>
+      <div class="role">Head of Production</div>
+      <p>Oversees all production quality and supplier relationships. Ensures every order meets Zenan's exacting standards.</p>
+    </div>
+    <div class="team-card reveal">
+      <div class="team-avatar"><img src="https://api.dicebear.com/9.x/notionists/svg?seed=SophieRaines19&backgroundColor=fce7f3" alt="Client Success" /></div>
+      <h3>Sophie Raines</h3>
+      <div class="role">Client Success Manager</div>
+      <p>Your main point of contact from inquiry through delivery. Committed to making every project seamless.</p>
+    </div>
+    <div class="team-card reveal">
+      <div class="team-avatar"><img src="https://api.dicebear.com/9.x/notionists/svg?seed=LucaFerreira88&backgroundColor=d1fae5" alt="Creative Lead" /></div>
+      <h3>Luca Ferreira</h3>
+      <div class="role">Creative &amp; Design Lead</div>
+      <p>Handles artwork, proofs, and brand adaptation. Ensures your logo looks perfect on every product type.</p>
+    </div>
+    <div class="team-card reveal">
+      <div class="team-avatar"><img src="https://api.dicebear.com/9.x/notionists/svg?seed=JordanVance55&backgroundColor=fef3c7" alt="Sales" /></div>
+      <h3>Jordan Vance</h3>
+      <div class="role">Sales &amp; Business Development</div>
+      <p>Grows client relationships and identifies new opportunities. Passionate about connecting businesses with the right products.</p>
+    </div>
+    <div class="team-card reveal">
+      <div class="team-avatar"><img src="https://api.dicebear.com/9.x/notionists/svg?seed=PriyaNair33&backgroundColor=ede9fe" alt="Logistics" /></div>
+      <h3>Priya Nair</h3>
+      <div class="role">Logistics &amp; Fulfillment</div>
+      <p>Coordinates shipping, customs, and delivery timelines. Keeps every order moving efficiently from production to your door.</p>
+    </div>
+    <div class="team-card reveal">
+      <div class="team-avatar"><img src="https://api.dicebear.com/9.x/notionists/svg?seed=OwenBrandt61&backgroundColor=e0f2fe" alt="Quality Assurance" /></div>
+      <h3>Owen Brandt</h3>
+      <div class="role">Quality Assurance</div>
+      <p>Conducts final inspections and maintains production standards. No order ships without passing a thorough quality check.</p>
+    </div>
+    <div class="team-card reveal">
+      <div class="team-avatar"><img src="https://api.dicebear.com/9.x/notionists/svg?seed=NatalieCho27&backgroundColor=fce7f3" alt="Procurement" /></div>
+      <h3>Natalie Cho</h3>
+      <div class="role">Procurement &amp; Sourcing</div>
+      <p>Sources materials and manages supplier partnerships. Finds the best products at the right price without compromising quality.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-band">
+  <h2 class="reveal">Ready to Work Together?</h2>
+  <p class="reveal">Browse our products and submit an inquiry — we'd love to help with your next project.</p>
+  <a href="products.html" class="btn-primary reveal">See Our Products ›</a>
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo">
+        <img src="brand_assets/Zenan logo.png" alt="Zenan Glass" />
+      </a>
+      <p>Premium custom glass products and branded merchandise for businesses across North America.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col footer-contact">
+      <h4>Contact Us</h4>
+      <ul>
+        <li><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> 430 Flint Road, Toronto, ON M3J 2J4</li>
+        <li><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.06 6.06l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17z"/></svg></span> <a href="tel:4163587247">416-358-7247</a></li>
+        <li><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13 17"/><polyline points="22 7 13 7"/><polyline points="2 17 9 12 2 7"/><rect x="2" y="7" width="2" height="10" rx="1"/></svg></span> Fax: 416-736-8085</li>
+        <li><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span> <a href="mailto:luc@test">luc@test</a></li>
+        <li><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> Mon–Fri 8am–5pm</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Zenan Glass. All rights reserved.</span>
+    <span>Made with care in Canada 🍁</span>
+  </div>
+</footer>
+
+<style>
+  /* ══ CARD TEXT FIX ══
+     backdrop-filter creates a stacking context; ::after overlay (even at opacity:0 with transition)
+     gets its own compositing layer that sits ABOVE normal-flow children.
+     Fix: remove ::after entirely from cards; use ::before only for specular shine at z-index 0;
+     force all direct children to position:relative; z-index:1 so they clear the shine layer. */
+
+  /* Section headers must sit ABOVE backdrop-filter cards (which create new stacking contexts) */
+  .section-header {
+    position: relative !important;
+    z-index: 10 !important;
+  }
+
+  /* Kill the ::after overlays that hide text */
+  .service-card::after,
+  .value-card::after,
+  .value-card[data-glow]::after,
+  .team-card::after { display: none !important; }
+
+  /* ── FULLY TRANSPARENT GLASS ──
+     No fill at all — pure backdrop-filter lens. The canvas animation
+     shows through completely; only the border and specular highlight
+     define the card boundary. */
+  .team-card {
+    background: rgba(255,255,255,.30) !important;
+    backdrop-filter: blur(28px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+    border: 1px solid rgba(255,255,255,.38) !important;
+    overflow: visible !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.7),
+      0 4px 24px rgba(37,88,176,.05) !important;
+    transition: box-shadow .4s, transform .4s !important;
+  }
+  .stat-card, .value-card, .service-card {
+    background: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .stat-card:hover, .value-card:hover, .service-card:hover { box-shadow: none !important; }
+  .team-card:hover {
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.85),
+      0 16px 44px rgba(37,88,176,.09),
+      0 2px 8px rgba(37,88,176,.05) !important;
+  }
+
+  /* Top specular highlight only */
+  .team-card::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important; left: 0 !important; right: 0 !important; height: 38% !important;
+    background: linear-gradient(180deg,
+      rgba(255,255,255,.18) 0%,
+      rgba(255,255,255,0) 100%) !important;
+    border-radius: inherit !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+
+  /* All direct children float above the shine */
+  .stat-card > *,
+  .service-card > *,
+  .value-card > *,
+  .team-card > * {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  /* Readable text on the blended surface */
+  .value-card h3,
+  .team-card h3 { color: #0f172a !important; }
+
+  .service-card p,
+  .value-card p,
+  .team-card p { color: #334155 !important; }
+
+  .stat-card .lbl { color: #475569 !important; }
+
+  /* Location grid responsive */
+  @media (max-width: 768px) {
+    .location > div > div[style*="grid-template-columns"] {
+      display: block !important;
+    }
+    .location > div > div > div:first-child { min-height: 280px !important; margin-bottom: 24px; }
+  }
+</style>
+
+<script>
+  // ── Nav toggle
+  function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
+  document.querySelectorAll('.nav-links a').forEach(a =>
+    a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'))
+  );
+
+  // ══════════════════════════════════════════════
+// ── CANVAS BACKGROUND ──
+  (function () {
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, frame = 0;
+    let mouse = { x: .5, y: .5 }, targetMouse = { x: .5, y: .5 };
+    window.addEventListener('mousemove', e => { targetMouse.x = e.clientX/window.innerWidth; targetMouse.y = e.clientY/window.innerHeight; });
+    // Click ripples
+    const ripples = [];
+    window.addEventListener('click', e => { ripples.push({ x: e.clientX, y: e.clientY, r: 0, alpha: .35, hue: 200 + Math.random()*30 }); });
+
+    const orbs = [
+      { x:.15, y:.1,  r:.32, hue:210, speed:.00018, phase:0,   gold:false, depth:1   },
+      { x:.72, y:.25, r:.26, hue:195, speed:.00022, phase:1.8, gold:false, depth:.7  },
+      { x:.45, y:.6,  r:.36, hue:220, speed:.00015, phase:3.4, gold:false, depth:1.2 },
+      { x:.85, y:.7,  r:.24, hue:200, speed:.0002,  phase:0.9, gold:false, depth:.8  },
+      { x:.3,  y:.85, r:.28, hue:185, speed:.00017, phase:2.3, gold:false, depth:1   },
+      { x:.6,  y:.4,  r:.22, hue:230, speed:.00025, phase:4.1, gold:false, depth:.6  },
+      { x:.9,  y:.35, r:.20, hue:205, speed:.00019, phase:1.1, gold:false, depth:.9  },
+      { x:.2,  y:.55, r:.18, hue:215, speed:.00021, phase:2.7, gold:false, depth:1.1 },
+      { x:.5,  y:.15, r:.15, hue:190, speed:.00023, phase:0.4, gold:false, depth:.75 },
+    ];
+    const beams = [
+      { x:.25, y:.2,  angle:-.38, spread:.70, speed:.00105, phase:0,   hue:210, alpha:.18  },
+      { x:.6,  y:.55, angle: .28, spread:.58, speed:.00082, phase:2.1, hue:198, alpha:.17  },
+      { x:.8,  y:.15, angle:-.55, spread:.65, speed:.00124, phase:1.2, hue:222, alpha:.16  },
+      { x:.1,  y:.75, angle: .48, spread:.60, speed:.00091, phase:3.5, hue:190, alpha:.18  },
+      { x:.5,  y:.9,  angle:-.22, spread:.82, speed:.00068, phase:0.7, hue:215, alpha:.15  },
+      { x:.7,  y:.4,  angle: .15, spread:.50, speed:.00100, phase:1.9, hue:175, alpha:.16  },
+      { x:.35, y:.5,  angle: .62, spread:.48, speed:.00115, phase:3.0, hue:195, alpha:.14  },
+      { x:.15, y:.3,  angle: .35, spread:.65, speed:.00077, phase:4.2, hue:240, alpha:.15  },
+      { x:.9,  y:.65, angle:-.42, spread:.72, speed:.00096, phase:1.5, hue:185, alpha:.14  },
+      { x:.42, y:.08, angle: .58, spread:.55, speed:.00110, phase:2.8, hue:230, alpha:.13  },
+      { x:.55, y:.72, angle:-.30, spread:.62, speed:.00088, phase:0.4, hue:260, alpha:.15  },
+      { x:.22, y:.88, angle: .44, spread:.54, speed:.00118, phase:1.7, hue:260, alpha:.14  },
+      { x:.78, y:.32, angle:-.18, spread:.68, speed:.00074, phase:3.3, hue:260, alpha:.16  },
+    ];
+    const facets = Array.from({ length: 85 }, () => ({
+      x: Math.random(), y: Math.random(),
+      s: 8 + Math.random() * 62,
+      sides: [3,4,6][Math.floor(Math.random()*3)],
+      rot: Math.random() * Math.PI * 2,
+      rspeed: (Math.random()-.5) * .006,
+      alpha: .045 + Math.random() * .13,
+      hue: [190,210,225,240,175,260][Math.floor(Math.random()*6)] + Math.random()*20,
+      drift: { x: (Math.random()-.5)*.00058, y: (Math.random()-.5)*.00048 },
+      depth: .5 + Math.random() * .8,
+    }));
+    const sparkles = Array.from({ length: 150 }, () => ({
+      x: Math.random(), y: Math.random(),
+      life: Math.random(), speed: .007 + Math.random() * .016,
+      size: .8 + Math.random() * 3.5,
+      hue: [200,215,175,240,260][Math.floor(Math.random()*5)] + Math.random()*20,
+      type: Math.floor(Math.random()*3),
+    }));
+    const auroras = [
+      { y:.08, amp:.06, freq:.0014, speed:.00026, hue:260, alpha:.17 },
+      { y:.22, amp:.07, freq:.0012, speed:.00025, hue:205, alpha:.20 },
+      { y:.40, amp:.06, freq:.0015, speed:.00031, hue:240, alpha:.18 },
+      { y:.58, amp:.08, freq:.001,  speed:.00021, hue:175, alpha:.17 },
+      { y:.72, amp:.05, freq:.0018, speed:.00035, hue:215, alpha:.16 },
+      { y:.84, amp:.06, freq:.0016, speed:.00028, hue:260, alpha:.15 },
+      { y:.95, amp:.04, freq:.0022, speed:.00027, hue:195, alpha:.14 },
+    ];
+    // Diagonal strips
+    const strips = [
+      { x1:.0,  y1:.10, x2:.55, y2:.0,  hue:260, a:.14, sp:.00020 },
+      { x1:.0,  y1:.15, x2:.60, y2:.0,  hue:210, a:.15, sp:.00020 },
+      { x1:.0,  y1:.35, x2:.85, y2:.0,  hue:240, a:.13, sp:.00026 },
+      { x1:.0,  y1:.50, x2:.90, y2:.08, hue:260, a:.14, sp:.00018 },
+      { x1:.0,  y1:.58, x2:1.0, y2:.12, hue:175, a:.14, sp:.00017 },
+      { x1:.0,  y1:.78, x2:1.0, y2:.35, hue:220, a:.12, sp:.00023 },
+      { x1:.12, y1:1.0, x2:.95, y2:.18, hue:260, a:.13, sp:.00021 },
+      { x1:.18, y1:1.0, x2:1.0, y2:.22, hue:195, a:.13, sp:.00028 },
+      { x1:.42, y1:1.0, x2:1.0, y2:.52, hue:230, a:.12, sp:.00022 },
+      { x1:.65, y1:1.0, x2:1.0, y2:.70, hue:205, a:.11, sp:.00024 },
+      { x1:.82, y1:1.0, x2:1.0, y2:.88, hue:260, a:.10, sp:.00019 },
+    ];
+
+    function drawDiagonalLines() {
+      strips.forEach((l,i) => {
+        const pulse = Math.sin(frame*l.sp*1000 + i*1.4)*.35+.65;
+        const x1=l.x1*W, y1=l.y1*H, x2=l.x2*W, y2=l.y2*H;
+        const g=ctx.createLinearGradient(x1,y1,x2,y2);
+        g.addColorStop(0,`hsla(${l.hue},92%,78%,0)`);
+        g.addColorStop(.28,`hsla(${l.hue},95%,82%,${l.a*pulse})`);
+        g.addColorStop(.5,`hsla(${l.hue},98%,88%,${l.a*pulse*1.6})`);
+        g.addColorStop(.72,`hsla(${l.hue},95%,82%,${l.a*pulse})`);
+        g.addColorStop(1,`hsla(${l.hue},92%,78%,0)`);
+        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+        ctx.strokeStyle=g; ctx.lineWidth=3.2; ctx.stroke();
+        const ox=(y2-y1)/Math.sqrt((x2-x1)**2+(y2-y1)**2)*10;
+        const oy=-(x2-x1)/Math.sqrt((x2-x1)**2+(y2-y1)**2)*10;
+        const g2=ctx.createLinearGradient(x1+ox,y1+oy,x2+ox,y2+oy);
+        g2.addColorStop(0,`hsla(${l.hue+20},88%,72%,0)`);
+        g2.addColorStop(.5,`hsla(${l.hue+20},90%,78%,${l.a*pulse*.55})`);
+        g2.addColorStop(1,`hsla(${l.hue+20},88%,72%,0)`);
+        ctx.beginPath(); ctx.moveTo(x1+ox,y1+oy); ctx.lineTo(x2+ox,y2+oy);
+        ctx.strokeStyle=g2; ctx.lineWidth=1.2; ctx.stroke();
+      });
+    }
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+
+    function drawAurora(a) {
+      const t = frame * a.speed;
+      ctx.beginPath();
+      ctx.moveTo(0, a.y * H);
+      for(let x=0; x<=W; x+=8){
+        const y = (a.y + Math.sin(x*a.freq + t)*a.amp + Math.sin(x*a.freq*.6 + t*1.4)*a.amp*.5)*H;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+      const g = ctx.createLinearGradient(0,a.y*H-60,0,a.y*H+60);
+      g.addColorStop(0,`hsla(${a.hue},75%,80%,0)`);
+      g.addColorStop(.5,`hsla(${a.hue},80%,82%,${a.alpha})`);
+      g.addColorStop(1,`hsla(${a.hue},75%,80%,0)`);
+      ctx.fillStyle = g; ctx.fill();
+    }
+    function drawOrb(o) {
+      const t = frame*o.speed+o.phase;
+      const mx = (mouse.x-.5)*o.depth*.055, my = (mouse.y-.5)*o.depth*.055;
+      const cx = (o.x + Math.sin(t)*.09 + mx)*W;
+      const cy = (o.y + Math.cos(t*1.3)*.07 + my)*H;
+      const rad = o.r*Math.min(W,H);
+      const g = ctx.createRadialGradient(cx-rad*.2,cy-rad*.2,0, cx,cy,rad);
+      g.addColorStop(0,`hsla(${o.hue},75%,82%,.16)`);
+      g.addColorStop(.4,`hsla(${o.hue},70%,83%,.08)`);
+      g.addColorStop(.75,`hsla(${o.hue},65%,86%,.03)`);
+      g.addColorStop(1,`hsla(${o.hue},60%,88%,0)`);
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.fill();
+      const hg = ctx.createRadialGradient(cx-rad*.3,cy-rad*.3,0,cx-rad*.3,cy-rad*.3,rad*.45);
+      hg.addColorStop(0,`rgba(255,255,255,.07)`); hg.addColorStop(1,`rgba(255,255,255,0)`);
+      ctx.fillStyle=hg; ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.fill();
+    }
+    function drawBeam(b) {
+      const t=frame*b.speed+b.phase;
+      const mx=(mouse.x-.5)*.04, my=(mouse.y-.5)*.04;
+      const cx=(b.x+Math.sin(t*.7)*.08+mx)*W, cy=(b.y+Math.cos(t*.5)*.06+my)*H;
+      const angle=b.angle+Math.sin(t)*.14, len=b.spread*W*1.8;
+      ctx.save(); ctx.translate(cx,cy); ctx.rotate(angle);
+      const bw=60+Math.sin(t*1.3)*26;
+      const g=ctx.createLinearGradient(-len/2,0,len/2,0);
+      g.addColorStop(0,`hsla(${b.hue},80%,78%,0)`);
+      g.addColorStop(.2,`hsla(${b.hue},82%,80%,${b.alpha*.6})`);
+      g.addColorStop(.5,`hsla(${b.hue},88%,85%,${b.alpha*1.8})`);
+      g.addColorStop(.8,`hsla(${b.hue},82%,80%,${b.alpha*.6})`);
+      g.addColorStop(1,`hsla(${b.hue},80%,78%,0)`);
+      ctx.fillStyle=g; ctx.fillRect(-len/2,-bw/2,len,bw); ctx.restore();
+    }
+    function drawFacet(f) {
+      f.rot+=f.rspeed; f.x+=f.drift.x; f.y+=f.drift.y;
+      if(f.x<-.05)f.x=1.05; if(f.x>1.05)f.x=-.05;
+      if(f.y<-.05)f.y=1.05; if(f.y>1.05)f.y=-.05;
+      const mx=(mouse.x-.5)*f.depth*.025, my=(mouse.y-.5)*f.depth*.025;
+      ctx.save(); ctx.translate((f.x+mx)*W, (f.y+my)*H); ctx.rotate(f.rot);
+      ctx.beginPath();
+      for(let i=0;i<f.sides;i++){
+        const a=(i/f.sides)*Math.PI*2-(f.sides===6?0:Math.PI/2);
+        const r=f.s*(.62+.38*Math.abs(Math.cos(a*(f.sides===3?1.5:2))));
+        i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+      }
+      ctx.closePath();
+      const g=ctx.createLinearGradient(-f.s,-f.s,f.s,f.s);
+      g.addColorStop(0,`hsla(${f.hue},82%,94%,${f.alpha*2})`);
+      g.addColorStop(.45,`hsla(${f.hue},74%,90%,${f.alpha})`);
+      g.addColorStop(1,`hsla(${f.hue},68%,86%,${f.alpha*.3})`);
+      ctx.fillStyle=g; ctx.fill();
+      ctx.strokeStyle=`hsla(${f.hue},65%,78%,${f.alpha*.85})`; ctx.lineWidth=.8; ctx.stroke();
+      ctx.beginPath();
+      for(let i=0;i<f.sides;i++){
+        const a=(i/f.sides)*Math.PI*2-(f.sides===6?0:Math.PI/2);
+        const r=f.s*.4*(.62+.38*Math.abs(Math.cos(a*(f.sides===3?1.5:2))));
+        i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+      }
+      ctx.closePath();
+      ctx.strokeStyle=`rgba(255,255,255,${f.alpha*1.2})`; ctx.lineWidth=.5; ctx.stroke();
+      ctx.restore();
+    }
+    function drawMesh() {
+      const pts = facets.map(f=>({x:f.x*W,y:f.y*H,hue:f.hue,alpha:f.alpha}));
+      for(let i=0;i<pts.length;i++){
+        for(let j=i+1;j<pts.length;j++){
+          const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
+          if(d<180){
+            const a = .055*(1-d/180);
+            const g=ctx.createLinearGradient(pts[i].x,pts[i].y,pts[j].x,pts[j].y);
+            g.addColorStop(0,`hsla(${pts[i].hue},65%,75%,${a})`);
+            g.addColorStop(1,`hsla(${pts[j].hue},65%,75%,${a})`);
+            ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
+            ctx.strokeStyle=g; ctx.lineWidth=.6; ctx.stroke();
+          }
+        }
+      }
+    }
+    function drawSparkle(s) {
+      s.life += s.speed;
+      if(s.life>1){ s.life=0; s.x=Math.random(); s.y=Math.random(); }
+      const a = Math.sin(s.life*Math.PI);
+      const px=s.x*W, py=s.y*H;
+      ctx.save(); ctx.globalAlpha = a*.65;
+      if(s.type===0){
+        ctx.fillStyle=`hsla(${s.hue},82%,88%,1)`;
+        ctx.beginPath(); ctx.arc(px,py,s.size*a,0,Math.PI*2); ctx.fill();
+      } else if(s.type===1){
+        ctx.strokeStyle=`hsla(${s.hue},78%,84%,1)`; ctx.lineWidth=.7;
+        const sz=s.size*3*a;
+        ctx.beginPath(); ctx.moveTo(px-sz,py); ctx.lineTo(px+sz,py); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px,py-sz); ctx.lineTo(px,py+sz); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px-sz*.7,py-sz*.7); ctx.lineTo(px+sz*.7,py+sz*.7); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px+sz*.7,py-sz*.7); ctx.lineTo(px-sz*.7,py+sz*.7); ctx.stroke();
+      } else {
+        ctx.fillStyle=`hsla(${s.hue},85%,90%,1)`;
+        const sz=s.size*2.5*a;
+        ctx.beginPath(); ctx.moveTo(px,py-sz); ctx.lineTo(px+sz*.6,py); ctx.lineTo(px,py+sz); ctx.lineTo(px-sz*.6,py); ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+    }
+    function drawRipples() {
+      for(let i=ripples.length-1;i>=0;i--){
+        const r=ripples[i];
+        r.r += 4; r.alpha -= .008;
+        if(r.alpha<=0){ ripples.splice(i,1); continue; }
+        ctx.beginPath(); ctx.arc(r.x,r.y,r.r,0,Math.PI*2);
+        ctx.strokeStyle=`hsla(${r.hue},70%,75%,${r.alpha})`; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(r.x,r.y,r.r*.6,0,Math.PI*2);
+        ctx.strokeStyle=`hsla(${r.hue},75%,80%,${r.alpha*.6})`; ctx.lineWidth=.8; ctx.stroke();
+      }
+    }
+    function draw() {
+      frame++;
+      mouse.x += (targetMouse.x - mouse.x) * .04;
+      mouse.y += (targetMouse.y - mouse.y) * .04;
+      ctx.clearRect(0,0,W,H);
+      const bx = W*(0.5 + (mouse.x-.5)*.15), by = H*(0.4 + (mouse.y-.5)*.1);
+      const base = ctx.createRadialGradient(bx, by*.6, 0, W*.5, H*.5, Math.max(W,H)*.92);
+      base.addColorStop(0,'rgba(215,235,255,1)');
+      base.addColorStop(.22,'rgba(192,220,255,1)');
+      base.addColorStop(.45,'rgba(158,200,252,1)');
+      base.addColorStop(.65,'rgba(118,170,240,1)');
+      base.addColorStop(.82,'rgba(78,132,225,1)');
+      base.addColorStop(.92,'rgba(50,95,200,1)');
+      base.addColorStop(1,'rgba(32,65,170,1)');
+      ctx.fillStyle=base; ctx.fillRect(0,0,W,H);
+
+      // Corner navy vignette
+      const vig = ctx.createRadialGradient(W*.5,H*.5,Math.min(W,H)*.2, W*.5,H*.5,Math.max(W,H)*.85);
+      vig.addColorStop(0,'rgba(10,30,80,0)');
+      vig.addColorStop(.50,'rgba(10,30,80,.08)');
+      vig.addColorStop(.78,'rgba(8,22,70,.22)');
+      vig.addColorStop(1,'rgba(4,12,50,.38)');
+      ctx.fillStyle=vig; ctx.fillRect(0,0,W,H);
+
+      auroras.forEach(drawAurora);
+      drawDiagonalLines();
+      drawMesh();
+      orbs.forEach(drawOrb);
+      beams.forEach(drawBeam);
+      facets.forEach(drawFacet);
+      sparkles.forEach(drawSparkle);
+      drawRipples();
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  // ══════════════════════════════════════════════
+  // PARALLAX — scroll-driven transforms
+  // ══════════════════════════════════════════════
+  const parallaxEls = document.querySelectorAll('[data-parallax]');
+
+  function applyParallax() {
+    const sy = window.scrollY;
+    parallaxEls.forEach(el => {
+      const speed  = parseFloat(el.dataset.parallax) || 0;
+      const offset = sy * speed;
+      // Only move if the element has .in (was revealed) or is the hero
+      el.style.transform = `translateY(${offset}px)`;
+    });
+  }
+  window.addEventListener('scroll', applyParallax, { passive: true });
+
+  // ══════════════════════════════════════════════
+  // SCROLL REVEAL
+  // ══════════════════════════════════════════════
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const delay = +entry.target.dataset.delay || 0;
+      setTimeout(() => entry.target.classList.add('in'), delay);
+      revealObs.unobserve(entry.target);
+    });
+  }, { threshold: 0.08 });
+
+  // Stagger grids
+  document.querySelectorAll('.values-grid .value-card, .team-grid .team-card, .stats-grid .stat-card, .services-grid .service-card')
+    .forEach((el, i) => { el.dataset.delay = (i % 4) * 90; });
+
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => revealObs.observe(el));
+
+  // ══════════════════════════════════════════════
+  // COUNTER ANIMATION
+  // ══════════════════════════════════════════════
+  function animateCount(el) {
+    const target = +el.dataset.count, suffix = el.dataset.suffix || '';
+    const dur = 1800, start = performance.now();
+    (function step(now) {
+      const p = Math.min((now - start) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(eased * target) + suffix;
+      if (p < 1) requestAnimationFrame(step);
+    })(start);
+  }
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.querySelectorAll('.stat-card').forEach(card => card.classList.add('counted'));
+      e.target.querySelectorAll('[data-count]').forEach(animateCount);
+    });
+  }, { threshold: 0.3 }).observe(document.querySelector('.stats-strip'));
+
+  // ── DRINK EASTER EGGS ──
+  function pourDrink(cfg) {
+    const bc = document.createElement('canvas');
+    bc.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:9999;cursor:pointer;';
+    document.body.appendChild(bc);
+    const cx = bc.getContext('2d');
+    let W = bc.width = window.innerWidth, H = bc.height = window.innerHeight;
+    window.addEventListener('resize', () => { W = bc.width = window.innerWidth; H = bc.height = window.innerHeight; });
+    let fillLevel = 0, draining = false, startTime = null, drainStart = null;
+    const bubbles = [];
+    const foam = cfg.foam ? Array.from({length: 80}, () => ({
+      x: Math.random() * 2, r: 6 + Math.random() * 22, wobble: Math.random() * Math.PI * 2,
+    })) : [];
+    function addBubble() {
+      if (fillLevel < 0.04) return;
+      bubbles.push({ x: Math.random() * W, y: H - Math.random() * H * fillLevel * 0.9,
+        r: 1.5 + Math.random() * (cfg.bubbleSize || 3.5), speed: 0.6 + Math.random() * 1.8, alpha: 0.35 + Math.random() * 0.4 });
+    }
+    function draw(ts) {
+      if (!startTime) startTime = ts;
+      if (!draining) {
+        fillLevel = Math.min((ts - startTime) / 3200, 1);
+        fillLevel = 1 - Math.pow(1 - fillLevel, 2.4);
+      } else {
+        if (!drainStart) drainStart = ts;
+        fillLevel = Math.max(1 - (ts - drainStart) / 1800, 0);
+        if (fillLevel <= 0) { document.body.removeChild(bc); return; }
+      }
+      cx.clearRect(0, 0, W, H);
+      const top = H * (1 - fillLevel);
+      const g = cx.createLinearGradient(0, top, W, H);
+      cfg.gradient.forEach(([stop, color]) => g.addColorStop(stop, color));
+      cx.fillStyle = g; cx.fillRect(0, top, W, H);
+      cx.beginPath(); cx.moveTo(0, top);
+      for (let x = 0; x <= W; x += 6) {
+        const y = top + Math.sin(x / 90 + ts / 400) * 5 + Math.sin(x / 40 + ts / 250) * 3;
+        cx.lineTo(x, y);
+      }
+      cx.lineTo(W, H); cx.lineTo(0, H); cx.closePath();
+      cx.fillStyle = cfg.surfaceColor; cx.fill();
+      foam.forEach((f, i) => {
+        const fx = (f.x + i * 0.37 + ts * 0.00008) % 1.2 * W - W * 0.1;
+        const fy = top - f.r * 0.6 + Math.sin(f.wobble + ts / 600) * 4;
+        cx.beginPath(); cx.arc(fx, fy, f.r * Math.min(fillLevel * 3, 1), 0, Math.PI * 2);
+        cx.fillStyle = 'rgba(255,252,242,.92)'; cx.fill();
+        cx.strokeStyle = 'rgba(220,200,170,.35)'; cx.lineWidth = 1; cx.stroke();
+      });
+      if (Math.random() < (cfg.bubbleRate || 0.4) && !draining) addBubble();
+      for (let i = bubbles.length - 1; i >= 0; i--) {
+        const b = bubbles[i]; b.y -= b.speed;
+        if (b.y < top) { bubbles.splice(i, 1); continue; }
+        cx.beginPath(); cx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        cx.strokeStyle = `rgba(${cfg.bubbleColor},${b.alpha})`; cx.lineWidth = 1; cx.stroke();
+      }
+      if (fillLevel > 0.45 && !draining) {
+        const ta = Math.min((fillLevel - 0.45) / 0.2, 1);
+        cx.globalAlpha = ta; cx.fillStyle = '#fff';
+        cx.font = `bold ${Math.round(W * 0.06)}px -apple-system, sans-serif`;
+        cx.textAlign = 'center'; cx.textBaseline = 'middle';
+        cx.shadowColor = 'rgba(0,0,0,.18)'; cx.shadowBlur = 12;
+        cx.fillText(cfg.text, W / 2, H / 2 - 24);
+        cx.font = `${Math.round(W * 0.022)}px -apple-system, sans-serif`;
+        cx.globalAlpha = 1; cx.shadowBlur = 0;
+      }
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+    bc.addEventListener('click', () => { draining = true; });
+  }
+  function pourBeer() {
+    pourDrink({ gradient: [[0,'rgba(234,158,12,.50)'],[0.4,'rgba(210,130,8,.50)'],[1,'rgba(170,90,4,.50)']],
+      surfaceColor: 'rgba(240,165,20,.50)', foam: true, bubbleColor: '255,215,80', bubbleRate: 0.4, text: 'Cheers! 🍺' });
+  }
+  function pourWine() {
+    pourDrink({ gradient: [[0,'rgba(140,20,60,.50)'],[0.4,'rgba(110,10,40,.50)'],[1,'rgba(70,5,20,.50)']],
+      surfaceColor: 'rgba(160,30,70,.50)', foam: false, bubbleColor: '200,80,120', bubbleRate: 0.08, text: 'Santé! 🍷' });
+  }
+
+  // ── MAP REVEAL ANIMATION ──
+  const mapEl  = document.getElementById('canadaMap');
+  const leafEl = document.getElementById('mapleLeaf');
+  if (mapEl) {
+    new IntersectionObserver((entries, obs) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        // Leaf pulses first, then map expands from behind it
+        leafEl.classList.add('leaf-pulse');
+        setTimeout(() => {
+          mapEl.classList.add('map-revealed');
+        }, 300);
+        obs.unobserve(e.target);
+      });
+    }, { threshold: 0.4 }).observe(mapEl.parentElement);
+  }
+</script>
+</body>
+</html>

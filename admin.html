@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Zenan Glass</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scrollbar-width: thin; scrollbar-color: rgba(37,88,176,.3) transparent; }
+    html::-webkit-scrollbar { width: 4px; }
+    html::-webkit-scrollbar-track { background: transparent; }
+    html::-webkit-scrollbar-thumb { background: rgba(37,88,176,.25); border-radius: 10px; }
+    html::-webkit-scrollbar-thumb:hover { background: rgba(37,88,176,.45); }
+    :root {
+      --blue: #2558B0; --blue-d: #1a4490; --blue-l: #3a6ec8; --blue-bg: #eef3fb; --blue-bg2: #dce8f8;
+      --dark: #0f1e36; --body: #2d3d52; --muted: #6b7a90;
+      --white: #ffffff; --off: #f5f7fa; --off2: #eef0f4; --border: #dde3ed;
+      --radius: 10px; --sidebar: 280px; --header: 60px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --shadow: 0 2px 12px rgba(15,30,54,.08); --shadow-md: 0 6px 24px rgba(15,30,54,.12);
+    }
+    html, body { height: 100%; font-family: var(--font); color: var(--body); background: var(--white); }
+
+    /* ── HEADER ── */
+    .admin-header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      height: var(--header); background: var(--dark);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    }
+    .h-left { display: flex; align-items: center; gap: 14px; }
+    .h-logo { background: var(--white); padding: 5px 12px; border-radius: 7px; display: flex; }
+    .h-logo img { height: 28px; width: auto; display: block; }
+    .h-title { color: rgba(255,255,255,.75); font-size: .88rem; font-weight: 600; }
+    .h-right { display: flex; align-items: center; gap: 10px; }
+    .h-btn {
+      padding: 7px 14px; border-radius: 7px; font-size: .82rem; font-weight: 600; font-family: var(--font);
+      cursor: pointer; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
+      transition: background .2s, color .2s;
+    }
+    .h-btn-ghost { background: rgba(255,255,255,.1); color: rgba(255,255,255,.80); }
+    .h-btn-ghost:hover { background: rgba(255,255,255,.18); color: var(--white); }
+    .h-btn-danger { background: rgba(220,38,38,.15); color: #fca5a5; }
+    .h-btn-danger:hover { background: rgba(220,38,38,.28); color: #fca5a5; }
+    .h-user { font-size: .82rem; color: rgba(255,255,255,.55); }
+
+    /* ── LAYOUT ── */
+    .layout { display: flex; min-height: 100vh; padding-top: var(--header); }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar); min-width: var(--sidebar);
+      background: var(--white); border-right: 1px solid var(--border);
+      position: fixed; top: var(--header); bottom: 0; left: 0;
+      overflow-y: auto; display: flex; flex-direction: column; gap: 0;
+    }
+    .s-section { padding: 18px 16px; border-bottom: 1px solid var(--border); }
+    .s-title { font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
+
+    /* Upload */
+    #fileInput { display: none; }
+    .upload-btn {
+      width: 100%; padding: 10px; border-radius: 8px;
+      background: var(--blue); color: var(--white);
+      border: none; font-size: .88rem; font-weight: 700; font-family: var(--font);
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px;
+      transition: background .2s;
+    }
+    .upload-btn:hover { background: var(--blue-d); }
+    .upload-hint { font-size: .73rem; color: var(--muted); text-align: center; margin-top: 8px; }
+    .upload-progress { font-size: .78rem; color: var(--blue); margin-top: 8px; font-weight: 600; display: none; }
+
+    /* Add category */
+    .cat-input-row { display: flex; gap: 6px; margin-bottom: 10px; }
+    .cat-input-row input {
+      flex: 1; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 7px;
+      font-size: .85rem; font-family: var(--font); color: var(--dark); outline: none;
+      transition: border-color .2s;
+    }
+    .cat-input-row input:focus { border-color: var(--blue); }
+    .cat-add-btn {
+      padding: 8px 12px; background: var(--blue); color: var(--white);
+      border: none; border-radius: 7px; font-size: .82rem; font-weight: 700;
+      font-family: var(--font); cursor: pointer; white-space: nowrap;
+      transition: background .2s;
+    }
+    .cat-add-btn:hover { background: var(--blue-d); }
+
+    .color-swatches { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .swatch {
+      width: 22px; height: 22px; border-radius: 50%; cursor: pointer;
+      border: 2px solid transparent; transition: transform .15s, border-color .15s;
+      flex-shrink: 0;
+    }
+    .swatch:hover { transform: scale(1.15); }
+    .swatch.selected { border-color: var(--dark); transform: scale(1.15); }
+
+    /* Category list */
+    .cat-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+    .cat-chip {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px; border-radius: 8px;
+      background: var(--off); border: 1.5px solid var(--border);
+      cursor: grab; user-select: none;
+      transition: box-shadow .15s, transform .15s, border-color .15s;
+    }
+    .cat-chip:hover { box-shadow: var(--shadow); border-color: var(--border); transform: translateY(-1px); }
+    .cat-chip.dragging { opacity: .5; transform: scale(.96); }
+    .drag-handle { color: var(--muted); font-size: .9rem; cursor: grab; }
+    .chip-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .chip-name { font-size: .85rem; font-weight: 600; color: var(--dark); }
+    .chip-img-input { flex: 1; font-size: .75rem; border: 1px solid rgba(37,88,176,.18); border-radius: 6px; padding: 3px 7px; color: var(--dark); background: rgba(255,255,255,.7); min-width: 0; }
+    .chip-img-input::placeholder { color: var(--muted); }
+    .chip-count { font-size: .72rem; color: var(--muted); }
+    .chip-del {
+      width: 20px; height: 20px; border-radius: 50%; background: none; border: none;
+      color: var(--muted); font-size: .85rem; cursor: pointer; display: grid; place-items: center;
+      transition: background .15s, color .15s; flex-shrink: 0;
+    }
+    .chip-del:hover { background: #fee2e2; color: #dc2626; }
+    .cat-empty { font-size: .82rem; color: var(--muted); text-align: center; padding: 12px 0; }
+
+    /* ── MAIN ── */
+    .main { flex: 1; margin-left: var(--sidebar); padding: 24px; min-height: calc(100vh - var(--header)); }
+
+    .main-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; margin-bottom: 20px;
+    }
+    .main-stats { font-size: .85rem; color: var(--muted); }
+    .main-stats strong { color: var(--dark); }
+
+    .filter-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ftab {
+      padding: 5px 14px; border-radius: 20px; border: 1.5px solid var(--border);
+      background: var(--white); color: var(--muted); font-size: .8rem; font-weight: 500;
+      font-family: var(--font); cursor: pointer; transition: .2s;
+    }
+    .ftab:hover { border-color: var(--blue); color: var(--blue); }
+    .ftab.active { background: var(--blue); border-color: var(--blue); color: var(--white); font-weight: 700; }
+
+    /* ── IMAGE GRID ── */
+    .img-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      column-gap: 16px; row-gap: 0;
+    }
+    .img-row-divider {
+      grid-column: 1 / -1;
+      height: 1px; background: rgba(37,88,176,.12);
+      margin: 20px 0;
+    }
+
+    .img-card {
+      background: transparent; border: none; border-radius: var(--radius);
+      overflow: hidden; display: flex; flex-direction: column;
+      padding-bottom: 12px; padding-top: 4px;
+      transition: transform .2s; position: relative;
+    }
+    .img-card:hover { transform: translateY(-3px); }
+    .img-card.drag-over { outline: 2px dashed var(--blue); outline-offset: -2px; }
+    .img-card.hidden { display: none; }
+
+    .card-img-wrap {
+      aspect-ratio: 4/3; position: relative; overflow: hidden;
+      background: var(--white); cursor: pointer;
+    }
+    .card-img-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; transition: transform .3s; }
+    .card-img-wrap:hover img { transform: scale(1.04); }
+
+    /* Placeholder when no real image */
+    .card-placeholder {
+      width: 100%; height: 100%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 8px;
+      background: var(--white);
+    }
+    .card-placeholder .ph-emoji { font-size: 3rem; }
+    .card-placeholder .ph-label { font-size: .75rem; color: var(--muted); }
+
+    .drop-overlay {
+      position: absolute; inset: 0; background: rgba(37,88,176,.12);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .2s; pointer-events: none;
+      border: 2px dashed var(--blue); border-radius: 0;
+    }
+    .img-card.drag-over .drop-overlay { opacity: 1; }
+    .drop-overlay span { color: var(--blue); font-size: .85rem; font-weight: 700; background: var(--white); padding: 6px 14px; border-radius: 20px; }
+
+    .card-delete {
+      position: absolute; top: 8px; right: 8px; z-index: 5;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: rgba(15,30,54,.55); color: var(--white);
+      border: none; font-size: .85rem; cursor: pointer; display: grid; place-items: center;
+      opacity: 0; transition: opacity .15s, background .15s;
+    }
+    .img-card:hover .card-delete { opacity: 1; }
+    .card-delete:hover { background: #dc2626; }
+
+    .card-body { padding: 10px 12px 12px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .card-name { font-size: .8rem; font-weight: 600; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .card-tags { display: flex; flex-wrap: wrap; gap: 5px; min-height: 24px; }
+    .tag-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 8px; border-radius: 20px;
+      font-size: .7rem; font-weight: 700; color: var(--white);
+    }
+    .tag-pill .tag-x {
+      background: none; border: none; color: rgba(255,255,255,.75); cursor: pointer;
+      font-size: .8rem; line-height: 1; padding: 0 1px; font-family: var(--font);
+      transition: color .15s;
+    }
+    .tag-pill .tag-x:hover { color: var(--white); }
+
+    .card-assign-btn {
+      align-self: flex-start; padding: 4px 10px; border-radius: 6px;
+      background: var(--off); border: 1.5px solid var(--border); color: var(--muted);
+      font-size: .75rem; font-weight: 600; cursor: pointer; font-family: var(--font);
+      transition: border-color .15s, color .15s, background .15s;
+      position: relative;
+    }
+    .card-assign-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-bg); }
+
+    /* Variants list */
+    .variants-list { display: flex; flex-direction: column; gap: 5px; }
+    .variant-row { display: flex; align-items: center; gap: 4px; }
+    .variant-del {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-size: 1rem; line-height: 1; padding: 0 3px; flex-shrink: 0;
+      transition: color .15s;
+    }
+    .variant-del:hover { color: #dc2626; }
+    .add-variant-btn {
+      align-self: flex-start; padding: 3px 10px; border-radius: 5px;
+      background: transparent; border: 1.5px dashed var(--border); color: var(--muted);
+      font-size: .72rem; font-weight: 600; cursor: pointer; font-family: var(--font);
+      margin-top: 2px; transition: border-color .15s, color .15s;
+    }
+    .add-variant-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+    /* Confirm dialog */
+    .confirm-backdrop {
+      display: none; position: fixed; inset: 0; z-index: 500;
+      background: rgba(15,30,54,.45); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    .confirm-backdrop.open { display: flex; }
+    .confirm-box {
+      background: var(--white); border-radius: 14px; padding: 28px 32px;
+      max-width: 360px; width: 90%; text-align: center;
+      box-shadow: 0 24px 60px rgba(15,30,54,.18);
+      animation: fadeUp .18s ease;
+    }
+    .confirm-box h3 { font-size: 1rem; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
+    .confirm-box p { font-size: .875rem; color: var(--muted); margin-bottom: 22px; line-height: 1.5; }
+    .confirm-btns { display: flex; gap: 10px; justify-content: center; }
+    .confirm-btn {
+      padding: 9px 22px; border-radius: 7px; font-size: .88rem; font-weight: 700;
+      font-family: var(--font); cursor: pointer; border: none; transition: background .2s;
+    }
+    .confirm-btn-cancel { background: var(--off); color: var(--muted); border: 1.5px solid var(--border); }
+    .confirm-btn-cancel:hover { background: var(--off2); }
+    .confirm-btn-delete { background: #dc2626; color: var(--white); }
+    .confirm-btn-delete:hover { background: #b91c1c; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+    /* Category popover on card */
+    .cat-popover {
+      position: absolute; bottom: calc(100% + 4px); left: 0; z-index: 50;
+      background: var(--white); border: 1.5px solid var(--border); border-radius: 9px;
+      box-shadow: var(--shadow-md); padding: 8px; min-width: 170px;
+      display: none; flex-direction: column; gap: 4px;
+    }
+    .cat-popover.open { display: flex; }
+    .pop-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 8px; border-radius: 6px; cursor: pointer;
+      transition: background .15s;
+    }
+    .pop-item:hover { background: var(--off); }
+    .pop-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .pop-name { font-size: .83rem; font-weight: 600; color: var(--dark); }
+    .pop-check { margin-left: auto; color: var(--blue); font-size: .85rem; }
+    .pop-empty { font-size: .8rem; color: var(--muted); padding: 6px 8px; }
+
+    /* Inline edit fields */
+    .card-edit-field {
+      width: 100%; border: none; background: transparent;
+      font-family: var(--font); color: var(--dark); outline: none;
+      padding: 2px 5px; border-radius: 4px;
+      transition: background .15s, box-shadow .15s;
+    }
+    .card-edit-field:hover { background: var(--off); }
+    .card-edit-field:focus { background: var(--off); box-shadow: 0 0 0 2px rgba(37,88,176,.18); }
+    .card-name-field { font-size: .82rem; font-weight: 600; margin-bottom: 4px; }
+    .card-meta-row { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
+    .card-meta-label { font-size: .7rem; color: var(--muted); white-space: nowrap; }
+    .card-meta-field { font-size: .78rem; color: var(--body); flex: 1; min-width: 0; }
+    .card-oz-field { width: 54px; flex: none; }
+
+    /* Enable/disable toggle */
+    .card-footer-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 12px; border-top: none; background: transparent;
+    }
+    .toggle-wrap { display: flex; align-items: center; gap: 7px; }
+    .toggle-label { font-size: .72rem; font-weight: 700; }
+    .toggle-label.on { color: #16a34a; }
+    .toggle-label.off { color: var(--muted); }
+    .toggle-switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background: #cbd5e1; border-radius: 20px; transition: background .2s;
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute; height: 14px; width: 14px; left: 3px; top: 3px;
+      background: white; border-radius: 50%; transition: transform .2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+    .toggle-switch input:checked + .toggle-slider { background: #16a34a; }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); }
+    .img-card.disabled .card-img-wrap { opacity: .5; filter: grayscale(60%); }
+    .img-card.disabled .card-body { opacity: .6; }
+
+    /* Empty state */
+    .empty-state {
+      grid-column: 1 / -1; text-align: center; padding: 64px 24px;
+    }
+    .empty-state .es-icon { font-size: 4rem; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 1.1rem; font-weight: 800; color: var(--dark); margin-bottom: 6px; }
+    .empty-state p { font-size: .9rem; color: var(--muted); max-width: 320px; margin: 0 auto; }
+
+    /* ── SECTION TABS ── */
+    .section-tabs { display: flex; gap: 3px; background: var(--off2); border-radius: 9px; padding: 3px; margin-bottom: 20px; width: fit-content; }
+    .stab {
+      padding: 7px 22px; border-radius: 7px; border: none;
+      font-size: .85rem; font-weight: 600; font-family: var(--font);
+      color: var(--muted); background: none; cursor: pointer; transition: .18s;
+    }
+    .stab.active { background: var(--white); color: var(--dark); box-shadow: 0 1px 6px rgba(15,30,54,.1); }
+
+    /* Gallery admin */
+    .gal-toolbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+    .gal-upload-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .gal-cat-select {
+      padding: 9px 14px; border: 1.5px solid var(--border); border-radius: 7px;
+      font-size: .85rem; font-family: var(--font); color: var(--dark); outline: none;
+      background: var(--white); cursor: pointer; transition: border-color .2s;
+    }
+    .gal-cat-select:focus { border-color: var(--blue); }
+    .gal-progress { font-size: .78rem; color: var(--blue); font-weight: 600; display: none; }
+
+    /* ── FOLDER CONNECT ── */
+    .folder-btn {
+      width: 100%; padding: 9px; border-radius: 8px; font-size: .83rem; font-weight: 700;
+      font-family: var(--font); cursor: pointer; border: 1.5px dashed var(--border);
+      background: var(--off); color: var(--muted); display: flex; align-items: center;
+      justify-content: center; gap: 7px; transition: .2s;
+    }
+    .folder-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-bg); }
+    .folder-btn.connected { border-style: solid; border-color: #16a34a; color: #16a34a; background: #f0fdf4; }
+    .folder-status { font-size: .72rem; color: var(--muted); margin-top: 6px; text-align: center; line-height: 1.4; }
+    .folder-status.ok { color: #16a34a; }
+
+    /* ── CLIENTS ── */
+    .clients-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 22px; }
+    .clients-search {
+      padding: 9px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: .85rem; font-family: var(--font); color: var(--dark); outline: none;
+      width: 240px; transition: border-color .2s;
+    }
+    .clients-search:focus { border-color: var(--blue); }
+    .add-client-btn {
+      padding: 9px 18px; background: var(--blue); color: var(--white); border: none;
+      border-radius: 8px; font-size: .88rem; font-weight: 700; font-family: var(--font);
+      cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: background .2s;
+    }
+    .add-client-btn:hover { background: var(--blue-d); }
+
+    .clients-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px;
+    }
+    .client-card {
+      background: var(--white); border: 1.5px solid var(--border); border-radius: 12px;
+      overflow: hidden; box-shadow: var(--shadow); transition: box-shadow .2s;
+    }
+    .client-card-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px; cursor: pointer; user-select: none;
+      transition: background .15s;
+    }
+    .client-card-header:hover { background: var(--off); }
+    .client-avatar {
+      width: 38px; height: 38px; border-radius: 9px; background: var(--blue-bg2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 800; color: var(--blue); flex-shrink: 0;
+    }
+    .client-info { flex: 1; min-width: 0; }
+    .client-name { font-size: .95rem; font-weight: 800; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .client-email { font-size: .75rem; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .client-chevron { color: var(--muted); font-size: .75rem; transition: transform .2s; flex-shrink: 0; }
+    .client-card.open .client-chevron { transform: rotate(180deg); }
+    .client-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .client-action-btn {
+      width: 30px; height: 30px; border-radius: 7px; border: 1.5px solid var(--border);
+      background: var(--off); color: var(--muted); cursor: pointer;
+      display: grid; place-items: center; font-size: .85rem; transition: .15s;
+    }
+    .client-action-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-bg); }
+    .client-action-btn.del:hover { border-color: #dc2626; color: #dc2626; background: #fee2e2; }
+
+    .client-details {
+      display: none; padding: 0 16px 16px; border-top: 1.5px solid var(--border);
+      padding-top: 16px;
+    }
+    .client-card.open .client-details { display: block; }
+    .client-section-label { font-size: .66rem; font-weight: 800; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin-bottom: 8px; }
+
+    .client-files-label { font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); }
+    .client-files-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 10px; }
+    .client-file-tile {
+      border: 1.5px solid var(--border); border-radius: 9px; overflow: hidden;
+      background: var(--off); display: flex; flex-direction: column;
+    }
+    .client-file-preview {
+      width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: var(--off2);
+    }
+    .client-file-preview-pdf {
+      width: 100%; height: 100px; border: none; display: block; background: var(--off2); pointer-events: none;
+    }
+    .client-file-preview-icon {
+      aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem; background: var(--off2);
+    }
+    .client-file-meta { padding: 6px 8px; display: flex; align-items: center; gap: 4px; }
+    .client-file-name-sm { font-size: .7rem; font-weight: 600; color: var(--dark); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .client-file-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 10px; border-radius: 8px; background: var(--off);
+      border: 1.5px solid var(--border);
+    }
+    .client-file-icon { font-size: 1rem; flex-shrink: 0; }
+    .client-file-name { font-size: .78rem; color: var(--dark); font-weight: 600; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .client-file-size { font-size: .7rem; color: var(--muted); white-space: nowrap; }
+    .client-file-dl { background: none; border: none; color: var(--blue); cursor: pointer; font-size: .8rem; padding: 0 3px; transition: color .15s; }
+    .client-file-dl:hover { color: var(--blue-d); }
+    .client-file-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: .85rem; padding: 0 3px; transition: color .15s; }
+    .client-file-del:hover { color: #dc2626; }
+    .client-add-file-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 12px; border-radius: 7px; border: 1.5px dashed var(--border);
+      background: none; color: var(--muted); font-size: .78rem; font-weight: 600;
+      font-family: var(--font); cursor: pointer; transition: .15s; margin-top: 2px;
+    }
+    .client-add-file-btn:hover { border-color: var(--blue); color: var(--blue); }
+    .client-empty { grid-column: 1/-1; text-align: center; padding: 60px 24px; color: var(--muted); font-size: .9rem; }
+
+    /* Client modal */
+    .client-modal-backdrop {
+      display: none; position: fixed; inset: 0; z-index: 600;
+      background: rgba(15,30,54,.5); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    .client-modal-backdrop.open { display: flex; }
+    .client-modal {
+      background: var(--white); border-radius: 16px; padding: 32px;
+      width: 460px; max-width: 95vw; box-shadow: 0 24px 60px rgba(15,30,54,.18);
+      animation: fadeUp .18s ease;
+    }
+    .client-modal h3 { font-size: 1.05rem; font-weight: 800; color: var(--dark); margin-bottom: 22px; }
+    .cm-field { margin-bottom: 16px; }
+    .cm-label { font-size: .75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 6px; display: block; }
+    .cm-input {
+      width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: .9rem; font-family: var(--font); color: var(--dark); outline: none; transition: border-color .2s;
+    }
+    .cm-input:focus { border-color: var(--blue); }
+    .cm-file-drop {
+      border: 2px dashed var(--border); border-radius: 10px; padding: 20px;
+      text-align: center; cursor: pointer; transition: border-color .2s, background .2s;
+    }
+    .cm-file-drop:hover, .cm-file-drop.drag-over { border-color: var(--blue); background: var(--blue-bg); }
+    .cm-file-drop p { font-size: .83rem; color: var(--muted); margin-top: 6px; }
+    .cm-pending-files { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+    .cm-pending-row { display: flex; align-items: center; gap: 8px; background: var(--off); border-radius: 7px; padding: 6px 10px; }
+    .cm-pending-name { font-size: .8rem; font-weight: 600; color: var(--dark); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cm-pending-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: .9rem; transition: color .15s; }
+    .cm-pending-del:hover { color: #dc2626; }
+    .cm-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+    .cm-btn {
+      padding: 9px 22px; border-radius: 8px; font-size: .88rem; font-weight: 700;
+      font-family: var(--font); cursor: pointer; border: none; transition: background .2s;
+    }
+    .cm-btn-cancel { background: var(--off); color: var(--muted); border: 1.5px solid var(--border); }
+    .cm-btn-cancel:hover { background: var(--off2); }
+    .cm-btn-save { background: var(--blue); color: var(--white); }
+    .cm-btn-save:hover { background: var(--blue-d); }
+
+    /* File lightbox */
+    .file-lightbox {
+      display: none; position: fixed; inset: 0; z-index: 900;
+      background: rgba(10,20,40,.88); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 14px;
+    }
+    .file-lightbox.open { display: flex; }
+    .file-lightbox-inner {
+      max-width: 92vw; max-height: 82vh;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .file-lightbox-inner img {
+      max-width: 88vw; max-height: 80vh;
+      border-radius: 10px; box-shadow: 0 24px 60px rgba(0,0,0,.5);
+      object-fit: contain; display: block;
+    }
+    .file-lightbox-inner iframe {
+      width: 82vw; height: 80vh;
+      border: none; border-radius: 10px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.5);
+    }
+    .file-lightbox-name {
+      color: rgba(255,255,255,.7); font-size: .85rem; max-width: 80vw;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;
+    }
+    .file-lightbox-close {
+      position: fixed; top: 18px; right: 22px;
+      background: rgba(255,255,255,.12); border: none; color: #fff;
+      width: 38px; height: 38px; border-radius: 50%; font-size: 1.1rem;
+      cursor: pointer; display: grid; place-items: center;
+      transition: background .15s;
+    }
+    .file-lightbox-close:hover { background: rgba(255,255,255,.25); }
+    .file-lightbox-dl {
+      background: var(--blue); border: none; color: #fff;
+      padding: 9px 20px; border-radius: 8px; font-size: .85rem; font-weight: 700;
+      font-family: var(--font); cursor: pointer; transition: background .15s;
+    }
+    .file-lightbox-dl:hover { background: var(--blue-d); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 999;
+      background: var(--dark); color: var(--white); padding: 12px 18px;
+      border-radius: 9px; font-size: .85rem; font-weight: 500;
+      box-shadow: var(--shadow-md); opacity: 0; transform: translateY(12px);
+      transition: opacity .25s, transform .25s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.green { background: #16a34a; }
+    .toast.red { background: #dc2626; }
+  </style>
+</head>
+<body>
+
+<!-- AUTH GUARD runs before anything renders -->
+<script>
+  (function() {
+    const sess = localStorage.getItem('zenan_session');
+    if (!sess) { window.location.href = 'login.html'; }
+  })();
+</script>
+
+<!-- HEADER -->
+<header class="admin-header">
+  <div class="h-left">
+    <a href="index.html" class="h-logo">
+      <img src="brand_assets/Zenan logo.png" alt="Zenan Glass" />
+    </a>
+    <span class="h-title">Admin Dashboard</span>
+  </div>
+  <div class="h-right">
+    <span class="h-user">👤 <span id="sessionUser"></span></span>
+    <a href="products.html" target="_blank" class="h-btn h-btn-ghost">View Site ↗</a>
+    <button class="h-btn h-btn-danger" onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- Project Folder -->
+    <div class="s-section">
+      <div class="s-title">Project Folder</div>
+      <button class="folder-btn" id="folderBtn" onclick="connectProjectFolder()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        Connect Folder
+      </button>
+      <div class="folder-status" id="folderStatus">Click to link your project folder. Client subfolders will be created automatically.</div>
+    </div>
+
+    <!-- Upload -->
+    <div class="s-section">
+      <div class="s-title">Upload Images</div>
+      <input type="file" id="fileInput" multiple accept="image/*" onchange="handleUpload(event)" />
+      <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        Upload Images
+      </button>
+      <div class="upload-hint">JPEG, PNG, WebP · Multiple files supported</div>
+      <div class="upload-progress" id="uploadProgress"></div>
+    </div>
+
+    <!-- Categories -->
+    <div class="s-section" style="flex:1;">
+      <div class="s-title">Categories</div>
+
+      <div class="color-swatches" id="colorSwatches"></div>
+
+      <div class="cat-input-row">
+        <input type="text" id="catInput" placeholder="Category name…" maxlength="30" onkeydown="if(event.key==='Enter')addCategory()" />
+        <button class="cat-add-btn" onclick="addCategory()">Add</button>
+      </div>
+
+      <div class="s-title" style="margin-top:4px;">Drag chips onto images ↓</div>
+      <div class="cat-list" id="catList"></div>
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- Section tabs -->
+    <div class="section-tabs">
+      <button class="stab active" data-section="products" onclick="switchSection('products')">Products</button>
+      <button class="stab" data-section="gallery" onclick="switchSection('gallery')">Gallery</button>
+      <button class="stab" data-section="clients" onclick="switchSection('clients')">Clients</button>
+    </div>
+
+    <!-- Products section (existing) -->
+    <div id="productsSection">
+      <div class="main-toolbar">
+        <div class="main-stats" id="mainStats"></div>
+        <div class="filter-tabs" id="filterTabs"></div>
+      </div>
+      <div class="img-grid" id="imgGrid"></div>
+    </div>
+
+    <!-- Gallery section -->
+    <div id="gallerySection" style="display:none;">
+      <div class="gal-toolbar">
+        <div class="gal-upload-row">
+          <label for="galFileInput" class="upload-btn" style="width:auto;padding:10px 18px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+            Upload Gallery Images
+          </label>
+          <input type="file" id="galFileInput" multiple accept="image/*" onchange="handleGalUpload(event)" style="display:none" />
+          <select class="gal-cat-select" id="galCatSelect">
+            <option value="glassware">Glassware</option>
+            <option value="apparel">Apparel</option>
+          </select>
+          <span class="gal-progress" id="galProgress"></span>
+        </div>
+        <div class="main-stats" id="galStats"></div>
+      </div>
+      <div class="img-grid" id="galGrid"></div>
+    </div>
+
+    <!-- Clients section -->
+    <div id="clientsSection" style="display:none;">
+      <div class="clients-toolbar">
+        <input type="text" class="clients-search" id="clientSearch" placeholder="Search clients…" oninput="renderClients()" />
+        <button class="add-client-btn" onclick="openClientModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Client
+        </button>
+      </div>
+      <div class="clients-grid" id="clientsGrid"></div>
+    </div>
+
+  </main>
+
+</div>
+
+<!-- CLIENT MODAL -->
+<div class="client-modal-backdrop" id="clientModalBackdrop">
+  <div class="client-modal">
+    <h3 id="clientModalTitle">Add Client</h3>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="cm-field" style="margin:0">
+        <label class="cm-label">Client Name</label>
+        <input type="text" class="cm-input" id="cmName" placeholder="e.g. Acme Brewing Co." />
+      </div>
+      <div class="cm-field" style="margin:0">
+        <label class="cm-label">Client Email</label>
+        <input type="email" class="cm-input" id="cmClientEmail" placeholder="client@test" />
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;">
+      <div class="cm-field" style="margin:0">
+        <label class="cm-label">Rep Name</label>
+        <input type="text" class="cm-input" id="cmRepName" placeholder="Sales rep name" />
+      </div>
+      <div class="cm-field" style="margin:0">
+        <label class="cm-label">Rep Email</label>
+        <input type="email" class="cm-input" id="cmRepEmail" placeholder="rep@test" />
+      </div>
+    </div>
+
+    <div style="margin-top:16px;padding:14px;background:var(--off);border-radius:10px;border:1.5px solid var(--border);">
+      <div style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:12px;">Client Login Credentials</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="cm-field" style="margin:0">
+          <label class="cm-label">Username</label>
+          <input type="text" class="cm-input" id="cmLoginUser" placeholder="login username" autocomplete="off" />
+        </div>
+        <div class="cm-field" style="margin:0">
+          <label class="cm-label">Password</label>
+          <div style="position:relative">
+            <input type="password" class="cm-input" id="cmLoginPass" placeholder="set password" autocomplete="new-password" style="padding-right:40px" />
+            <button type="button" onclick="togglePassVis()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:.85rem;" id="passToggleBtn">👁</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cm-field" style="margin-top:16px">
+      <label class="cm-label">Attach Files</label>
+      <div class="cm-file-drop" id="cmFileDrop" onclick="document.getElementById('cmFileInput').click()" ondragover="cmDragOver(event)" ondrop="cmDrop(event)" ondragleave="cmDragLeave(event)">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9baab8" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        <p>Click or drag & drop files here</p>
+      </div>
+      <input type="file" id="cmFileInput" multiple style="display:none" onchange="cmPickFiles(event)" />
+      <div class="cm-pending-files" id="cmPendingFiles"></div>
+    </div>
+    <div class="cm-btns">
+      <button class="cm-btn cm-btn-cancel" onclick="closeClientModal()">Cancel</button>
+      <button class="cm-btn cm-btn-save" onclick="saveClient()">Save Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- FILE LIGHTBOX -->
+<div class="file-lightbox" id="fileLightbox" onclick="closeLightbox(event)">
+  <button class="file-lightbox-close" onclick="closeLightboxForce()">✕</button>
+  <div class="file-lightbox-inner" id="fileLightboxInner"></div>
+  <div class="file-lightbox-name" id="fileLightboxName"></div>
+  <button class="file-lightbox-dl" id="fileLightboxDl">⬇ Download</button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- DELETE CONFIRM -->
+<div class="confirm-backdrop" id="confirmBackdrop">
+  <div class="confirm-box">
+    <h3>Delete Image?</h3>
+    <p>This will permanently remove the image and cannot be undone.</p>
+    <div class="confirm-btns">
+      <button class="confirm-btn confirm-btn-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="confirm-btn confirm-btn-delete" id="confirmDeleteBtn">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Constants
+const COLORS = ['#2558B0','#16a34a','#dc2626','#ea580c','#7c3aed','#0891b2','#db2777','#65a30d','#b45309','#374151'];
+let selectedColor = COLORS[0];
+let activeFilter = 'all';
+let activeOzFilter = 'all';
+
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Variants helper (backward-compat with old single itemNumber/oz)
+function getVariants(img) {
+  if (img.variants && img.variants.length) return img.variants;
+  return [{ id: (img.id || '') + '_v0', itemNumber: img.itemNumber || '', oz: img.oz || '' }];
+}
+
+function addVariant(imgId) {
+  const imgs = getImages();
+  const img = imgs.find(i => i.id === imgId);
+  if (!img) return;
+  if (!img.variants) img.variants = getVariants(img).map(v => ({...v}));
+  img.variants.push({ id: Date.now().toString() + Math.random().toString(36).slice(2), itemNumber: '', oz: '' });
+  saveImages(imgs);
+  renderGrid();
+}
+
+function updateVariant(imgId, variantId, field, value) {
+  const imgs = getImages();
+  const img = imgs.find(i => i.id === imgId);
+  if (!img) return;
+  if (!img.variants) img.variants = getVariants(img).map(v => ({...v}));
+  const v = img.variants.find(v => v.id === variantId);
+  if (!v) return;
+  v[field] = value;
+  saveImages(imgs);
+}
+
+function removeVariant(imgId, variantId) {
+  const imgs = getImages();
+  const img = imgs.find(i => i.id === imgId);
+  if (!img) return;
+  if (!img.variants) img.variants = getVariants(img).map(v => ({...v}));
+  if (img.variants.length <= 1) return;
+  img.variants = img.variants.filter(v => v.id !== variantId);
+  saveImages(imgs);
+  renderGrid();
+}
+
+// ── Delete confirm dialog
+let _pendingDeleteId = null;
+function confirmDelete(imgId) {
+  _pendingDeleteId = imgId;
+  document.getElementById('confirmBackdrop').classList.add('open');
+}
+function closeConfirm() {
+  _pendingDeleteId = null;
+  document.getElementById('confirmBackdrop').classList.remove('open');
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('confirmDeleteBtn').onclick = () => {
+    if (_pendingDeleteId) { saveImages(getImages().filter(i => i.id !== _pendingDeleteId)); renderAll(); toast('Image deleted.'); }
+    closeConfirm();
+  };
+});
+
+// ── DB helpers
+const DB = {
+  get: (key, def) => { try { return JSON.parse(localStorage.getItem(key)) ?? def; } catch { return def; } },
+  set: (key, val) => { try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch(e) { toast('Storage full.', 'red'); return false; } }
+};
+
+// ── Product IndexedDB (no size limit)
+const ProdIDB = {
+  _db: null,
+  open() {
+    return new Promise((res, rej) => {
+      const req = indexedDB.open('zenan_products_db', 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore('images', { keyPath: 'id' });
+      req.onsuccess = e => { this._db = e.target.result; res(this._db); };
+      req.onerror = rej;
+    });
+  },
+  async getAll() {
+    const db = this._db || await this.open();
+    return new Promise((res, rej) => {
+      const req = db.transaction('images', 'readonly').objectStore('images').getAll();
+      req.onsuccess = () => res(req.result || []);
+      req.onerror = rej;
+    });
+  },
+  async saveAll(imgs) {
+    const db = this._db || await this.open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction('images', 'readwrite');
+      const store = tx.objectStore('images');
+      store.clear();
+      imgs.forEach(img => store.put(img));
+      tx.oncomplete = () => { localStorage.setItem('zenan_products_v', Date.now()); res(true); };
+      tx.onerror = rej;
+    });
+  }
+};
+
+// ── In-memory cache so all existing sync calls work unchanged
+let _imgs = [];
+const getImages  = () => _imgs;
+const saveImages = (v) => { _imgs = v; ProdIDB.saveAll(v); };
+const getCats    = () => DB.get('zenan_categories', []);
+const saveCats   = v  => DB.set('zenan_categories', v);
+
+// ── Image compression
+function compressImage(file, maxW = 1400, quality = 0.82) {
+  return new Promise(resolve => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
+
+// ── Upload handler
+async function handleUpload(e) {
+  const files = [...e.target.files];
+  if (!files.length) return;
+  const prog = document.getElementById('uploadProgress');
+  prog.style.display = 'block';
+  const imgs = getImages();
+  for (let i = 0; i < files.length; i++) {
+    prog.textContent = `Uploading ${i + 1} / ${files.length}…`;
+    const src = await compressImage(files[i]);
+    if (!src) continue;
+    const newId = Date.now().toString() + Math.random().toString(36).slice(2);
+    imgs.push({
+      id: newId,
+      name: files[i].name.replace(/\.[^.]+$/, ''),
+      variants: [{ id: newId + '_v0', itemNumber: '', oz: '' }],
+      src,
+      categories: [],
+      enabled: true,
+      uploadedAt: new Date().toISOString()
+    });
+  }
+  saveImages(imgs);
+  e.target.value = '';
+  prog.style.display = 'none';
+  renderAll();
+  toast(`${files.length} image${files.length > 1 ? 's' : ''} uploaded!`, 'green');
+}
+
+// ── Category CRUD
+function addCategory() {
+  const input = document.getElementById('catInput');
+  const name = input.value.trim();
+  if (!name) { input.focus(); return; }
+  const cats = getCats();
+  if (cats.find(c => c.name.toLowerCase() === name.toLowerCase())) { toast('Category already exists.'); return; }
+  cats.push({ id: Date.now().toString(), name, color: selectedColor });
+  saveCats(cats);
+  input.value = '';
+  renderAll();
+  toast(`Category "${name}" added.`, 'green');
+}
+
+function setCatImg(id, filename) {
+  const cats = getCats();
+  const cat = cats.find(c => c.id === id);
+  if (!cat) return;
+  cat.img = filename;
+  saveCats(cats);
+  toast(`Image set for "${cat.name}".`, 'green');
+}
+
+function deleteCategory(id) {
+  const cats = getCats().filter(c => c.id !== id);
+  saveCats(cats);
+  // Remove from all images
+  const imgs = getImages().map(img => ({ ...img, categories: img.categories.filter(cid => cid !== id) }));
+  saveImages(imgs);
+  renderAll();
+  toast('Category deleted.');
+}
+
+// ── Category assignment
+function assignCat(imgId, catId) {
+  const imgs = getImages();
+  const img = imgs.find(i => i.id === imgId);
+  if (!img || img.categories.includes(catId)) return;
+  img.categories.push(catId);
+  saveImages(imgs);
+  renderAll();
+}
+
+function removeCat(imgId, catId) {
+  const imgs = getImages();
+  const img = imgs.find(i => i.id === imgId);
+  if (!img) return;
+  img.categories = img.categories.filter(c => c !== catId);
+  saveImages(imgs);
+  renderAll();
+}
+
+// ── Update image field (name / itemNumber / oz)
+function updateField(imgId, field, value) {
+  const imgs = getImages();
+  const img = imgs.find(i => i.id === imgId);
+  if (!img) return;
+  img[field] = value;
+  saveImages(imgs);
+  renderStats();
+}
+
+// ── Toggle enabled/disabled
+function toggleEnabled(imgId) {
+  const imgs = getImages();
+  const img = imgs.find(i => i.id === imgId);
+  if (!img) return;
+  img.enabled = img.enabled === false ? true : false;
+  saveImages(imgs);
+  renderAll();
+  toast(img.enabled !== false ? 'Product is now live.' : 'Product hidden from site.', img.enabled !== false ? 'green' : '');
+}
+
+// ── Oz range filter
+function setOzFilter(val) {
+  activeOzFilter = val;
+  renderGrid();
+}
+
+// ── Delete image (with confirm)
+function deleteImage(id) { confirmDelete(id); }
+
+// ── Render: color swatches
+function renderSwatches() {
+  document.getElementById('colorSwatches').innerHTML = COLORS.map(c =>
+    `<div class="swatch${c === selectedColor ? ' selected' : ''}" style="background:${c}" title="${c}" onclick="selectColor('${c}')"></div>`
+  ).join('');
+}
+function selectColor(c) { selectedColor = c; renderSwatches(); }
+
+// ── Render: category sidebar list
+function renderCats() {
+  const cats = getCats();
+  const imgs = getImages();
+  const el = document.getElementById('catList');
+  if (!cats.length) { el.innerHTML = '<div class="cat-empty">No categories yet.</div>'; return; }
+  el.innerHTML = cats.map(cat => {
+    const count = imgs.filter(i => i.categories.includes(cat.id)).length;
+    return `<div class="cat-chip" draggable="true"
+      ondragstart="chipDragStart(event, '${cat.id}')"
+      ondragend="chipDragEnd(event)">
+      <span class="drag-handle">⠿</span>
+      <span class="chip-dot" style="background:${cat.color}"></span>
+      <span class="chip-name">${cat.name}</span>
+      <span class="chip-count">${count}</span>
+      <button class="chip-del" title="Delete category" onclick="deleteCategory('${cat.id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// ── Render: filter tabs + oz range select
+function renderFilters() {
+  const cats = getCats();
+  const el = document.getElementById('filterTabs');
+  el.innerHTML =
+    `<select style="padding:5px 10px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);color:var(--muted);font-size:.8rem;font-weight:500;font-family:var(--font);cursor:pointer;outline:none;" onchange="setOzFilter(this.value)">
+      <option value="all"${activeOzFilter==='all'?' selected':''}>All oz</option>
+      <option value="0-5"${activeOzFilter==='0-5'?' selected':''}>Under 5 oz</option>
+      <option value="5-10"${activeOzFilter==='5-10'?' selected':''}>5–10 oz</option>
+      <option value="10-16"${activeOzFilter==='10-16'?' selected':''}>10–16 oz</option>
+      <option value="16-9999"${activeOzFilter==='16-9999'?' selected':''}>16+ oz</option>
+    </select>` +
+    `<button class="ftab${activeFilter === 'all' ? ' active' : ''}" onclick="setFilter('all', this)">All</button>` +
+    cats.map(c => `<button class="ftab${activeFilter === c.id ? ' active' : ''}" onclick="setFilter('${c.id}', this)">${c.name}</button>`).join('');
+}
+function setFilter(id, btn) {
+  activeFilter = id;
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
+}
+
+// ── Render: stats
+function renderStats() {
+  const imgs = getImages(), cats = getCats();
+  document.getElementById('mainStats').innerHTML =
+    `<strong>${imgs.length}</strong> image${imgs.length !== 1 ? 's' : ''} · <strong>${cats.length}</strong> categor${cats.length !== 1 ? 'ies' : 'y'}`;
+}
+
+// ── Render: image grid
+function renderGrid() {
+  const imgs = getImages(), cats = getCats();
+  const grid = document.getElementById('imgGrid');
+
+  let filtered = activeFilter === 'all' ? imgs : imgs.filter(i => i.categories.includes(activeFilter));
+
+  // Apply oz range filter (check any variant)
+  if (activeOzFilter !== 'all') {
+    const [minOz, maxOz] = activeOzFilter.split('-').map(Number);
+    filtered = filtered.filter(i =>
+      getVariants(i).some(v => { const oz = parseFloat(v.oz); return !isNaN(oz) && oz >= minOz && oz < maxOz; })
+    );
+  }
+
+  if (!imgs.length) {
+    grid.innerHTML = `<div class="empty-state">
+      <div class="es-icon">🖼️</div>
+      <h3>No images yet</h3>
+      <p>Click "Upload Images" in the sidebar to get started.</p>
+    </div>`;
+    return;
+  }
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-state">
+      <div class="es-icon">🔍</div>
+      <h3>No images match this filter</h3>
+      <p>Try a different category or oz range.</p>
+    </div>`;
+    return;
+  }
+
+  const COLS = 4;
+  const cards = filtered.map(img => {
+    const isEnabled = img.enabled !== false;
+    const assignedCats = cats.filter(c => img.categories.includes(c.id));
+    const tags = assignedCats.map(c =>
+      `<span class="tag-pill" style="background:${c.color}">${c.name}
+        <button class="tag-x" onclick="removeCat('${img.id}','${c.id}')">×</button>
+      </span>`
+    ).join('');
+
+    const popItems = cats.map(c => {
+      const assigned = img.categories.includes(c.id);
+      return `<div class="pop-item" onclick="assignCat('${img.id}','${c.id}');closePopovers()">
+        <span class="pop-dot" style="background:${c.color}"></span>
+        <span class="pop-name">${c.name}</span>
+        ${assigned ? '<span class="pop-check">✓</span>' : ''}
+      </div>`;
+    }).join('') || '<div class="pop-empty">No categories yet.</div>';
+
+    return `<div class="img-card${isEnabled ? '' : ' disabled'}" data-id="${img.id}"
+      ondragover="cardDragOver(event, this)"
+      ondragleave="cardDragLeave(this)"
+      ondrop="cardDrop(event, this)">
+
+      <div class="card-img-wrap">
+        <img src="${img.src}" alt="${escHtml(img.name)}" loading="lazy" />
+        <div class="drop-overlay"><span>Drop to assign</span></div>
+        <button class="card-delete" onclick="deleteImage('${img.id}')" title="Delete image">✕</button>
+      </div>
+
+      <div class="card-body">
+        <input class="card-edit-field card-name-field" value="${escHtml(img.name)}"
+          placeholder="Product name…"
+          onchange="updateField('${img.id}','name',this.value)" title="Click to rename" />
+        <div class="variants-list">
+          ${getVariants(img).map(v => `
+            <div class="variant-row">
+              <span class="card-meta-label">Item #</span>
+              <input class="card-edit-field card-meta-field" value="${escHtml(v.itemNumber)}"
+                placeholder="e.g. 925500"
+                onchange="updateVariant('${img.id}','${v.id}','itemNumber',this.value)" />
+              <span class="card-meta-label">oz</span>
+              <input class="card-edit-field card-meta-field card-oz-field" type="number"
+                value="${escHtml(String(v.oz||''))}" placeholder="12" step="0.5" min="0"
+                onchange="updateVariant('${img.id}','${v.id}','oz',this.value)" />
+              ${getVariants(img).length > 1 ? `<button class="variant-del" onclick="removeVariant('${img.id}','${v.id}')" title="Remove size">×</button>` : ''}
+            </div>`).join('')}
+        </div>
+        <button class="add-variant-btn" onclick="addVariant('${img.id}')">+ Add size</button>
+        <div class="card-tags">${tags}</div>
+        <div style="position:relative;">
+          <button class="card-assign-btn" onclick="togglePopover(event, '${img.id}')">+ Assign Category</button>
+          <div class="cat-popover" id="pop_${img.id}">${popItems}</div>
+        </div>
+      </div>
+
+      <div class="card-footer-row">
+        <div class="toggle-wrap">
+          <span class="toggle-label ${isEnabled ? 'on' : 'off'}">${isEnabled ? 'Live' : 'Hidden'}</span>
+          <label class="toggle-switch">
+            <input type="checkbox" ${isEnabled ? 'checked' : ''} onchange="toggleEnabled('${img.id}')" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  // Insert full-width divider after every row of COLS cards
+  const divider = `<div class="img-row-divider"></div>`;
+  let html = '';
+  cards.forEach((card, i) => {
+    html += card;
+    if ((i + 1) % COLS === 0 && i + 1 < cards.length) html += divider;
+  });
+  grid.innerHTML = html;
+}
+
+// ── Render all
+function renderAll() {
+  renderSwatches();
+  renderCats();
+  renderFilters();
+  renderStats();
+  renderGrid();
+}
+
+// ── Section switcher
+function switchSection(section) {
+  document.querySelectorAll('.stab').forEach(t => t.classList.toggle('active', t.dataset.section === section));
+  document.getElementById('productsSection').style.display = section === 'products' ? '' : 'none';
+  document.getElementById('gallerySection').style.display = section === 'gallery' ? '' : 'none';
+  document.getElementById('clientsSection').style.display = section === 'clients' ? '' : 'none';
+  if (section === 'gallery') renderGallery();
+  if (section === 'clients') renderClients();
+}
+
+// ── Gallery: IndexedDB storage (no size limit)
+const GalIDB = {
+  _db: null,
+  open() {
+    if (this._db) return Promise.resolve(this._db);
+    return new Promise((res, rej) => {
+      const req = indexedDB.open('zenan_gallery_db', 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore('images', { keyPath: 'id' });
+      req.onsuccess = e => { this._db = e.target.result; res(this._db); };
+      req.onerror = e => rej(e);
+    });
+  },
+  async getAll() {
+    const db = await this.open();
+    return new Promise((res, rej) => {
+      const req = db.transaction('images', 'readonly').objectStore('images').getAll();
+      req.onsuccess = () => res(req.result);
+      req.onerror = rej;
+    });
+  },
+  async saveAll(imgs) {
+    const db = await this.open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction('images', 'readwrite');
+      const store = tx.objectStore('images');
+      store.clear();
+      imgs.forEach(img => store.put(img));
+      tx.oncomplete = () => { localStorage.setItem('zenan_gallery_v', Date.now()); res(true); };
+      tx.onerror = rej;
+    });
+  }
+};
+
+// ── Gallery: upload
+async function handleGalUpload(e) {
+  try {
+    const files = [...e.target.files];
+    if (!files.length) return;
+    const cat  = document.getElementById('galCatSelect').value;
+    const prog = document.getElementById('galProgress');
+    prog.style.display = 'block';
+    const imgs = await GalIDB.getAll();
+    let added = 0;
+    for (let i = 0; i < files.length; i++) {
+      prog.textContent = `Uploading ${i + 1} / ${files.length}…`;
+      const src = await compressImage(files[i], 1200, 0.78);
+      if (!src) { toast(`Could not read ${files[i].name}`, 'red'); continue; }
+      imgs.push({
+        id: Date.now().toString() + Math.random().toString(36).slice(2),
+        name: files[i].name.replace(/\.[^.]+$/, ''),
+        src,
+        category: cat,
+        uploadedAt: new Date().toISOString()
+      });
+      added++;
+    }
+    e.target.value = '';
+    prog.style.display = 'none';
+    if (added) {
+      await GalIDB.saveAll(imgs);
+      renderGallery();
+      toast(`${added} image${added > 1 ? 's' : ''} added to gallery!`, 'green');
+    }
+  } catch(err) {
+    toast('Upload failed: ' + err.message, 'red');
+    console.error(err);
+  }
+}
+
+// ── Gallery: delete
+async function deleteGalImage(id) {
+  if (!confirm('Remove this image from the gallery?')) return;
+  const imgs = await GalIDB.getAll();
+  await GalIDB.saveAll(imgs.filter(i => i.id !== id));
+  renderGallery();
+  toast('Image removed from gallery.');
+}
+
+// ── Gallery: change category
+async function updateGalCategory(id, cat) {
+  const imgs = await GalIDB.getAll();
+  const img = imgs.find(i => i.id === id);
+  if (img) { img.category = cat; await GalIDB.saveAll(imgs); renderGallery(); }
+}
+
+// ── Gallery: render grid
+async function renderGallery() {
+  const imgs = await GalIDB.getAll();
+  const grid = document.getElementById('galGrid');
+  const catColor = { glassware: '#2558B0', apparel: '#7c3aed' };
+  const catName  = { glassware: 'Glassware', apparel: 'Apparel' };
+
+  document.getElementById('galStats').textContent = `${imgs.length} image${imgs.length !== 1 ? 's' : ''} in gallery`;
+
+  if (!imgs.length) {
+    grid.innerHTML = `<div class="empty-state">
+      <div class="es-icon">🖼️</div>
+      <h3>No gallery images yet</h3>
+      <p>Upload images above — they'll appear live on the Gallery page.</p>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = imgs.map(img => `
+    <div class="img-card">
+      <div class="card-img-wrap">
+        <img src="${escHtml(img.src)}" alt="${escHtml(img.name)}" />
+        <button class="card-delete" onclick="deleteGalImage('${img.id}')" title="Remove from gallery">✕</button>
+      </div>
+      <div class="card-body">
+        <div class="card-name">${escHtml(img.name)}</div>
+        <div class="card-tags">
+          <span class="tag-pill" style="background:${catColor[img.category] || '#64748b'}">${catName[img.category] || img.category}</span>
+        </div>
+        <div class="card-meta-row" style="margin-top:4px;">
+          <span class="card-meta-label">Category:</span>
+          <select class="card-edit-field card-meta-field" onchange="updateGalCategory('${img.id}', this.value)">
+            <option value="glassware" ${img.category === 'glassware' ? 'selected' : ''}>Glassware</option>
+            <option value="apparel"   ${img.category === 'apparel'   ? 'selected' : ''}>Apparel</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Drag & drop: category chips
+function chipDragStart(e, catId) {
+  e.dataTransfer.setData('catId', catId);
+  e.dataTransfer.effectAllowed = 'copy';
+  e.currentTarget.classList.add('dragging');
+}
+function chipDragEnd(e) { e.currentTarget.classList.remove('dragging'); }
+
+// ── Drag & drop: image cards
+function cardDragOver(e, card) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+  card.classList.add('drag-over');
+}
+function cardDragLeave(card) { card.classList.remove('drag-over'); }
+function cardDrop(e, card) {
+  e.preventDefault();
+  card.classList.remove('drag-over');
+  const catId = e.dataTransfer.getData('catId');
+  if (catId) assignCat(card.dataset.id, catId);
+}
+
+// ── Category popover
+function togglePopover(e, imgId) {
+  e.stopPropagation();
+  const pop = document.getElementById('pop_' + imgId);
+  const isOpen = pop.classList.contains('open');
+  closePopovers();
+  if (!isOpen) pop.classList.add('open');
+}
+function closePopovers() {
+  document.querySelectorAll('.cat-popover.open').forEach(p => p.classList.remove('open'));
+}
+document.addEventListener('click', closePopovers);
+
+// ── Toast
+let toastTimer;
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ── Logout
+function logout() {
+  localStorage.removeItem('zenan_session');
+  window.location.href = 'login.html';
+}
+
+// ── Init
+(async function init() {
+  const sess = JSON.parse(localStorage.getItem('zenan_session') || 'null');
+  if (!sess) { window.location.href = 'login.html'; return; }
+  document.getElementById('sessionUser').textContent = sess.username;
+  if (!localStorage.getItem('zenan_users')) {
+    localStorage.setItem('zenan_users', JSON.stringify([{ id: 'admin', username: 'admin', password: 'admin', role: 'admin' }]));
+  }
+  // Load products from IndexedDB; migrate from localStorage if first time
+  await ProdIDB.open();
+  let stored = await ProdIDB.getAll();
+  if (!stored.length) {
+    const lsData = DB.get('zenan_images', []);
+    if (lsData.length) {
+      await ProdIDB.saveAll(lsData);
+      stored = lsData;
+      try { localStorage.removeItem('zenan_images'); } catch(e) {}
+      toast('Products moved to expanded storage — space freed up!', 'green');
+    }
+  }
+  _imgs = stored;
+  renderAll();
+  restoreProjectFolder(); // reconnect project folder if previously linked
+})();
+
+// ══════════════════════════════════════════
+// ── PROJECT FOLDER (File System Access API)
+// ══════════════════════════════════════════
+
+const FolderIDB = {
+  _db: null,
+  open() {
+    return new Promise((res, rej) => {
+      const req = indexedDB.open('zenan_fs_db', 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore('handles', { keyPath: 'key' });
+      req.onsuccess = e => { this._db = e.target.result; res(this._db); };
+      req.onerror = rej;
+    });
+  },
+  async saveHandle(handle) {
+    const db = this._db || await this.open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction('handles', 'readwrite');
+      tx.objectStore('handles').put({ key: 'root', handle });
+      tx.oncomplete = res; tx.onerror = rej;
+    });
+  },
+  async getHandle() {
+    const db = this._db || await this.open();
+    return new Promise((res, rej) => {
+      const req = db.transaction('handles', 'readonly').objectStore('handles').get('root');
+      req.onsuccess = () => res(req.result ? req.result.handle : null);
+      req.onerror = rej;
+    });
+  }
+};
+
+let _rootDirHandle = null;
+
+async function connectProjectFolder() {
+  if (!window.showDirectoryPicker) {
+    toast('Your browser does not support folder access. Use Chrome or Edge.', 'red'); return;
+  }
+  try {
+    const handle = await window.showDirectoryPicker({ mode: 'readwrite', startIn: 'documents' });
+    _rootDirHandle = handle;
+    await FolderIDB.open();
+    await FolderIDB.saveHandle(handle);
+    updateFolderUI(handle.name);
+    toast('Project folder connected!', 'green');
+  } catch(e) {
+    if (e.name !== 'AbortError') toast('Could not connect folder.', 'red');
+  }
+}
+
+async function restoreProjectFolder() {
+  try {
+    await FolderIDB.open();
+    const handle = await FolderIDB.getHandle();
+    if (!handle) return;
+    const perm = await handle.queryPermission({ mode: 'readwrite' });
+    if (perm === 'granted') { _rootDirHandle = handle; updateFolderUI(handle.name); }
+    else {
+      // Show reconnect prompt — permission needs re-granting after browser restart
+      updateFolderUI(handle.name, false);
+    }
+  } catch(e) {}
+}
+
+function updateFolderUI(name, granted = true) {
+  const btn = document.getElementById('folderBtn');
+  const status = document.getElementById('folderStatus');
+  btn.classList.toggle('connected', granted);
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> ${granted ? '📂 ' + name : '🔄 Reconnect'}`;
+  status.textContent = granted
+    ? `Connected · client folders auto-created here`
+    : `"${name}" needs permission — click to reconnect`;
+  status.className = 'folder-status' + (granted ? ' ok' : '');
+}
+
+async function ensureClientFolder(clientName) {
+  if (!_rootDirHandle) {
+    // Try to reacquire permission silently
+    try {
+      await FolderIDB.open();
+      const handle = await FolderIDB.getHandle();
+      if (handle) {
+        const perm = await handle.requestPermission({ mode: 'readwrite' });
+        if (perm === 'granted') { _rootDirHandle = handle; updateFolderUI(handle.name); }
+      }
+    } catch(e) {}
+    if (!_rootDirHandle) return null;
+  }
+  try {
+    // Sanitise name for folder: remove special chars
+    const safeName = clientName.replace(/[<>:"/\\|?*]/g, '').trim() || 'client';
+    const clientsDir = await _rootDirHandle.getDirectoryHandle('clients', { create: true });
+    const clientDir  = await clientsDir.getDirectoryHandle(safeName, { create: true });
+    return clientDir;
+  } catch(e) { return null; }
+}
+
+async function writeFileToClientFolder(clientName, fileName, dataUrl) {
+  const dir = await ensureClientFolder(clientName);
+  if (!dir) return;
+  try {
+    // Convert dataUrl → Blob
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    const fileHandle = await dir.getFileHandle(fileName, { create: true });
+    const writable = await fileHandle.createWritable();
+    await writable.write(blob);
+    await writable.close();
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════
+// ── CLIENTS
+// ══════════════════════════════════════════
+
+// IndexedDB for client files
+const ClientIDB = {
+  _db: null,
+  open() {
+    return new Promise((res, rej) => {
+      const req = indexedDB.open('zenan_clients_db', 1);
+      req.onupgradeneeded = e => {
+        e.target.result.createObjectStore('files', { keyPath: 'id' });
+      };
+      req.onsuccess = e => { this._db = e.target.result; res(this._db); };
+      req.onerror = rej;
+    });
+  },
+  async getFiles(clientId) {
+    const db = this._db || await this.open();
+    return new Promise((res, rej) => {
+      const req = db.transaction('files','readonly').objectStore('files').getAll();
+      req.onsuccess = () => res((req.result || []).filter(f => f.clientId === clientId));
+      req.onerror = rej;
+    });
+  },
+  async saveFile(fileObj) {
+    const db = this._db || await this.open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction('files','readwrite');
+      tx.objectStore('files').put(fileObj);
+      tx.oncomplete = res; tx.onerror = rej;
+    });
+  },
+  async deleteFile(fileId) {
+    const db = this._db || await this.open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction('files','readwrite');
+      tx.objectStore('files').delete(fileId);
+      tx.oncomplete = res; tx.onerror = rej;
+    });
+  },
+  async deleteClientFiles(clientId) {
+    const files = await this.getFiles(clientId);
+    for (const f of files) await this.deleteFile(f.id);
+  }
+};
+
+// Clients metadata stored in localStorage
+function getClients() { return DB.get('zenan_clients', []); }
+function saveClients(clients) { DB.set('zenan_clients', clients); }
+
+// Modal state
+let _editClientId = null;
+let _pendingFiles = []; // { name, size, type, dataUrl }
+
+function togglePassVis() {
+  const inp = document.getElementById('cmLoginPass');
+  const btn = document.getElementById('passToggleBtn');
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+
+function openClientModal(clientId) {
+  _editClientId = clientId || null;
+  _pendingFiles = [];
+  const c = clientId ? getClients().find(x => x.id === clientId) : null;
+  document.getElementById('clientModalTitle').textContent = clientId ? 'Edit Client' : 'Add Client';
+  document.getElementById('cmName').value = c ? c.name : '';
+  document.getElementById('cmClientEmail').value = c ? (c.clientEmail || '') : '';
+  document.getElementById('cmRepName').value = c ? (c.repName || '') : '';
+  document.getElementById('cmRepEmail').value = c ? (c.repEmail || '') : '';
+  document.getElementById('cmLoginUser').value = c ? (c.loginUser || '') : '';
+  document.getElementById('cmLoginPass').value = c ? (c.loginPass || '') : '';
+  document.getElementById('cmLoginPass').type = 'password';
+  document.getElementById('passToggleBtn').textContent = '👁';
+  document.getElementById('cmPendingFiles').innerHTML = '';
+  document.getElementById('clientModalBackdrop').classList.add('open');
+}
+
+function closeClientModal() {
+  _editClientId = null;
+  _pendingFiles = [];
+  document.getElementById('clientModalBackdrop').classList.remove('open');
+}
+
+function cmPickFiles(e) {
+  [...e.target.files].forEach(readPendingFile);
+  e.target.value = '';
+}
+function cmDragOver(e) { e.preventDefault(); document.getElementById('cmFileDrop').classList.add('drag-over'); }
+function cmDragLeave(e) { document.getElementById('cmFileDrop').classList.remove('drag-over'); }
+function cmDrop(e) {
+  e.preventDefault();
+  document.getElementById('cmFileDrop').classList.remove('drag-over');
+  [...e.dataTransfer.files].forEach(readPendingFile);
+}
+
+function readPendingFile(file) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const item = { name: file.name, size: file.size, type: file.type, dataUrl: ev.target.result };
+    _pendingFiles.push(item);
+    renderPendingFiles();
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderPendingFiles() {
+  const el = document.getElementById('cmPendingFiles');
+  el.innerHTML = _pendingFiles.map((f, i) => `
+    <div class="cm-pending-row">
+      <span>${fileIcon(f.type)}</span>
+      <span class="cm-pending-name">${escHtml(f.name)}</span>
+      <span style="font-size:.7rem;color:var(--muted)">${fmtSize(f.size)}</span>
+      <button class="cm-pending-del" onclick="_pendingFiles.splice(${i},1);renderPendingFiles()">✕</button>
+    </div>`).join('');
+}
+
+async function saveClient() {
+  const name        = document.getElementById('cmName').value.trim();
+  const clientEmail = document.getElementById('cmClientEmail').value.trim();
+  const repName     = document.getElementById('cmRepName').value.trim();
+  const repEmail    = document.getElementById('cmRepEmail').value.trim();
+  const loginUser   = document.getElementById('cmLoginUser').value.trim();
+  const loginPass   = document.getElementById('cmLoginPass').value;
+  if (!name) { toast('Client name is required.', 'red'); return; }
+
+  await ClientIDB.open();
+  const clients = getClients();
+  let clientId = _editClientId || (Date.now().toString() + Math.random().toString(36).slice(2));
+
+  for (const f of _pendingFiles) {
+    const fileId = Date.now().toString() + Math.random().toString(36).slice(2);
+    await ClientIDB.saveFile({ id: fileId, clientId, name: f.name, size: f.size, type: f.type, dataUrl: f.dataUrl, addedAt: Date.now() });
+    writeFileToClientFolder(name, f.name, f.dataUrl); // also write to project folder
+  }
+
+  const record = { id: clientId, name, clientEmail, repName, repEmail, loginUser, loginPass, createdAt: Date.now() };
+  if (_editClientId) {
+    const idx = clients.findIndex(c => c.id === _editClientId);
+    if (idx > -1) { clients[idx] = { ...clients[idx], name, clientEmail, repName, repEmail, loginUser, loginPass }; }
+  } else {
+    clients.push(record);
+    ensureClientFolder(name); // create folder immediately on new client
+  }
+  saveClients(clients);
+  closeClientModal();
+  toast(_editClientId ? 'Client updated.' : 'Client added.', 'green');
+  renderClients();
+}
+
+async function deleteClient(clientId) {
+  if (!confirm('Delete this client and all their files?')) return;
+  await ClientIDB.open();
+  await ClientIDB.deleteClientFiles(clientId);
+  saveClients(getClients().filter(c => c.id !== clientId));
+  toast('Client deleted.');
+  renderClients();
+}
+
+async function deleteClientFile(fileId, clientId) {
+  await ClientIDB.open();
+  await ClientIDB.deleteFile(fileId);
+  renderClientCard(clientId);
+}
+
+async function downloadFile(fileId) {
+  await ClientIDB.open();
+  const db = ClientIDB._db || await ClientIDB.open();
+  const req = db.transaction('files','readonly').objectStore('files').get(fileId);
+  req.onsuccess = () => {
+    const f = req.result;
+    if (!f) return;
+    const a = document.createElement('a');
+    a.href = f.dataUrl;
+    a.download = f.name;
+    a.click();
+  };
+}
+
+async function renderClientCard(clientId) {
+  const card = document.querySelector(`.client-card[data-id="${clientId}"]`);
+  if (!card) return;
+  await ClientIDB.open();
+  const c = getClients().find(x => x.id === clientId);
+  if (!c) return;
+  const files = await ClientIDB.getFiles(clientId);
+  card.querySelector('.client-details').innerHTML = buildClientDetailsHtml(c, files);
+}
+
+function openLightbox(fileId) {
+  ClientIDB.open().then(() => {
+    const db = ClientIDB._db;
+    const req = db.transaction('files','readonly').objectStore('files').get(fileId);
+    req.onsuccess = () => {
+      const f = req.result;
+      if (!f) return;
+      const inner = document.getElementById('fileLightboxInner');
+      const dlBtn = document.getElementById('fileLightboxDl');
+      document.getElementById('fileLightboxName').textContent = f.name;
+      dlBtn.onclick = () => downloadFile(fileId);
+      if (f.type && f.type.startsWith('image/')) {
+        inner.innerHTML = `<img src="${f.dataUrl}" alt="${escHtml(f.name)}" />`;
+      } else if (f.type === 'application/pdf') {
+        inner.innerHTML = `<iframe src="${f.dataUrl}" title="${escHtml(f.name)}"></iframe>`;
+      } else {
+        inner.innerHTML = `<div style="text-align:center;color:#fff;font-size:4rem">${fileIcon(f.type)}<div style="font-size:1rem;margin-top:12px;opacity:.7">${escHtml(f.name)}</div></div>`;
+      }
+      document.getElementById('fileLightbox').classList.add('open');
+    };
+  });
+}
+
+function closeLightbox(e) {
+  // close only when clicking the backdrop itself, not its children
+  if (e && e.target !== document.getElementById('fileLightbox')) return;
+  document.getElementById('fileLightbox').classList.remove('open');
+  document.getElementById('fileLightboxInner').innerHTML = '';
+}
+function closeLightboxForce() {
+  document.getElementById('fileLightbox').classList.remove('open');
+  document.getElementById('fileLightboxInner').innerHTML = '';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightboxForce(); });
+
+function buildFileTile(f) {
+  let preview = '';
+  if (f.type && f.type.startsWith('image/')) {
+    preview = `<img class="client-file-preview" src="${f.dataUrl}" alt="${escHtml(f.name)}" />`;
+  } else if (f.type === 'application/pdf') {
+    preview = `<iframe class="client-file-preview-pdf" src="${f.dataUrl}" title="${escHtml(f.name)}"></iframe>`;
+  } else {
+    preview = `<div class="client-file-preview-icon">${fileIcon(f.type)}</div>`;
+  }
+  return `
+  <div class="client-file-tile" style="cursor:pointer;" onclick="openLightbox('${f.id}')">
+    ${preview}
+    <div class="client-file-meta" onclick="event.stopPropagation()">
+      <span class="client-file-name-sm" title="${escHtml(f.name)}">${escHtml(f.name)}</span>
+      <button class="client-file-dl" onclick="downloadFile('${f.id}')" title="Download">⬇</button>
+      <button class="client-file-del" onclick="deleteClientFile('${f.id}','${f.clientId}')" title="Remove">✕</button>
+    </div>
+  </div>`;
+}
+
+function buildClientDetailsHtml(c, files) {
+  const filesHtml = files.length
+    ? `<div class="client-files-grid">${files.map(buildFileTile).join('')}</div>`
+    : '<p style="font-size:.78rem;color:var(--muted);margin-bottom:10px;">No files attached.</p>';
+  return `
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.78rem;margin-bottom:14px;">
+    <div style="background:var(--off);border-radius:8px;padding:9px 11px;">
+      <div class="client-section-label">Rep</div>
+      <div style="font-weight:700;color:var(--dark)">${escHtml(c.repName || '—')}</div>
+      <div style="color:var(--muted)">${escHtml(c.repEmail || '—')}</div>
+    </div>
+    <div style="background:var(--off);border-radius:8px;padding:9px 11px;">
+      <div class="client-section-label">Login</div>
+      <div style="font-weight:700;color:var(--dark)">${escHtml(c.loginUser || '—')}</div>
+      <div style="color:var(--muted);font-family:monospace;letter-spacing:2px;">${c.loginPass ? '••••••••' : '—'}</div>
+    </div>
+  </div>
+  <div style="font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:10px;">Files (${files.length})</div>
+  ${filesHtml}
+  <button class="client-add-file-btn" onclick="addFileToClient('${c.id}')">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Attach file
+  </button>`;
+}
+
+function toggleClientCard(clientId) {
+  const card = document.querySelector(`.client-card[data-id="${clientId}"]`);
+  if (!card) return;
+  card.classList.toggle('open');
+}
+
+async function renderClients() {
+  const q = (document.getElementById('clientSearch')?.value || '').toLowerCase();
+  const clients = getClients().filter(c =>
+    c.name.toLowerCase().includes(q) || (c.clientEmail || c.email || '').toLowerCase().includes(q)
+  ).sort((a,b) => b.createdAt - a.createdAt);
+
+  await ClientIDB.open();
+  const grid = document.getElementById('clientsGrid');
+  if (!clients.length) {
+    grid.innerHTML = '<div class="client-empty">No clients yet. Click <strong>Add Client</strong> to get started.</div>';
+    return;
+  }
+
+  const cards = await Promise.all(clients.map(async c => {
+    const files = await ClientIDB.getFiles(c.id);
+    const initials = c.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    return `
+    <div class="client-card" data-id="${c.id}">
+      <div class="client-card-header" onclick="toggleClientCard('${c.id}')">
+        <div class="client-avatar">${initials}</div>
+        <div class="client-info">
+          <div class="client-name">${escHtml(c.name)}</div>
+          <div class="client-email">${escHtml(c.clientEmail || c.email || '')}</div>
+        </div>
+        <div class="client-card-actions" onclick="event.stopPropagation()">
+          <button class="client-action-btn" onclick="openClientModal('${c.id}')" title="Edit">✏️</button>
+          <button class="client-action-btn del" onclick="deleteClient('${c.id}')" title="Delete">🗑</button>
+        </div>
+        <span class="client-chevron">▼</span>
+      </div>
+      <div class="client-details">
+        ${buildClientDetailsHtml(c, files)}
+      </div>
+    </div>`;
+  }));
+  grid.innerHTML = cards.join('');
+}
+
+// Quick file attach from card (without opening full modal)
+function addFileToClient(clientId) {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.multiple = true;
+  inp.onchange = async e => {
+    await ClientIDB.open();
+    for (const file of e.target.files) {
+      await new Promise(res => {
+        const reader = new FileReader();
+        reader.onload = async ev => {
+          const fileId = Date.now().toString() + Math.random().toString(36).slice(2);
+          await ClientIDB.saveFile({ id: fileId, clientId, name: file.name, size: file.size, type: file.type, dataUrl: ev.target.result, addedAt: Date.now() });
+          const client = getClients().find(c => c.id === clientId);
+          if (client) writeFileToClientFolder(client.name, file.name, ev.target.result);
+          res();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    toast('File(s) attached.', 'green');
+    renderClients();
+  };
+  inp.click();
+}
+
+function fileIcon(type) {
+  if (!type) return '📄';
+  if (type.startsWith('image/')) return '🖼️';
+  if (type === 'application/pdf') return '📕';
+  if (type.includes('word') || type.includes('document')) return '📝';
+  if (type.includes('sheet') || type.includes('excel') || type.includes('csv')) return '📊';
+  if (type.includes('zip') || type.includes('rar') || type.includes('tar')) return '🗜️';
+  return '📄';
+}
+
+function fmtSize(bytes) {
+  if (!bytes) return '';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+// Close modal on backdrop click
+document.getElementById('clientModalBackdrop').addEventListener('click', function(e) {
+  if (e.target === this) closeClientModal();
+});
+</script>
+</body>
+</html>

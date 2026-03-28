@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(start \"\" \"c:\\\\Users\\\\nikit\\\\OneDrive\\\\Documents\\\\Zenan\\\\index.html\")",
+      "Bash(start \"\" \"c:\\\\Users\\\\nikit\\\\OneDrive\\\\Documents\\\\Zenan\\\\gallery.html\")",
+      "Bash(start \"\" \"c:\\\\Users\\\\nikit\\\\OneDrive\\\\Documents\\\\Zenan\\\\login.html\")",
+      "Bash(ls \"c:\\\\Users\\\\nikit\\\\OneDrive\\\\Documents\\\\Zenan\\\\brand_assets\\\\suppliers\"\" 2>/dev/null || echo \"empty \")",
+      "Bash(python -:*)",
+      "Bash(node -e \":*)",
+      "Bash(for f:*)",
+      "Bash(do)",
+      "Bash(echo \"=== $f ===\")",
+      "Read(//c/Users/nikit/OneDrive/Documents/Zenan/**)",
+      "Bash(echo \"WARN: <nav> still present\")"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\nikit\\.claude\\projects\\c--Users-nikit-OneDrive-Documents-Zenan\\memory"
+    ]
+  }
+}

@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — Zenan Glass</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    .pour-wrap { position: relative; display: flex; }
+    .pour-tip {
+      position: absolute; right: calc(100% + 12px); top: 50%;
+      transform: translateY(-50%) translateX(4px); opacity: 0;
+      background: rgba(15,25,55,.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      color: #e8efff; font-size: .72rem; font-weight: 500; letter-spacing: .02em;
+      white-space: nowrap; padding: 6px 12px; border-radius: 8px;
+      pointer-events: none; transition: opacity .2s, transform .2s;
+      box-shadow: 0 4px 18px rgba(0,0,0,.18);
+    }
+    .pour-tip::after {
+      content: ''; position: absolute; left: 100%; top: 50%; transform: translateY(-50%);
+      border: 5px solid transparent; border-left-color: rgba(15,25,55,.72);
+    }
+    .pour-wrap:hover .pour-tip { opacity: 1; transform: translateY(-50%) translateX(0); }
+    html { scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+
+    :root {
+      --blue:   #2558B0;
+      --blue2:  #3b82f6;
+      --aqua:   #0891b2;
+      --dark:   #0f172a;
+      --body:   #334155;
+      --muted:  #64748b;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); color: var(--body); line-height: 1.6; background: transparent; min-height: 100vh; overflow-x: hidden; }
+
+    /* ── FIXED BACKGROUND CANVAS ── */
+    #bgCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    nav, main, footer { position: relative; z-index: 1; }
+
+    .grad-text {
+      background: linear-gradient(135deg, #2558B0 0%, #3b82f6 50%, #60a5fa 80%, #93c5fd 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal       { opacity: 0; transform: translateY(24px); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
+    .reveal-left  { opacity: 0; transform: translateX(-24px); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
+    .reveal-right { opacity: 0; transform: translateX(24px);  transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
+    .reveal.in, .reveal-left.in, .reveal-right.in { opacity: 1; transform: translate(0); }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(5px) saturate(180%); -webkit-backdrop-filter: blur(5px) saturate(180%);
+      border-bottom: 1px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 6vw; height: 68px;
+      box-shadow: 0 2px 16px rgba(37,88,176,.06);
+    }
+    .logo-wrap { display: flex; align-items: center; text-decoration: none; }
+    .logo-wrap img { height: 52px; width: auto; display: block; }
+    .nav-links { display: flex; gap: 2px; list-style: none; margin-left: auto; }
+    .nav-links a {
+      color: #1e3a6e; text-decoration: none; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      padding: 8px 16px; border-radius: 7px; transition: background .2s, color .2s;
+    }
+    .nav-links a:hover { background: rgba(37,88,176,.08); color: #2558B0; }
+    .nav-links a.active { color: var(--blue); font-weight: 700; }
+    #navLoginBtn { color: #1e3a6e; text-decoration: none; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 8px 16px; border-radius: 8px; transition: background .2s, color .2s; flex-shrink: 0; margin-left: 4px; }
+    #navLoginBtn:hover { background: rgba(37,88,176,.08); color: #2558B0; }
+    .nav-insta { display: flex !important; align-items: center; gap: 5px; }
+    .nav-insta svg { flex-shrink: 0; }
+    .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; border: none; background: none; }
+    .nav-hamburger span { display: block; width: 24px; height: 2px; background: var(--dark); border-radius: 2px; }
+    @media (max-width: 640px) {
+      .nav-hamburger { display: flex; }
+      .nav-links { display: none; flex-direction: column; gap: 0; position: absolute; top: 68px; left: 0; right: 0; background: rgba(255,255,255,.92); backdrop-filter: blur(24px); padding: 8px 0 16px; box-shadow: 0 8px 30px rgba(37,88,176,.09); }
+      .nav-links.open { display: flex; }
+      .nav-links a { border-radius: 0; padding: 12px 6vw; }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 30px 6vw 90px; text-align: left; background: transparent;
+    }
+    .hero-content {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;
+    }
+    .hero-text { display: flex; flex-direction: column; justify-content: center; }
+    .hero-img-wrap {
+      width: 100%; border-radius: 22px; overflow: hidden;
+    }
+    .hero-img-wrap img {
+      width: 100%; height: auto; display: block;
+    }
+    @media (max-width: 700px) {
+      .hero-content { grid-template-columns: 1fr; text-align: center; }
+      .hero { text-align: center; }
+    }
+    .breadcrumb-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.28); border: 1px solid rgba(37,88,176,.14);
+      backdrop-filter: blur(12px); padding: 5px 16px; border-radius: 20px;
+      font-size: .78rem; color: var(--muted); margin-bottom: 28px;
+    }
+    .breadcrumb-pill a { color: var(--blue2); text-decoration: none; font-weight: 600; }
+    .hero h1 {
+      font-size: clamp(2.6rem, 6vw, 4.2rem); font-weight: 900; color: #0f172a;
+      line-height: 1.08; margin-bottom: 18px; letter-spacing: -.02em;
+      filter: drop-shadow(0 2px 8px rgba(37,88,176,.10));
+    }
+    .hero h1 .grad-text {
+      filter: drop-shadow(0 0 6px rgba(96,165,250,.12));
+    }
+    .hero p {
+      font-size: 1.05rem; max-width: 480px; margin: 0; line-height: 1.85; font-weight: 600; letter-spacing: .01em;
+      background: linear-gradient(120deg, #1e3a6e 0%, #2558B0 40%, #3b82f6 70%, #60a5fa 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      filter: drop-shadow(0 1px 6px rgba(37,88,176,.12));
+    }
+    @keyframes shimmer-pulse {
+      0%, 100% { filter: drop-shadow(0 0 6px rgba(96,165,250,.12)); }
+      50%       { filter: drop-shadow(0 0 10px rgba(96,165,250,.2)); }
+    }
+    .hero h1 .grad-text { animation: shimmer-pulse 3s ease-in-out infinite; }
+
+    /* ── MAIN LAYOUT ── */
+    main { overflow: visible; }
+    .contact-wrap {
+      max-width: 1300px; margin: 0 auto;
+      padding: 20px 6vw 100px;
+      display: grid; grid-template-columns: 1fr 1.6fr 0.85fr; gap: 40px; align-items: start;
+    }
+    @media (max-width: 1000px) { .contact-wrap { grid-template-columns: 1fr 1.4fr; } .process-side { display: none; } }
+    @media (max-width: 860px) { .contact-wrap { grid-template-columns: 1fr; gap: 36px; } }
+
+    /* ── VERTICAL PROCESS (side panel) ── */
+    .process-side { padding-top: 8px; }
+    .process-side-title { font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--blue); margin-bottom: 18px; }
+    .vsteps { display: flex; flex-direction: column; position: relative; }
+    .vstep { display: flex; gap: 16px; align-items: flex-start; padding-bottom: 36px; position: relative; }
+    .vstep:last-child { padding-bottom: 0; }
+    .vstep-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; position: relative; }
+    .vstep-num {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #fff; border: 2.5px solid var(--blue);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.05rem; font-weight: 800; color: var(--blue);
+      box-shadow: 3px 3px 0 #FFD700; flex-shrink: 0; z-index: 1;
+    }
+    .vstep-line { display: none; }
+    .vstep:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 22px; /* center of 44px circle */
+      top: 44px;  /* bottom edge of circle */
+      bottom: 0;
+      width: 2px;
+      background: repeating-linear-gradient(180deg, #2558B0 0, #2558B0 6px, transparent 6px, transparent 14px);
+      background-size: 2px 20px;
+      animation: vline-flow 1.4s linear infinite;
+      opacity: .35;
+    }
+    @keyframes vline-flow { 0%{background-position:0 0} 100%{background-position:0 20px} }
+    .vstep-content { padding-top: 8px; }
+    .vstep-content h4 { font-size: .9rem; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .vstep-content p { font-size: .78rem; color: #0f172a; line-height: 1.6; }
+
+    /* ── GLASS CARD BASE — flat ── */
+    .glass-card {
+      background: none !important;
+      backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      overflow: visible !important;
+    }
+    .glass-card::before { display: none !important; }
+
+    /* ── LEFT: INFO ── */
+    .contact-info { display: flex; flex-direction: column; gap: 16px; }
+    .info-section-label {
+      font-size: .72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.4px; color: var(--blue2); margin-bottom: 6px;
+    }
+
+    .info-card {
+      padding: 14px 18px; margin-bottom: 6px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .info-card:last-child { margin-bottom: 0; }
+    .info-card .person-name { font-size: .97rem; font-weight: 700; color: var(--dark); position: relative; z-index: 1; }
+    .info-card .person-title { font-size: .78rem; color: #0f172a; margin-top: -3px; margin-bottom: 2px; position: relative; z-index: 1; }
+    .info-row {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .88rem; color: var(--body); position: relative; z-index: 1;
+    }
+    .info-row .ic {
+      width: 22px; height: 22px; flex-shrink: 0;
+      display: grid; place-items: center;
+      background: none; border: none;
+    }
+    .info-row a { color: var(--blue); text-decoration: none; font-weight: 500; }
+    .info-row a:hover { text-decoration: underline; }
+
+    .hours-card { padding: 14px 18px; }
+    .hours-title { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--blue2); margin-bottom: 8px; position: relative; z-index: 1; }
+    .hours-row { display: flex; justify-content: space-between; font-size: .86rem; color: var(--body); margin-bottom: 5px; position: relative; z-index: 1; }
+    .hours-row:last-of-type { margin-bottom: 0; }
+    .hours-row .day { font-weight: 600; color: var(--dark); }
+    .hours-note { font-size: .8rem; color: #0f172a; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(37,88,176,.1); line-height: 1.55; position: relative; z-index: 1; }
+
+    /* ── RIGHT: FORM ── */
+    .contact-form-wrap { }
+    .form-glass { padding: 36px 36px; }
+    @media (max-width: 500px) { .form-glass { padding: 24px 20px; } }
+    .form-heading { font-size: 1.25rem; font-weight: 800; color: var(--dark); margin-bottom: 5px; position: relative; z-index: 1; }
+    .form-sub { font-size: .88rem; color: #0f172a; margin-bottom: 26px; position: relative; z-index: 1; }
+
+    form.contact-form { display: flex; flex-direction: column; gap: 15px; position: relative; z-index: 1; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label { font-size: .81rem; font-weight: 600; color: var(--dark); }
+    .form-group label .req { color: var(--blue2); margin-left: 2px; }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%; padding: 11px 13px;
+      border: 1px solid rgba(37,88,176,.16); border-radius: 10px;
+      font-size: .92rem; font-family: var(--font); color: var(--dark);
+      background: rgba(255,255,255,.55);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,88,176,.10);
+      background: rgba(255,255,255,.75);
+    }
+    .form-group textarea { resize: vertical; min-height: 90px; }
+    .form-group .field-hint { font-size: .75rem; color: #0f172a; margin-top: 2px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 500px) { .form-row-2 { grid-template-columns: 1fr; } }
+
+    .btn-submit {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 13px 32px; border-radius: 10px;
+      background: #fff; color: #2558B0; font-size: .97rem; font-weight: 700; font-family: var(--font);
+      border: 2px solid #2558B0; cursor: pointer; margin-top: 4px;
+      box-shadow: 5px 5px 0 #FFD700;
+      transition: transform .18s, box-shadow .18s;
+    }
+    .btn-submit:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #FFD700; }
+    .form-note { font-size: .76rem; color: #0f172a; text-align: center; position: relative; z-index: 1; }
+
+    .success-msg {
+      display: none; background: rgba(240,253,244,.8); border: 1px solid rgba(187,247,208,.8);
+      backdrop-filter: blur(8px); border-radius: 12px; padding: 20px 22px;
+      color: #166534; font-weight: 600; font-size: .95rem; text-align: center;
+      position: relative; z-index: 1;
+    }
+    .success-msg.show { display: block; }
+
+    /* ── PROCESS (contact page) ── */
+    .process-section-ct { padding: 80px 6vw 60px; text-align: center; }
+    .steps-wrap-ct { position: relative; max-width: 1060px; margin: 0 auto; }
+    .steps-connector-ct {
+      position: absolute; top: 42px; left: calc(12.5% + 28px); right: calc(12.5% + 28px);
+      height: 2px; z-index: 0;
+      background: repeating-linear-gradient(90deg, #2558B0 0, #2558B0 8px, transparent 8px, transparent 18px);
+      background-size: 26px 2px;
+      animation: connector-flow-ct 1.2s linear infinite;
+      opacity: .35;
+    }
+    @keyframes connector-flow-ct { 0%{background-position:0 0} 100%{background-position:26px 0} }
+    .steps-ct { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; position: relative; z-index: 1; }
+    @media (max-width: 700px) { .steps-ct { grid-template-columns: repeat(2,1fr); } .steps-connector-ct { display: none; } }
+    .step-ct {
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      padding: 10px 18px 0;
+    }
+    .step-num-ct {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: #fff; border: 2.5px solid #2558B0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; font-weight: 800; color: #2558B0;
+      margin-bottom: 16px; box-shadow: 3px 3px 0 #FFD700; flex-shrink: 0;
+    }
+    .step-ct h3 { font-size: .97rem; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+    .step-ct p { font-size: .85rem; color: #0f172a; line-height: 1.6; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(5px) saturate(180%); -webkit-backdrop-filter: blur(5px) saturate(180%);
+      border-top: 1px solid rgba(255,255,255,.2);
+      box-shadow: 0 -2px 16px rgba(37,88,176,.06);
+      color: #0f172a; padding: 14px 6vw 12px; position: relative;
+    }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+      padding-bottom: 36px; border-bottom: 1px solid rgba(37,88,176,.1);
+    }
+    .footer-logo { display: inline-flex; margin-bottom: 14px; }
+    .footer-logo img { height: 46px; width: auto; display: block; }
+    .footer-brand p { font-size: .88rem; line-height: 1.7; max-width: 280px; color: #0f172a; }
+    .footer-col h4 { color: #0f172a; font-size: .83rem; font-weight: 700; margin-bottom: 14px; letter-spacing: .08em; text-transform: uppercase; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 9px; font-size: .88rem; color: #0f172a; }
+    .footer-col a { color: #0f172a; text-decoration: none; transition: color .2s; }
+    .footer-col a:hover { color: #2558B0; }
+    .footer-contact li { display: flex; gap: 8px; align-items: flex-start; }
+    .footer-contact .ic { display: flex; align-items: center; margin-top: 3px; flex-shrink: 0; opacity: .5; }
+    .footer-bottom {
+      max-width: 1100px; margin: 22px auto 0;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+      font-size: .8rem; color: #0f172a;
+    }
+    @media (max-width: 700px) {
+      .footer-inner { grid-template-columns: 1fr; gap: 28px; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- GLOBAL BACKGROUND CANVAS -->
+<canvas id="bgCanvas"></canvas>
+
+<nav>
+  <a href="index.html" class="logo-wrap">
+    <img src="brand_assets/Zenan logo.png" alt="Zenan Glass" />
+  </a>
+  <button class="nav-hamburger" aria-label="Toggle menu" onclick="toggleNav()">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="products.html">Products</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="contact.html" class="active">Contact</a></li>
+  </ul>
+  <a id="navLoginBtn" href="login.html">Log In</a>
+<script>
+(function(){
+  var btn = document.getElementById('navLoginBtn');
+  if (!btn) return;
+  if (localStorage.getItem('zenan_session')) {
+    btn.textContent = 'My Account'; btn.href = 'admin.html';
+  } else if (sessionStorage.getItem('zenan_client_session')) {
+    btn.textContent = 'My Account'; btn.href = 'client-portal.html';
+  }
+})();
+</script>
+</nav>
+<div style="position:fixed;top:84px;right:20px;z-index:199;display:flex;flex-direction:column;gap:8px;">
+  <div class="pour-wrap">
+    <button onclick="pourBeer()" style="padding:0;border:none;background:none;cursor:pointer;transition:transform .2s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img src="brand_assets/Beer screen icon.png" style="height:30px;width:auto;display:block;"></button>
+    <span class="pour-tip">Pour yourself a cold one ✦</span>
+  </div>
+  <div class="pour-wrap">
+    <button onclick="pourWine()" style="padding:0;border:none;background:none;cursor:pointer;transition:transform .2s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img src="brand_assets/Wine screen icon.png" style="height:30px;width:auto;display:block;"></button>
+    <span class="pour-tip">A glass of something fine ✦</span>
+  </div>
+</div>
+
+<main>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-text reveal-left">
+      <h1>Get in <span style="color:#2558B0;">Touch</span></h1>
+      <p>Reach out to our sales team directly or fill in the form and we'll get back to you within one business day.</p>
+    </div>
+    <div class="hero-img-wrap reveal-right">
+      <img src="brand_assets/Contact us BG.png" alt="Get in Touch">
+    </div>
+  </div>
+</section>
+
+<!-- MAIN CONTENT -->
+<div class="contact-wrap">
+
+  <!-- LEFT: CONTACT INFO -->
+  <div class="contact-info">
+
+    <!-- Toronto Office -->
+    <div class="reveal">
+      <div class="info-section-label">Toronto Office</div>
+      <div class="glass-card info-card">
+        <div class="info-row">
+          <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2558B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+          <span>430 Flint Road, Toronto, ON M3J 2J4</span>
+        </div>
+        <div class="info-row">
+          <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2558B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.06 6.06l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17z"/></svg></span>
+          <span>Admin: <a href="tel:4163587247">416-358-7247</a></span>
+        </div>
+        <div class="info-row">
+          <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2558B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13 17"/><polyline points="22 7 13 7"/><polyline points="2 17 9 12 2 7"/><rect x="2" y="7" width="2" height="10" rx="1"/></svg></span>
+          <span>Fax: 416-736-8085</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sales Canada -->
+    <div class="reveal">
+      <div class="info-section-label">Sales — Canada</div>
+      <div class="glass-card info-card" style="margin-bottom:12px;">
+        <div class="person-name">Dan Silva</div>
+        <div class="person-title">Vice President</div>
+        <div class="info-row">
+          <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2558B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.06 6.06l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17z"/></svg></span>
+          <a href="tel:4168756001">416-875-6001</a>
+        </div>
+        <div class="info-row">
+          <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2558B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+          <a href="mailto:daniel@test">daniel@test</a>
+        </div>
+      </div>
+      <div class="glass-card info-card">
+        <div class="person-name">Luc Groulx</div>
+        <div class="person-title">President &amp; General Manager</div>
+        <div class="info-row">
+          <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2558B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.06 6.06l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17z"/></svg></span>
+          <a href="tel:4163587247">416-358-7247</a>
+        </div>
+        <div class="info-row">
+          <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2558B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+          <a href="mailto:luc@test">luc@test</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hours -->
+    <div class="reveal">
+      <div class="info-section-label">Hours of Operation</div>
+      <div class="glass-card hours-card">
+        <div class="hours-title">Office Hours</div>
+        <div class="hours-row"><span class="day">Monday – Friday</span><span>8:00 am – 5:00 pm</span></div>
+        <div class="hours-row"><span class="day">Saturday – Sunday</span><span>Closed</span></div>
+        <div class="hours-note">
+          <strong>Client Pick-Ups:</strong><br>
+          Monday – Friday: 9am – 12pm &amp; 1pm – 4pm
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: FORM -->
+  <div class="contact-form-wrap reveal-right">
+    <div class="glass-card form-glass">
+      <div class="form-heading">Send Us a Message</div>
+      <p class="form-sub">Tell us about your project and we'll connect you with the right rep for your region.</p>
+
+      <div class="success-msg" id="successMsg">
+        ✓ Message sent! We'll be in touch within one business day.
+      </div>
+
+      <form class="contact-form" id="contactForm" onsubmit="submitContact(event)">
+        <input type="hidden" name="access_key" value="502684a2-5885-4edf-8571-ee612d933398" />
+        <input type="hidden" name="subject" value="New Contact Inquiry — Zenan Glass" />
+        <input type="hidden" name="from_name" value="Zenan Glass Website" />
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="name">Full Name <span class="req">*</span></label>
+            <input type="text" id="name" name="Full Name" placeholder="Jane Smith" required />
+          </div>
+          <div class="form-group">
+            <label for="company">Company Name</label>
+            <input type="text" id="company" name="Company Name" placeholder="Your Company Inc." />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="email">Email Address <span class="req">*</span></label>
+            <input type="email" id="email" name="email" placeholder="jane@company.com" required />
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="Phone Number" placeholder="416-000-0000" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="address">Shipping Address <span class="req">*</span></label>
+          <input type="text" id="address" name="Shipping Address" placeholder="123 Main St, City, Province, Postal Code" required />
+          <span class="field-hint">Helps us assign the right sales rep for your territory.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="products">Products of Interest <span class="req">*</span></label>
+          <textarea id="products" name="Products of Interest" placeholder="e.g. Etched Wine Glasses #WG-101, Custom Beer Mugs, or link to product page. Include any special requests." required></textarea>
+          <span class="field-hint">Product names or item numbers are all helpful.</span>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="qty">Quantity <span class="req">*</span></label>
+            <input type="text" id="qty" name="Quantity" placeholder="e.g. 100 units" required />
+            <span class="field-hint">Please tell us how many you are interested in purchasing.</span>
+          </div>
+          <div class="form-group">
+            <label for="customization">Customization <span class="req">*</span></label>
+            <select id="customization" name="Customization" required>
+              <option value="" disabled selected>Please choose…</option>
+              <option>Custom Decorated</option>
+              <option>Blank</option>
+            </select>
+            <span class="field-hint">Blank or custom decorated with your logo/artwork.</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="referral">How did you hear about us? <span class="req">*</span></label>
+          <input type="text" id="referral" name="How did you hear about us" placeholder="e.g. Google, referral, trade show, social media…" required />
+        </div>
+
+        <button type="submit" class="btn-submit">Send Message ›</button>
+        <p class="form-note">We respond within 1 business day · Mon–Fri 8am–5pm EST</p>
+      </form>
+    </div>
+  </div>
+
+  <!-- RIGHT: VERTICAL PROCESS -->
+  <div class="process-side reveal">
+    <div class="process-side-title">Our Process</div>
+    <div class="vsteps">
+      <div class="vstep">
+        <div class="vstep-left"><div class="vstep-num">1</div><div class="vstep-line"></div></div>
+        <div class="vstep-content"><h4>Inquire</h4><p>Tell us what you need — product type, quantity, branding details, and timeline. We'll respond within one business day.</p></div>
+      </div>
+      <div class="vstep">
+        <div class="vstep-left"><div class="vstep-num">2</div><div class="vstep-line"></div></div>
+        <div class="vstep-content"><h4>Quote &amp; Proof</h4><p>We send a detailed quote and a digital proof for your approval. No surprises on price or design.</p></div>
+      </div>
+      <div class="vstep">
+        <div class="vstep-left"><div class="vstep-num">3</div><div class="vstep-line"></div></div>
+        <div class="vstep-content"><h4>Production</h4><p>Once approved, we handle production and keep you updated throughout. Quality checks at every stage.</p></div>
+      </div>
+      <div class="vstep">
+        <div class="vstep-left"><div class="vstep-num">4</div><div class="vstep-line"></div></div>
+        <div class="vstep-content"><h4>Delivery</h4><p>We ship directly to you or your recipients across Canada and the US with full tracking.</p></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo">
+        <img src="brand_assets/Zenan logo.png" alt="Zenan Glass" />
+      </a>
+      <p>Premium custom glass products and branded merchandise for businesses across North America.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col footer-contact">
+      <h4>Contact Us</h4>
+      <ul>
+        <li><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> 430 Flint Road, Toronto, ON M3J 2J4</li>
+        <li><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.06 6.06l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17z"/></svg></span> <a href="tel:4163587247">416-358-7247</a></li>
+        <li><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span> <a href="mailto:luc@test">luc@test</a></li>
+        <li><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> Mon–Fri 8am–5pm</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Zenan Glass. All rights reserved.</span>
+    <span>Made with care in Canada 🍁</span>
+  </div>
+</footer>
+
+<script>
+  function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
+  document.querySelectorAll('.nav-links a').forEach(a =>
+    a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'))
+  );
+
+  async function submitContact(e) {
+    e.preventDefault();
+    const form = document.getElementById('contactForm');
+    const btn = form.querySelector('.btn-submit');
+    const formData = new FormData(form);
+    const payload = Object.fromEntries(formData);
+    payload.access_key = '502684a2-5885-4edf-8571-ee612d933398';
+    payload.subject = 'New Contact Inquiry — Zenan Glass';
+    payload.from_name = 'Zenan Glass Website';
+    btn.textContent = 'Sending…'; btn.disabled = true;
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json();
+      if (res.status === 200) {
+        form.style.display = 'none';
+        document.getElementById('successMsg').classList.add('show');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        throw new Error(json.message || 'Submission failed');
+      }
+    } catch (err) {
+      console.error('Form error:', err);
+      btn.textContent = 'Send Message ›'; btn.disabled = false;
+      alert('Something went wrong: ' + err.message);
+    }
+  }
+
+  // ══════════════════════════════════════════════
+// ── CANVAS BACKGROUND ──
+  (function () {
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, frame = 0;
+    let mouse = { x: .5, y: .5 }, targetMouse = { x: .5, y: .5 };
+    window.addEventListener('mousemove', e => { targetMouse.x = e.clientX/window.innerWidth; targetMouse.y = e.clientY/window.innerHeight; });
+    // Click ripples
+    const ripples = [];
+    window.addEventListener('click', e => { ripples.push({ x: e.clientX, y: e.clientY, r: 0, alpha: .35, hue: 200 + Math.random()*30 }); });
+
+    const orbs = [
+      { x:.15, y:.1,  r:.32, hue:210, speed:.00018, phase:0,   gold:false, depth:1   },
+      { x:.72, y:.25, r:.26, hue:195, speed:.00022, phase:1.8, gold:false, depth:.7  },
+      { x:.45, y:.6,  r:.36, hue:220, speed:.00015, phase:3.4, gold:false, depth:1.2 },
+      { x:.85, y:.7,  r:.24, hue:200, speed:.0002,  phase:0.9, gold:false, depth:.8  },
+      { x:.3,  y:.85, r:.28, hue:185, speed:.00017, phase:2.3, gold:false, depth:1   },
+      { x:.6,  y:.4,  r:.22, hue:230, speed:.00025, phase:4.1, gold:false, depth:.6  },
+      { x:.9,  y:.35, r:.20, hue:205, speed:.00019, phase:1.1, gold:false, depth:.9  },
+      { x:.2,  y:.55, r:.18, hue:215, speed:.00021, phase:2.7, gold:false, depth:1.1 },
+      { x:.5,  y:.15, r:.15, hue:190, speed:.00023, phase:0.4, gold:false, depth:.75 },
+    ];
+    const beams = [
+      { x:.25, y:.2,  angle:-.38, spread:.70, speed:.00105, phase:0,   hue:210, alpha:.18  },
+      { x:.6,  y:.55, angle: .28, spread:.58, speed:.00082, phase:2.1, hue:198, alpha:.17  },
+      { x:.8,  y:.15, angle:-.55, spread:.65, speed:.00124, phase:1.2, hue:222, alpha:.16  },
+      { x:.1,  y:.75, angle: .48, spread:.60, speed:.00091, phase:3.5, hue:190, alpha:.18  },
+      { x:.5,  y:.9,  angle:-.22, spread:.82, speed:.00068, phase:0.7, hue:215, alpha:.15  },
+      { x:.7,  y:.4,  angle: .15, spread:.50, speed:.00100, phase:1.9, hue:175, alpha:.16  },
+      { x:.35, y:.5,  angle: .62, spread:.48, speed:.00115, phase:3.0, hue:195, alpha:.14  },
+      { x:.15, y:.3,  angle: .35, spread:.65, speed:.00077, phase:4.2, hue:240, alpha:.15  },
+      { x:.9,  y:.65, angle:-.42, spread:.72, speed:.00096, phase:1.5, hue:185, alpha:.14  },
+      { x:.42, y:.08, angle: .58, spread:.55, speed:.00110, phase:2.8, hue:230, alpha:.13  },
+      { x:.55, y:.72, angle:-.30, spread:.62, speed:.00088, phase:0.4, hue:260, alpha:.15  },
+      { x:.22, y:.88, angle: .44, spread:.54, speed:.00118, phase:1.7, hue:260, alpha:.14  },
+      { x:.78, y:.32, angle:-.18, spread:.68, speed:.00074, phase:3.3, hue:260, alpha:.16  },
+    ];
+    const facets = Array.from({ length: 85 }, () => ({
+      x: Math.random(), y: Math.random(),
+      s: 8 + Math.random() * 62,
+      sides: [3,4,6][Math.floor(Math.random()*3)],
+      rot: Math.random() * Math.PI * 2,
+      rspeed: (Math.random()-.5) * .006,
+      alpha: .045 + Math.random() * .13,
+      hue: [190,210,225,240,175,260][Math.floor(Math.random()*6)] + Math.random()*20,
+      drift: { x: (Math.random()-.5)*.00058, y: (Math.random()-.5)*.00048 },
+      depth: .5 + Math.random() * .8,
+    }));
+    const sparkles = Array.from({ length: 150 }, () => ({
+      x: Math.random(), y: Math.random(),
+      life: Math.random(), speed: .007 + Math.random() * .016,
+      size: .8 + Math.random() * 3.5,
+      hue: [200,215,175,240,260][Math.floor(Math.random()*5)] + Math.random()*20,
+      type: Math.floor(Math.random()*3),
+    }));
+    const auroras = [
+      { y:.08, amp:.06, freq:.0014, speed:.00026, hue:260, alpha:.17 },
+      { y:.22, amp:.07, freq:.0012, speed:.00025, hue:205, alpha:.20 },
+      { y:.40, amp:.06, freq:.0015, speed:.00031, hue:240, alpha:.18 },
+      { y:.58, amp:.08, freq:.001,  speed:.00021, hue:175, alpha:.17 },
+      { y:.72, amp:.05, freq:.0018, speed:.00035, hue:215, alpha:.16 },
+      { y:.84, amp:.06, freq:.0016, speed:.00028, hue:260, alpha:.15 },
+      { y:.95, amp:.04, freq:.0022, speed:.00027, hue:195, alpha:.14 },
+    ];
+    // Diagonal strips
+    const strips = [
+      { x1:.0,  y1:.10, x2:.55, y2:.0,  hue:260, a:.14, sp:.00020 },
+      { x1:.0,  y1:.15, x2:.60, y2:.0,  hue:210, a:.15, sp:.00020 },
+      { x1:.0,  y1:.35, x2:.85, y2:.0,  hue:240, a:.13, sp:.00026 },
+      { x1:.0,  y1:.50, x2:.90, y2:.08, hue:260, a:.14, sp:.00018 },
+      { x1:.0,  y1:.58, x2:1.0, y2:.12, hue:175, a:.14, sp:.00017 },
+      { x1:.0,  y1:.78, x2:1.0, y2:.35, hue:220, a:.12, sp:.00023 },
+      { x1:.12, y1:1.0, x2:.95, y2:.18, hue:260, a:.13, sp:.00021 },
+      { x1:.18, y1:1.0, x2:1.0, y2:.22, hue:195, a:.13, sp:.00028 },
+      { x1:.42, y1:1.0, x2:1.0, y2:.52, hue:230, a:.12, sp:.00022 },
+      { x1:.65, y1:1.0, x2:1.0, y2:.70, hue:205, a:.11, sp:.00024 },
+      { x1:.82, y1:1.0, x2:1.0, y2:.88, hue:260, a:.10, sp:.00019 },
+    ];
+
+    function drawDiagonalLines() {
+      strips.forEach((l,i) => {
+        const pulse = Math.sin(frame*l.sp*1000 + i*1.4)*.35+.65;
+        const x1=l.x1*W, y1=l.y1*H, x2=l.x2*W, y2=l.y2*H;
+        const g=ctx.createLinearGradient(x1,y1,x2,y2);
+        g.addColorStop(0,`hsla(${l.hue},92%,78%,0)`);
+        g.addColorStop(.28,`hsla(${l.hue},95%,82%,${l.a*pulse})`);
+        g.addColorStop(.5,`hsla(${l.hue},98%,88%,${l.a*pulse*1.6})`);
+        g.addColorStop(.72,`hsla(${l.hue},95%,82%,${l.a*pulse})`);
+        g.addColorStop(1,`hsla(${l.hue},92%,78%,0)`);
+        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+        ctx.strokeStyle=g; ctx.lineWidth=3.2; ctx.stroke();
+        const ox=(y2-y1)/Math.sqrt((x2-x1)**2+(y2-y1)**2)*10;
+        const oy=-(x2-x1)/Math.sqrt((x2-x1)**2+(y2-y1)**2)*10;
+        const g2=ctx.createLinearGradient(x1+ox,y1+oy,x2+ox,y2+oy);
+        g2.addColorStop(0,`hsla(${l.hue+20},88%,72%,0)`);
+        g2.addColorStop(.5,`hsla(${l.hue+20},90%,78%,${l.a*pulse*.55})`);
+        g2.addColorStop(1,`hsla(${l.hue+20},88%,72%,0)`);
+        ctx.beginPath(); ctx.moveTo(x1+ox,y1+oy); ctx.lineTo(x2+ox,y2+oy);
+        ctx.strokeStyle=g2; ctx.lineWidth=1.2; ctx.stroke();
+      });
+    }
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+
+    function drawAurora(a) {
+      const t = frame * a.speed;
+      ctx.beginPath();
+      ctx.moveTo(0, a.y * H);
+      for(let x=0; x<=W; x+=8){
+        const y = (a.y + Math.sin(x*a.freq + t)*a.amp + Math.sin(x*a.freq*.6 + t*1.4)*a.amp*.5)*H;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+      const g = ctx.createLinearGradient(0,a.y*H-60,0,a.y*H+60);
+      g.addColorStop(0,`hsla(${a.hue},75%,80%,0)`);
+      g.addColorStop(.5,`hsla(${a.hue},80%,82%,${a.alpha})`);
+      g.addColorStop(1,`hsla(${a.hue},75%,80%,0)`);
+      ctx.fillStyle = g; ctx.fill();
+    }
+    function drawOrb(o) {
+      const t = frame*o.speed+o.phase;
+      const mx = (mouse.x-.5)*o.depth*.055, my = (mouse.y-.5)*o.depth*.055;
+      const cx = (o.x + Math.sin(t)*.09 + mx)*W;
+      const cy = (o.y + Math.cos(t*1.3)*.07 + my)*H;
+      const rad = o.r*Math.min(W,H);
+      const g = ctx.createRadialGradient(cx-rad*.2,cy-rad*.2,0, cx,cy,rad);
+      g.addColorStop(0,`hsla(${o.hue},75%,82%,.16)`);
+      g.addColorStop(.4,`hsla(${o.hue},70%,83%,.08)`);
+      g.addColorStop(.75,`hsla(${o.hue},65%,86%,.03)`);
+      g.addColorStop(1,`hsla(${o.hue},60%,88%,0)`);
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.fill();
+      const hg = ctx.createRadialGradient(cx-rad*.3,cy-rad*.3,0,cx-rad*.3,cy-rad*.3,rad*.45);
+      hg.addColorStop(0,`rgba(255,255,255,.07)`); hg.addColorStop(1,`rgba(255,255,255,0)`);
+      ctx.fillStyle=hg; ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.fill();
+    }
+    function drawBeam(b) {
+      const t=frame*b.speed+b.phase;
+      const mx=(mouse.x-.5)*.04, my=(mouse.y-.5)*.04;
+      const cx=(b.x+Math.sin(t*.7)*.08+mx)*W, cy=(b.y+Math.cos(t*.5)*.06+my)*H;
+      const angle=b.angle+Math.sin(t)*.14, len=b.spread*W*1.8;
+      ctx.save(); ctx.translate(cx,cy); ctx.rotate(angle);
+      const bw=60+Math.sin(t*1.3)*26;
+      const g=ctx.createLinearGradient(-len/2,0,len/2,0);
+      g.addColorStop(0,`hsla(${b.hue},80%,78%,0)`);
+      g.addColorStop(.2,`hsla(${b.hue},82%,80%,${b.alpha*.6})`);
+      g.addColorStop(.5,`hsla(${b.hue},88%,85%,${b.alpha*1.8})`);
+      g.addColorStop(.8,`hsla(${b.hue},82%,80%,${b.alpha*.6})`);
+      g.addColorStop(1,`hsla(${b.hue},80%,78%,0)`);
+      ctx.fillStyle=g; ctx.fillRect(-len/2,-bw/2,len,bw); ctx.restore();
+    }
+    function drawFacet(f) {
+      f.rot+=f.rspeed; f.x+=f.drift.x; f.y+=f.drift.y;
+      if(f.x<-.05)f.x=1.05; if(f.x>1.05)f.x=-.05;
+      if(f.y<-.05)f.y=1.05; if(f.y>1.05)f.y=-.05;
+      const mx=(mouse.x-.5)*f.depth*.025, my=(mouse.y-.5)*f.depth*.025;
+      ctx.save(); ctx.translate((f.x+mx)*W, (f.y+my)*H); ctx.rotate(f.rot);
+      ctx.beginPath();
+      for(let i=0;i<f.sides;i++){
+        const a=(i/f.sides)*Math.PI*2-(f.sides===6?0:Math.PI/2);
+        const r=f.s*(.62+.38*Math.abs(Math.cos(a*(f.sides===3?1.5:2))));
+        i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+      }
+      ctx.closePath();
+      const g=ctx.createLinearGradient(-f.s,-f.s,f.s,f.s);
+      g.addColorStop(0,`hsla(${f.hue},82%,94%,${f.alpha*2})`);
+      g.addColorStop(.45,`hsla(${f.hue},74%,90%,${f.alpha})`);
+      g.addColorStop(1,`hsla(${f.hue},68%,86%,${f.alpha*.3})`);
+      ctx.fillStyle=g; ctx.fill();
+      ctx.strokeStyle=`hsla(${f.hue},65%,78%,${f.alpha*.85})`; ctx.lineWidth=.8; ctx.stroke();
+      ctx.beginPath();
+      for(let i=0;i<f.sides;i++){
+        const a=(i/f.sides)*Math.PI*2-(f.sides===6?0:Math.PI/2);
+        const r=f.s*.4*(.62+.38*Math.abs(Math.cos(a*(f.sides===3?1.5:2))));
+        i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+      }
+      ctx.closePath();
+      ctx.strokeStyle=`rgba(255,255,255,${f.alpha*1.2})`; ctx.lineWidth=.5; ctx.stroke();
+      ctx.restore();
+    }
+    function drawMesh() {
+      const pts = facets.map(f=>({x:f.x*W,y:f.y*H,hue:f.hue,alpha:f.alpha}));
+      for(let i=0;i<pts.length;i++){
+        for(let j=i+1;j<pts.length;j++){
+          const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
+          if(d<180){
+            const a = .055*(1-d/180);
+            const g=ctx.createLinearGradient(pts[i].x,pts[i].y,pts[j].x,pts[j].y);
+            g.addColorStop(0,`hsla(${pts[i].hue},65%,75%,${a})`);
+            g.addColorStop(1,`hsla(${pts[j].hue},65%,75%,${a})`);
+            ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
+            ctx.strokeStyle=g; ctx.lineWidth=.6; ctx.stroke();
+          }
+        }
+      }
+    }
+    function drawSparkle(s) {
+      s.life += s.speed;
+      if(s.life>1){ s.life=0; s.x=Math.random(); s.y=Math.random(); }
+      const a = Math.sin(s.life*Math.PI);
+      const px=s.x*W, py=s.y*H;
+      ctx.save(); ctx.globalAlpha = a*.65;
+      if(s.type===0){
+        ctx.fillStyle=`hsla(${s.hue},82%,88%,1)`;
+        ctx.beginPath(); ctx.arc(px,py,s.size*a,0,Math.PI*2); ctx.fill();
+      } else if(s.type===1){
+        ctx.strokeStyle=`hsla(${s.hue},78%,84%,1)`; ctx.lineWidth=.7;
+        const sz=s.size*3*a;
+        ctx.beginPath(); ctx.moveTo(px-sz,py); ctx.lineTo(px+sz,py); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px,py-sz); ctx.lineTo(px,py+sz); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px-sz*.7,py-sz*.7); ctx.lineTo(px+sz*.7,py+sz*.7); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px+sz*.7,py-sz*.7); ctx.lineTo(px-sz*.7,py+sz*.7); ctx.stroke();
+      } else {
+        ctx.fillStyle=`hsla(${s.hue},85%,90%,1)`;
+        const sz=s.size*2.5*a;
+        ctx.beginPath(); ctx.moveTo(px,py-sz); ctx.lineTo(px+sz*.6,py); ctx.lineTo(px,py+sz); ctx.lineTo(px-sz*.6,py); ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+    }
+    function drawRipples() {
+      for(let i=ripples.length-1;i>=0;i--){
+        const r=ripples[i];
+        r.r += 4; r.alpha -= .008;
+        if(r.alpha<=0){ ripples.splice(i,1); continue; }
+        ctx.beginPath(); ctx.arc(r.x,r.y,r.r,0,Math.PI*2);
+        ctx.strokeStyle=`hsla(${r.hue},70%,75%,${r.alpha})`; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(r.x,r.y,r.r*.6,0,Math.PI*2);
+        ctx.strokeStyle=`hsla(${r.hue},75%,80%,${r.alpha*.6})`; ctx.lineWidth=.8; ctx.stroke();
+      }
+    }
+    function draw() {
+      frame++;
+      mouse.x += (targetMouse.x - mouse.x) * .04;
+      mouse.y += (targetMouse.y - mouse.y) * .04;
+      ctx.clearRect(0,0,W,H);
+      const bx = W*(0.5 + (mouse.x-.5)*.15), by = H*(0.4 + (mouse.y-.5)*.1);
+      const base = ctx.createRadialGradient(bx, by*.6, 0, W*.5, H*.5, Math.max(W,H)*.92);
+      base.addColorStop(0,'rgba(215,235,255,1)');
+      base.addColorStop(.22,'rgba(192,220,255,1)');
+      base.addColorStop(.45,'rgba(158,200,252,1)');
+      base.addColorStop(.65,'rgba(118,170,240,1)');
+      base.addColorStop(.82,'rgba(78,132,225,1)');
+      base.addColorStop(.92,'rgba(50,95,200,1)');
+      base.addColorStop(1,'rgba(32,65,170,1)');
+      ctx.fillStyle=base; ctx.fillRect(0,0,W,H);
+
+      // Corner navy vignette
+      const vig = ctx.createRadialGradient(W*.5,H*.5,Math.min(W,H)*.2, W*.5,H*.5,Math.max(W,H)*.85);
+      vig.addColorStop(0,'rgba(10,30,80,0)');
+      vig.addColorStop(.50,'rgba(10,30,80,.08)');
+      vig.addColorStop(.78,'rgba(8,22,70,.22)');
+      vig.addColorStop(1,'rgba(4,12,50,.38)');
+      ctx.fillStyle=vig; ctx.fillRect(0,0,W,H);
+
+      auroras.forEach(drawAurora);
+      drawDiagonalLines();
+      drawMesh();
+      orbs.forEach(drawOrb);
+      beams.forEach(drawBeam);
+      facets.forEach(drawFacet);
+      sparkles.forEach(drawSparkle);
+      drawRipples();
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  // ── SCROLL REVEAL
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const delay = +entry.target.dataset.delay || 0;
+      setTimeout(() => entry.target.classList.add('in'), delay);
+      revealObs.unobserve(entry.target);
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => revealObs.observe(el));
+
+  // ── DRINK EASTER EGGS ──
+  function pourDrink(cfg) {
+    const bc = document.createElement('canvas');
+    bc.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:9999;cursor:pointer;';
+    document.body.appendChild(bc);
+    const cx = bc.getContext('2d');
+    let W = bc.width = window.innerWidth, H = bc.height = window.innerHeight;
+    window.addEventListener('resize', () => { W = bc.width = window.innerWidth; H = bc.height = window.innerHeight; });
+    let fillLevel = 0, draining = false, startTime = null, drainStart = null;
+    const bubbles = [];
+    const foam = cfg.foam ? Array.from({length: 80}, () => ({
+      x: Math.random() * 2, r: 6 + Math.random() * 22, wobble: Math.random() * Math.PI * 2,
+    })) : [];
+    function addBubble() {
+      if (fillLevel < 0.04) return;
+      bubbles.push({ x: Math.random() * W, y: H - Math.random() * H * fillLevel * 0.9,
+        r: 1.5 + Math.random() * (cfg.bubbleSize || 3.5), speed: 0.6 + Math.random() * 1.8, alpha: 0.35 + Math.random() * 0.4 });
+    }
+    function draw(ts) {
+      if (!startTime) startTime = ts;
+      if (!draining) {
+        fillLevel = Math.min((ts - startTime) / 3200, 1);
+        fillLevel = 1 - Math.pow(1 - fillLevel, 2.4);
+      } else {
+        if (!drainStart) drainStart = ts;
+        fillLevel = Math.max(1 - (ts - drainStart) / 1800, 0);
+        if (fillLevel <= 0) { document.body.removeChild(bc); return; }
+      }
+      cx.clearRect(0, 0, W, H);
+      const top = H * (1 - fillLevel);
+      const g = cx.createLinearGradient(0, top, W, H);
+      cfg.gradient.forEach(([stop, color]) => g.addColorStop(stop, color));
+      cx.fillStyle = g; cx.fillRect(0, top, W, H);
+      cx.beginPath(); cx.moveTo(0, top);
+      for (let x = 0; x <= W; x += 6) {
+        const y = top + Math.sin(x / 90 + ts / 400) * 5 + Math.sin(x / 40 + ts / 250) * 3;
+        cx.lineTo(x, y);
+      }
+      cx.lineTo(W, H); cx.lineTo(0, H); cx.closePath();
+      cx.fillStyle = cfg.surfaceColor; cx.fill();
+      foam.forEach((f, i) => {
+        const fx = (f.x + i * 0.37 + ts * 0.00008) % 1.2 * W - W * 0.1;
+        const fy = top - f.r * 0.6 + Math.sin(f.wobble + ts / 600) * 4;
+        cx.beginPath(); cx.arc(fx, fy, f.r * Math.min(fillLevel * 3, 1), 0, Math.PI * 2);
+        cx.fillStyle = 'rgba(255,252,242,.92)'; cx.fill();
+        cx.strokeStyle = 'rgba(220,200,170,.35)'; cx.lineWidth = 1; cx.stroke();
+      });
+      if (Math.random() < (cfg.bubbleRate || 0.4) && !draining) addBubble();
+      for (let i = bubbles.length - 1; i >= 0; i--) {
+        const b = bubbles[i]; b.y -= b.speed;
+        if (b.y < top) { bubbles.splice(i, 1); continue; }
+        cx.beginPath(); cx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        cx.strokeStyle = `rgba(${cfg.bubbleColor},${b.alpha})`; cx.lineWidth = 1; cx.stroke();
+      }
+      if (fillLevel > 0.45 && !draining) {
+        const ta = Math.min((fillLevel - 0.45) / 0.2, 1);
+        cx.globalAlpha = ta; cx.fillStyle = '#fff';
+        cx.font = `bold ${Math.round(W * 0.06)}px -apple-system, sans-serif`;
+        cx.textAlign = 'center'; cx.textBaseline = 'middle';
+        cx.shadowColor = 'rgba(0,0,0,.18)'; cx.shadowBlur = 12;
+        cx.fillText(cfg.text, W / 2, H / 2 - 24);
+        cx.font = `${Math.round(W * 0.022)}px -apple-system, sans-serif`;
+        cx.globalAlpha = 1; cx.shadowBlur = 0;
+      }
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+    bc.addEventListener('click', () => { draining = true; });
+  }
+  function pourBeer() {
+    pourDrink({ gradient: [[0,'rgba(234,158,12,.50)'],[0.4,'rgba(210,130,8,.50)'],[1,'rgba(170,90,4,.50)']],
+      surfaceColor: 'rgba(240,165,20,.50)', foam: true, bubbleColor: '255,215,80', bubbleRate: 0.4, text: 'Cheers! 🍺' });
+  }
+  function pourWine() {
+    pourDrink({ gradient: [[0,'rgba(140,20,60,.50)'],[0.4,'rgba(110,10,40,.50)'],[1,'rgba(70,5,20,.50)']],
+      surfaceColor: 'rgba(160,30,70,.50)', foam: false, bubbleColor: '200,80,120', bubbleRate: 0.08, text: 'Santé! 🍷' });
+  }
+</script>
+</body>
+</html>

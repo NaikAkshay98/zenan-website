@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client Portal — Zenan Glass</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scrollbar-width: thin; scrollbar-color: rgba(37,88,176,.3) transparent; }
+    html::-webkit-scrollbar { width: 4px; }
+    html::-webkit-scrollbar-track { background: transparent; }
+    html::-webkit-scrollbar-thumb { background: rgba(37,88,176,.25); border-radius: 10px; }
+    html::-webkit-scrollbar-thumb:hover { background: rgba(37,88,176,.45); }
+    :root {
+      --blue: #2558B0; --blue-d: #1a4490; --blue-l: #3a6ec8; --blue-bg: #eef3fb;
+      --dark: #0f1e36; --body: #2d3d52; --muted: #6b7a90;
+      --white: #ffffff; --off: #f5f7fa; --border: #dde3ed;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --shadow: 0 2px 12px rgba(15,30,54,.08); --shadow-md: 0 6px 24px rgba(15,30,54,.12);
+    }
+    html, body { height: 100%; font-family: var(--font); color: var(--body); background: transparent; }
+
+    /* ── CANVAS ── */
+    #bgCanvas { position: fixed; inset: 0; z-index: 0; }
+    body { background: transparent; }
+    main, nav, footer { position: relative; z-index: 1; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+      width: calc(100% - 40px); max-width: 1200px; z-index: 100;
+      display: flex; align-items: center; gap: 16px;
+      background: rgba(255,255,255,.72); backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,.6); border-radius: 18px;
+      padding: 10px 20px; box-shadow: 0 4px 24px rgba(37,88,176,.08);
+    }
+    .logo-wrap { display: flex; align-items: center; text-decoration: none; }
+    .logo-wrap img { height: 52px; width: auto; display: block; }
+    .nav-links { display: flex; gap: 2px; list-style: none; margin-left: auto; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: .93rem; font-weight: 500; padding: 8px 16px; border-radius: 7px; transition: background .2s, color .2s; }
+    .nav-links a:hover { background: rgba(37,88,176,.07); color: var(--dark); }
+    .nav-links a.active { color: var(--blue); font-weight: 700; }
+
+    /* ── PAGE ── */
+    .page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 120px 20px 60px; }
+
+    /* ── LOGIN CARD ── */
+    .login-card {
+      background: rgba(255,255,255,.88); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,.7); border-radius: 20px;
+      padding: 44px 40px; width: 400px; max-width: 100%;
+      box-shadow: 0 16px 48px rgba(15,30,54,.12);
+      animation: fadeUp .3s ease;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .login-logo { display: flex; justify-content: center; margin-bottom: 24px; }
+    .login-logo img { height: 48px; }
+    .login-card h2 { font-size: 1.5rem; font-weight: 800; color: var(--dark); text-align: center; margin-bottom: 6px; }
+    .login-card p { font-size: .88rem; color: var(--muted); text-align: center; margin-bottom: 28px; }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--muted); margin-bottom: 6px; }
+    .field input {
+      width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: .95rem; font-family: var(--font); color: var(--dark); outline: none;
+      background: rgba(255,255,255,.9); transition: border-color .2s;
+    }
+    .field input:focus { border-color: var(--blue); }
+    .field-pass { position: relative; }
+    .field-pass input { padding-right: 42px; }
+    .pass-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: .9rem; color: var(--muted); }
+    .login-btn {
+      width: 100%; padding: 13px; margin-top: 8px;
+      background: var(--white); color: var(--blue);
+      border: 2px solid var(--blue); border-radius: 10px;
+      font-size: 1rem; font-weight: 700; font-family: var(--font);
+      cursor: pointer; box-shadow: 5px 5px 0 #FFD700;
+      transition: transform .18s, box-shadow .18s;
+    }
+    .login-btn:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #FFD700; }
+    .login-error { display: none; background: #fee2e2; color: #dc2626; font-size: .83rem; padding: 10px 14px; border-radius: 8px; margin-top: 12px; font-weight: 600; text-align: center; }
+    .login-error.show { display: block; }
+
+    /* ── DASHBOARD ── */
+    .dashboard { display: none; width: 100%; max-width: 900px; }
+    .dashboard.show { display: block; }
+
+    .dash-header {
+      background: rgba(255,255,255,.88); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,.7); border-radius: 20px;
+      padding: 28px 32px; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 20px;
+      box-shadow: var(--shadow-md); animation: fadeUp .3s ease;
+    }
+    .dash-avatar {
+      width: 60px; height: 60px; border-radius: 14px;
+      background: linear-gradient(135deg, #2558B0, #3a6ec8);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; font-weight: 800; color: #fff; flex-shrink: 0;
+    }
+    .dash-welcome h1 { font-size: 1.4rem; font-weight: 800; color: var(--dark); }
+    .dash-welcome p { font-size: .88rem; color: var(--muted); margin-top: 3px; }
+    .dash-logout {
+      margin-left: auto; padding: 9px 18px; border-radius: 9px;
+      background: var(--off); border: 1.5px solid var(--border);
+      color: var(--muted); font-size: .85rem; font-weight: 600;
+      font-family: var(--font); cursor: pointer; transition: .15s;
+    }
+    .dash-logout:hover { border-color: #dc2626; color: #dc2626; background: #fee2e2; }
+
+    .dash-grid { display: grid; grid-template-columns: 280px 1fr; gap: 20px; align-items: start; }
+    @media (max-width: 700px) { .dash-grid { grid-template-columns: 1fr; } }
+
+    .dash-card {
+      background: rgba(255,255,255,.88); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,.7); border-radius: 18px;
+      padding: 24px; box-shadow: var(--shadow); animation: fadeUp .35s ease;
+    }
+    .dash-card-title {
+      font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .9px;
+      color: var(--muted); margin-bottom: 16px;
+    }
+
+    /* Rep card */
+    .rep-avatar {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 12px;
+    }
+    .rep-name { font-size: 1.05rem; font-weight: 800; color: var(--dark); margin-bottom: 4px; }
+    .rep-email {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .82rem; color: var(--blue); text-decoration: none;
+      background: var(--blue-bg); padding: 5px 10px; border-radius: 7px; margin-top: 4px;
+    }
+    .rep-email:hover { text-decoration: underline; }
+    .rep-divider { height: 1px; background: var(--border); margin: 14px 0; }
+    .rep-meta-row { display: flex; align-items: center; gap: 8px; font-size: .8rem; color: var(--muted); margin-bottom: 6px; }
+    .rep-meta-row strong { color: var(--dark); }
+
+    /* Files */
+    .files-empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: .9rem; }
+    .files-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 12px; }
+    .file-tile {
+      border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden;
+      background: var(--white); cursor: pointer; transition: box-shadow .2s, transform .2s;
+    }
+    .file-tile:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+    .file-tile-preview { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: var(--off); }
+    .file-tile-preview-icon { aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 2.4rem; background: var(--off); }
+    .file-tile-meta { padding: 8px 10px; display: flex; align-items: center; gap: 6px; border-top: 1px solid var(--border); }
+    .file-tile-name { font-size: .72rem; font-weight: 600; color: var(--dark); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-tile-dl {
+      background: none; border: none; color: var(--blue); cursor: pointer;
+      font-size: .8rem; padding: 0 2px; flex-shrink: 0; transition: color .15s;
+    }
+    .file-tile-dl:hover { color: var(--blue-d); }
+
+    /* Cart */
+    .cart-section {
+      background: rgba(255,255,255,.88); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,.7); border-radius: 18px;
+      padding: 24px; box-shadow: var(--shadow); margin-top: 20px;
+      animation: fadeUp .4s ease;
+    }
+    .cart-title { font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .9px; color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+    .cart-badge { background: var(--blue); color: #fff; font-size: .65rem; font-weight: 800; padding: 2px 8px; border-radius: 20px; }
+    .cart-empty { text-align: center; padding: 20px; color: var(--muted); font-size: .85rem; }
+    .cart-items { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .cart-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 14px; background: var(--off); border-radius: 10px;
+      border: 1.5px solid var(--border);
+    }
+    .cart-item-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .cart-item-name { font-size: .82rem; font-weight: 600; color: var(--dark); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cart-qty-wrap { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .cart-qty-label { font-size: .72rem; color: var(--muted); }
+    .cart-qty {
+      width: 60px; padding: 5px 8px; border: 1.5px solid var(--border); border-radius: 7px;
+      font-size: .85rem; font-family: var(--font); color: var(--dark); outline: none; text-align: center;
+      transition: border-color .2s;
+    }
+    .cart-qty:focus { border-color: var(--blue); }
+    .cart-item-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 0 3px; transition: color .15s; flex-shrink: 0; }
+    .cart-item-remove:hover { color: #dc2626; }
+
+    .cart-divider { height: 1px; background: var(--border); margin: 16px 0; }
+    .cart-msg-label { font-size: .75rem; font-weight: 700; color: var(--dark); margin-bottom: 7px; display: block; }
+    .cart-msg {
+      width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: .9rem; font-family: var(--font); color: var(--dark); outline: none; resize: vertical;
+      min-height: 90px; background: rgba(255,255,255,.9); transition: border-color .2s;
+    }
+    .cart-msg:focus { border-color: var(--blue); }
+    .cart-send-btn {
+      width: 100%; padding: 13px; margin-top: 14px;
+      background: var(--white); color: var(--blue);
+      border: 2px solid var(--blue); border-radius: 10px;
+      font-size: 1rem; font-weight: 700; font-family: var(--font);
+      cursor: pointer; box-shadow: 5px 5px 0 #FFD700;
+      transition: transform .18s, box-shadow .18s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .cart-send-btn:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #FFD700; }
+    .cart-send-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: 5px 5px 0 #FFD700; }
+    .cart-success { display: none; background: #f0fdf4; border: 1.5px solid #86efac; color: #16a34a; font-size: .85rem; font-weight: 600; padding: 12px 16px; border-radius: 10px; margin-top: 12px; text-align: center; }
+    .cart-success.show { display: block; }
+
+    /* + button on file tile */
+    .file-tile-add {
+      background: var(--blue); border: none; color: #fff; cursor: pointer;
+      width: 22px; height: 22px; border-radius: 50%; font-size: .9rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: background .15s, transform .15s;
+    }
+    .file-tile-add:hover { background: var(--blue-d); transform: scale(1.15); }
+    .file-tile-add.added { background: #16a34a; }
+
+    /* Lightbox */
+    .lightbox {
+      display: none; position: fixed; inset: 0; z-index: 900;
+      background: rgba(10,20,40,.9); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; flex-direction: column; gap: 14px;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox-inner { max-width: 90vw; max-height: 80vh; display: flex; align-items: center; justify-content: center; }
+    .lightbox-inner img { max-width: 88vw; max-height: 78vh; border-radius: 10px; object-fit: contain; box-shadow: 0 24px 60px rgba(0,0,0,.5); }
+    .lightbox-inner iframe { width: 80vw; height: 78vh; border: none; border-radius: 10px; box-shadow: 0 24px 60px rgba(0,0,0,.5); }
+    .lightbox-name { color: rgba(255,255,255,.7); font-size: .85rem; max-width: 80vw; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lightbox-close { position: fixed; top: 18px; right: 22px; background: rgba(255,255,255,.15); border: none; color: #fff; width: 38px; height: 38px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; display: grid; place-items: center; transition: background .15s; }
+    .lightbox-close:hover { background: rgba(255,255,255,.28); }
+    .lightbox-dl { background: var(--blue); border: none; color: #fff; padding: 9px 22px; border-radius: 8px; font-size: .85rem; font-weight: 700; font-family: var(--font); cursor: pointer; transition: background .15s; }
+    .lightbox-dl:hover { background: var(--blue-d); }
+  </style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<nav>
+  <a href="index.html" class="logo-wrap">
+    <img src="brand_assets/Zenan logo.png" alt="Zenan Glass" />
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="products.html">Products</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<main class="page">
+
+  <!-- LOGIN -->
+  <div class="login-card" id="loginCard">
+    <div class="login-logo">
+      <img src="brand_assets/Zenan logo.png" alt="Zenan Glass" />
+    </div>
+    <h2>Client Portal</h2>
+    <p>Sign in to view your files and account details.</p>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="portalUser" placeholder="Your username" autocomplete="off" onkeydown="if(event.key==='Enter')portalLogin()" />
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <div class="field-pass">
+        <input type="password" id="portalPass" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')portalLogin()" />
+        <button class="pass-toggle" type="button" onclick="togglePortalPass()">👁</button>
+      </div>
+    </div>
+    <button class="login-btn" onclick="portalLogin()">Sign In</button>
+    <div class="login-error" id="loginError">Incorrect username or password.</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="dashboard" id="dashboard">
+    <div class="dash-header">
+      <div class="dash-avatar" id="dashAvatar"></div>
+      <div class="dash-welcome">
+        <h1 id="dashName"></h1>
+        <p id="dashEmail"></p>
+      </div>
+      <button class="dash-logout" onclick="portalLogout()">Sign Out</button>
+    </div>
+
+    <div class="dash-grid">
+      <!-- Rep card -->
+      <div class="dash-card">
+        <div class="dash-card-title">Your Sales Rep</div>
+        <div class="rep-avatar" id="repAvatar"></div>
+        <div class="rep-name" id="repName">—</div>
+        <a class="rep-email" id="repEmailLink" href="#" onclick="return false">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span id="repEmailText">—</span>
+        </a>
+        <div class="rep-divider"></div>
+        <div class="rep-meta-row">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Account: <strong id="dashLoginUser"></strong></span>
+        </div>
+        <div class="rep-meta-row">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Member since <strong id="dashSince"></strong></span>
+        </div>
+      </div>
+
+      <!-- Files -->
+      <div class="dash-card">
+        <div class="dash-card-title">Your Files</div>
+        <div id="filesContainer"></div>
+      </div>
+    </div>
+
+    <!-- CART -->
+    <div class="cart-section" id="cartSection">
+      <div class="cart-title">
+        <span>🛒 Order Request <span class="cart-badge" id="cartBadge">0</span></span>
+        <span style="font-size:.75rem;color:var(--muted);font-weight:500;">Click + on a file to add it</span>
+      </div>
+      <div class="cart-items" id="cartItems">
+        <div class="cart-empty" id="cartEmpty">No items added yet. Click the <strong>+</strong> button on a file above.</div>
+      </div>
+      <div class="cart-divider"></div>
+      <label class="cart-msg-label" for="cartMsg">Message to your rep</label>
+      <textarea class="cart-msg" id="cartMsg" placeholder="Add any notes, special requests, branding details, quantities, timeline, or questions for your rep…"></textarea>
+      <button class="cart-send-btn" id="cartSendBtn" onclick="sendOrder()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send to Rep
+      </button>
+      <div class="cart-success" id="cartSuccess">✓ Your order request has been sent to your rep! They'll be in touch shortly.</div>
+    </div>
+
+  </div>
+
+</main>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="if(event.target===this)closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <div class="lightbox-inner" id="lightboxInner"></div>
+  <div class="lightbox-name" id="lightboxName"></div>
+  <button class="lightbox-dl" id="lightboxDl">⬇ Download</button>
+</div>
+
+<script>
+// ── CANVAS BACKGROUND ──
+  (function () {
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, frame = 0;
+    let mouse = { x: .5, y: .5 }, targetMouse = { x: .5, y: .5 };
+    window.addEventListener('mousemove', e => { targetMouse.x = e.clientX/window.innerWidth; targetMouse.y = e.clientY/window.innerHeight; });
+    // Click ripples
+    const ripples = [];
+    window.addEventListener('click', e => { ripples.push({ x: e.clientX, y: e.clientY, r: 0, alpha: .35, hue: 200 + Math.random()*30 }); });
+
+    const orbs = [
+      { x:.15, y:.1,  r:.32, hue:210, speed:.00018, phase:0,   gold:false, depth:1   },
+      { x:.72, y:.25, r:.26, hue:195, speed:.00022, phase:1.8, gold:false, depth:.7  },
+      { x:.45, y:.6,  r:.36, hue:220, speed:.00015, phase:3.4, gold:false, depth:1.2 },
+      { x:.85, y:.7,  r:.24, hue:200, speed:.0002,  phase:0.9, gold:false, depth:.8  },
+      { x:.3,  y:.85, r:.28, hue:185, speed:.00017, phase:2.3, gold:false, depth:1   },
+      { x:.6,  y:.4,  r:.22, hue:230, speed:.00025, phase:4.1, gold:false, depth:.6  },
+      { x:.9,  y:.35, r:.20, hue:205, speed:.00019, phase:1.1, gold:false, depth:.9  },
+      { x:.2,  y:.55, r:.18, hue:215, speed:.00021, phase:2.7, gold:false, depth:1.1 },
+      { x:.5,  y:.15, r:.15, hue:190, speed:.00023, phase:0.4, gold:false, depth:.75 },
+    ];
+    const beams = [
+      { x:.25, y:.2,  angle:-.38, spread:.70, speed:.00038, phase:0,   hue:210, alpha:.09  },
+      { x:.6,  y:.55, angle: .28, spread:.58, speed:.00028, phase:2.1, hue:198, alpha:.08  },
+      { x:.8,  y:.15, angle:-.55, spread:.65, speed:.00045, phase:1.2, hue:222, alpha:.075 },
+      { x:.1,  y:.75, angle: .48, spread:.60, speed:.00032, phase:3.5, hue:190, alpha:.085 },
+      { x:.5,  y:.9,  angle:-.22, spread:.82, speed:.00022, phase:0.7, hue:215, alpha:.07  },
+      { x:.7,  y:.4,  angle: .15, spread:.50, speed:.00035, phase:1.9, hue:205, alpha:.055 },
+      { x:.35, y:.5,  angle: .62, spread:.48, speed:.00041, phase:3.0, hue:195, alpha:.045 },
+    ];
+    const facets = Array.from({ length: 44 }, () => ({
+      x: Math.random(), y: Math.random(),
+      s: 10 + Math.random() * 58,
+      sides: [3,4,6][Math.floor(Math.random()*3)],
+      rot: Math.random() * Math.PI * 2,
+      rspeed: (Math.random()-.5) * .002,
+      alpha: .022 + Math.random() * .07,
+      hue: 190 + Math.random() * 50,
+      drift: { x: (Math.random()-.5)*.00024, y: (Math.random()-.5)*.00018 },
+      depth: .5 + Math.random() * .8,
+    }));
+    const sparkles = Array.from({ length: 70 }, () => ({
+      x: Math.random(), y: Math.random(),
+      life: Math.random(), speed: .003 + Math.random() * .007,
+      size: .8 + Math.random() * 3,
+      hue: 200 + Math.random() * 40,
+      type: Math.floor(Math.random()*3),
+    }));
+    const auroras = [
+      { y:.18, amp:.06, freq:.0012, speed:.00008, hue:205, alpha:.045 },
+      { y:.38, amp:.05, freq:.0015, speed:.00011, hue:215, alpha:.038 },
+      { y:.62, amp:.07, freq:.001,  speed:.00007, hue:195, alpha:.035 },
+      { y:.82, amp:.04, freq:.0018, speed:.00013, hue:210, alpha:.028 },
+    ];
+
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+
+    function drawAurora(a) {
+      const t = frame * a.speed;
+      ctx.beginPath();
+      ctx.moveTo(0, a.y * H);
+      for(let x=0; x<=W; x+=8){
+        const y = (a.y + Math.sin(x*a.freq + t)*a.amp + Math.sin(x*a.freq*.6 + t*1.4)*a.amp*.5)*H;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+      const g = ctx.createLinearGradient(0,a.y*H-60,0,a.y*H+60);
+      g.addColorStop(0,`hsla(${a.hue},75%,80%,0)`);
+      g.addColorStop(.5,`hsla(${a.hue},80%,82%,${a.alpha})`);
+      g.addColorStop(1,`hsla(${a.hue},75%,80%,0)`);
+      ctx.fillStyle = g; ctx.fill();
+    }
+    function drawOrb(o) {
+      const t = frame*o.speed+o.phase;
+      const mx = (mouse.x-.5)*o.depth*.055, my = (mouse.y-.5)*o.depth*.055;
+      const cx = (o.x + Math.sin(t)*.09 + mx)*W;
+      const cy = (o.y + Math.cos(t*1.3)*.07 + my)*H;
+      const rad = o.r*Math.min(W,H);
+      const g = ctx.createRadialGradient(cx-rad*.2,cy-rad*.2,0, cx,cy,rad);
+      g.addColorStop(0,`hsla(${o.hue},75%,82%,.16)`);
+      g.addColorStop(.4,`hsla(${o.hue},70%,83%,.08)`);
+      g.addColorStop(.75,`hsla(${o.hue},65%,86%,.03)`);
+      g.addColorStop(1,`hsla(${o.hue},60%,88%,0)`);
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.fill();
+      const hg = ctx.createRadialGradient(cx-rad*.3,cy-rad*.3,0,cx-rad*.3,cy-rad*.3,rad*.45);
+      hg.addColorStop(0,`rgba(255,255,255,.07)`); hg.addColorStop(1,`rgba(255,255,255,0)`);
+      ctx.fillStyle=hg; ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.fill();
+    }
+    function drawBeam(b) {
+      const t=frame*b.speed+b.phase;
+      const mx=(mouse.x-.5)*.04, my=(mouse.y-.5)*.04;
+      const cx=(b.x+Math.sin(t*.7)*.08+mx)*W, cy=(b.y+Math.cos(t*.5)*.06+my)*H;
+      const angle=b.angle+Math.sin(t)*.14, len=b.spread*W*1.8;
+      ctx.save(); ctx.translate(cx,cy); ctx.rotate(angle);
+      const bw=60+Math.sin(t*1.3)*26;
+      const g=ctx.createLinearGradient(-len/2,0,len/2,0);
+      g.addColorStop(0,`hsla(${b.hue},80%,78%,0)`);
+      g.addColorStop(.2,`hsla(${b.hue},82%,80%,${b.alpha*.6})`);
+      g.addColorStop(.5,`hsla(${b.hue},88%,85%,${b.alpha*1.8})`);
+      g.addColorStop(.8,`hsla(${b.hue},82%,80%,${b.alpha*.6})`);
+      g.addColorStop(1,`hsla(${b.hue},80%,78%,0)`);
+      ctx.fillStyle=g; ctx.fillRect(-len/2,-bw/2,len,bw); ctx.restore();
+    }
+    function drawFacet(f) {
+      f.rot+=f.rspeed; f.x+=f.drift.x; f.y+=f.drift.y;
+      if(f.x<-.05)f.x=1.05; if(f.x>1.05)f.x=-.05;
+      if(f.y<-.05)f.y=1.05; if(f.y>1.05)f.y=-.05;
+      const mx=(mouse.x-.5)*f.depth*.025, my=(mouse.y-.5)*f.depth*.025;
+      ctx.save(); ctx.translate((f.x+mx)*W, (f.y+my)*H); ctx.rotate(f.rot);
+      ctx.beginPath();
+      for(let i=0;i<f.sides;i++){
+        const a=(i/f.sides)*Math.PI*2-(f.sides===6?0:Math.PI/2);
+        const r=f.s*(.62+.38*Math.abs(Math.cos(a*(f.sides===3?1.5:2))));
+        i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+      }
+      ctx.closePath();
+      const g=ctx.createLinearGradient(-f.s,-f.s,f.s,f.s);
+      g.addColorStop(0,`hsla(${f.hue},82%,94%,${f.alpha*2})`);
+      g.addColorStop(.45,`hsla(${f.hue},74%,90%,${f.alpha})`);
+      g.addColorStop(1,`hsla(${f.hue},68%,86%,${f.alpha*.3})`);
+      ctx.fillStyle=g; ctx.fill();
+      ctx.strokeStyle=`hsla(${f.hue},65%,78%,${f.alpha*.85})`; ctx.lineWidth=.8; ctx.stroke();
+      ctx.beginPath();
+      for(let i=0;i<f.sides;i++){
+        const a=(i/f.sides)*Math.PI*2-(f.sides===6?0:Math.PI/2);
+        const r=f.s*.4*(.62+.38*Math.abs(Math.cos(a*(f.sides===3?1.5:2))));
+        i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+      }
+      ctx.closePath();
+      ctx.strokeStyle=`rgba(255,255,255,${f.alpha*1.2})`; ctx.lineWidth=.5; ctx.stroke();
+      ctx.restore();
+    }
+    function drawMesh() {
+      const pts = facets.map(f=>({x:f.x*W,y:f.y*H,hue:f.hue,alpha:f.alpha}));
+      for(let i=0;i<pts.length;i++){
+        for(let j=i+1;j<pts.length;j++){
+          const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
+          if(d<180){
+            const a = .055*(1-d/180);
+            const g=ctx.createLinearGradient(pts[i].x,pts[i].y,pts[j].x,pts[j].y);
+            g.addColorStop(0,`hsla(${pts[i].hue},65%,75%,${a})`);
+            g.addColorStop(1,`hsla(${pts[j].hue},65%,75%,${a})`);
+            ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
+            ctx.strokeStyle=g; ctx.lineWidth=.6; ctx.stroke();
+          }
+        }
+      }
+    }
+    function drawSparkle(s) {
+      s.life += s.speed;
+      if(s.life>1){ s.life=0; s.x=Math.random(); s.y=Math.random(); }
+      const a = Math.sin(s.life*Math.PI);
+      const px=s.x*W, py=s.y*H;
+      ctx.save(); ctx.globalAlpha = a*.65;
+      if(s.type===0){
+        ctx.fillStyle=`hsla(${s.hue},82%,88%,1)`;
+        ctx.beginPath(); ctx.arc(px,py,s.size*a,0,Math.PI*2); ctx.fill();
+      } else if(s.type===1){
+        ctx.strokeStyle=`hsla(${s.hue},78%,84%,1)`; ctx.lineWidth=.7;
+        const sz=s.size*3*a;
+        ctx.beginPath(); ctx.moveTo(px-sz,py); ctx.lineTo(px+sz,py); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px,py-sz); ctx.lineTo(px,py+sz); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px-sz*.7,py-sz*.7); ctx.lineTo(px+sz*.7,py+sz*.7); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px+sz*.7,py-sz*.7); ctx.lineTo(px-sz*.7,py+sz*.7); ctx.stroke();
+      } else {
+        ctx.fillStyle=`hsla(${s.hue},85%,90%,1)`;
+        const sz=s.size*2.5*a;
+        ctx.beginPath(); ctx.moveTo(px,py-sz); ctx.lineTo(px+sz*.6,py); ctx.lineTo(px,py+sz); ctx.lineTo(px-sz*.6,py); ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+    }
+    function drawRipples() {
+      for(let i=ripples.length-1;i>=0;i--){
+        const r=ripples[i];
+        r.r += 4; r.alpha -= .008;
+        if(r.alpha<=0){ ripples.splice(i,1); continue; }
+        ctx.beginPath(); ctx.arc(r.x,r.y,r.r,0,Math.PI*2);
+        ctx.strokeStyle=`hsla(${r.hue},70%,75%,${r.alpha})`; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(r.x,r.y,r.r*.6,0,Math.PI*2);
+        ctx.strokeStyle=`hsla(${r.hue},75%,80%,${r.alpha*.6})`; ctx.lineWidth=.8; ctx.stroke();
+      }
+    }
+    function draw() {
+      frame++;
+      mouse.x += (targetMouse.x - mouse.x) * .04;
+      mouse.y += (targetMouse.y - mouse.y) * .04;
+      ctx.clearRect(0,0,W,H);
+      const bx = W*(0.5 + (mouse.x-.5)*.15), by = H*(0.4 + (mouse.y-.5)*.1);
+      const base = ctx.createRadialGradient(bx, by*.6, 0, W*.5, H*.5, Math.max(W,H)*.85);
+      base.addColorStop(0,'rgba(232,244,255,1)');
+      base.addColorStop(.35,'rgba(228,241,254,1)');
+      base.addColorStop(.7,'rgba(238,247,255,1)');
+      base.addColorStop(1,'rgba(245,251,255,1)');
+      ctx.fillStyle=base; ctx.fillRect(0,0,W,H);
+      auroras.forEach(drawAurora);
+      drawMesh();
+      orbs.forEach(drawOrb);
+      beams.forEach(drawBeam);
+      facets.forEach(drawFacet);
+      sparkles.forEach(drawSparkle);
+      drawRipples();
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+// ── IndexedDB (same DB as admin)
+const PortalIDB = {
+  _db: null,
+  open() {
+    return new Promise((res, rej) => {
+      const req = indexedDB.open('zenan_clients_db', 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore('files', { keyPath: 'id' });
+      req.onsuccess = e => { this._db = e.target.result; res(this._db); };
+      req.onerror = rej;
+    });
+  },
+  async getFiles(clientId) {
+    const db = this._db || await this.open();
+    return new Promise((res, rej) => {
+      const req = db.transaction('files','readonly').objectStore('files').getAll();
+      req.onsuccess = () => res((req.result||[]).filter(f => f.clientId === clientId));
+      req.onerror = rej;
+    });
+  }
+};
+
+function getClients() {
+  try { return JSON.parse(localStorage.getItem('zenan_clients')) || []; } catch { return []; }
+}
+
+// ── Auth
+function togglePortalPass() {
+  const inp = document.getElementById('portalPass');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function portalLogin() {
+  const user = document.getElementById('portalUser').value.trim();
+  const pass = document.getElementById('portalPass').value;
+  const clients = getClients();
+  const match = clients.find(c => c.loginUser === user && c.loginPass === pass);
+  if (!match) {
+    document.getElementById('loginError').classList.add('show');
+    document.getElementById('portalPass').value = '';
+    return;
+  }
+  sessionStorage.setItem('zenan_client_session', JSON.stringify({ clientId: match.id }));
+  showDashboard(match);
+}
+
+function portalLogout() {
+  sessionStorage.removeItem('zenan_client_session');
+  document.getElementById('dashboard').classList.remove('show');
+  document.getElementById('loginCard').style.display = '';
+  document.getElementById('portalUser').value = '';
+  document.getElementById('portalPass').value = '';
+  document.getElementById('loginError').classList.remove('show');
+}
+
+function fileIcon(type) {
+  if (!type) return '📄';
+  if (type.startsWith('image/')) return '🖼️';
+  if (type === 'application/pdf') return '📕';
+  if (type.includes('word')||type.includes('document')) return '📝';
+  if (type.includes('sheet')||type.includes('excel')||type.includes('csv')) return '📊';
+  if (type.includes('zip')||type.includes('rar')) return '🗜️';
+  return '📄';
+}
+
+function fmtSize(b) {
+  if (!b) return '';
+  if (b < 1024) return b+' B';
+  if (b < 1048576) return (b/1024).toFixed(1)+' KB';
+  return (b/1048576).toFixed(1)+' MB';
+}
+
+function escHtml(s) {
+  return String(s??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Cart
+let _cart = []; // { id, name, type, dataUrl, qty }
+let _currentClient = null;
+
+function addToCart(idx) {
+  const f = _lbFiles[idx];
+  if (!f) return;
+  const existing = _cart.find(c => c.id === f.id);
+  if (existing) { existing.qty++; }
+  else { _cart.push({ id: f.id, name: f.name, type: f.type, dataUrl: f.dataUrl, qty: 1 }); }
+  renderCart();
+  // Flash the + button green
+  const btn = document.querySelector(`.file-tile-add[data-idx="${idx}"]`);
+  if (btn) { btn.classList.add('added'); btn.textContent = '✓'; setTimeout(() => { btn.classList.remove('added'); btn.textContent = '+'; }, 1200); }
+}
+
+function removeFromCart(id) {
+  _cart = _cart.filter(c => c.id !== id);
+  renderCart();
+}
+
+function updateQty(id, val) {
+  const item = _cart.find(c => c.id === id);
+  if (item) { item.qty = Math.max(1, parseInt(val) || 1); }
+}
+
+function renderCart() {
+  const badge = document.getElementById('cartBadge');
+  const itemsEl = document.getElementById('cartItems');
+  const emptyEl = document.getElementById('cartEmpty');
+  badge.textContent = _cart.length;
+  if (!_cart.length) {
+    emptyEl.style.display = '';
+    itemsEl.innerHTML = '';
+    itemsEl.appendChild(emptyEl);
+    return;
+  }
+  itemsEl.innerHTML = _cart.map(item => `
+    <div class="cart-item">
+      <span class="cart-item-icon">${fileIcon(item.type)}</span>
+      <span class="cart-item-name" title="${escHtml(item.name)}">${escHtml(item.name)}</span>
+      <div class="cart-qty-wrap">
+        <span class="cart-qty-label">Qty</span>
+        <input type="number" class="cart-qty" value="${item.qty}" min="1" onchange="updateQty('${item.id}', this.value)" />
+      </div>
+      <button class="cart-item-remove" onclick="removeFromCart('${item.id}')" title="Remove">✕</button>
+    </div>`).join('');
+}
+
+function sendOrder() {
+  const msg = document.getElementById('cartMsg').value.trim();
+  if (!_cart.length && !msg) { alert('Please add files or write a message before sending.'); return; }
+  const client = _currentClient;
+  const repEmail = client?.repEmail || '';
+
+  // Build email body
+  const itemLines = _cart.map(c => `• ${c.name}  (Qty: ${c.qty})`).join('\n');
+  const body = [
+    `Order Request from: ${client?.name || 'Client'}`,
+    `Client Email: ${client?.clientEmail || '—'}`,
+    '',
+    _cart.length ? `FILES / PROOFS:\n${itemLines}` : '',
+    '',
+    msg ? `MESSAGE:\n${msg}` : '',
+  ].filter(Boolean).join('\n');
+
+  const subject = encodeURIComponent(`Order Request — ${client?.name || 'Client'}`);
+  const bodyEnc = encodeURIComponent(body);
+  const mailto = `mailto:${repEmail}?subject=${subject}&body=${bodyEnc}`;
+  window.location.href = mailto;
+
+  // Show success
+  document.getElementById('cartSendBtn').disabled = true;
+  document.getElementById('cartSuccess').classList.add('show');
+  setTimeout(() => {
+    document.getElementById('cartSendBtn').disabled = false;
+    document.getElementById('cartSuccess').classList.remove('show');
+  }, 5000);
+}
+
+// ── Lightbox
+let _lbFiles = [];
+function openLightbox(idx) {
+  const f = _lbFiles[idx];
+  if (!f) return;
+  const inner = document.getElementById('lightboxInner');
+  document.getElementById('lightboxName').textContent = f.name;
+  document.getElementById('lightboxDl').onclick = () => {
+    const a = document.createElement('a'); a.href = f.dataUrl; a.download = f.name; a.click();
+  };
+  if (f.type && f.type.startsWith('image/')) {
+    inner.innerHTML = `<img src="${f.dataUrl}" alt="${escHtml(f.name)}" />`;
+  } else if (f.type === 'application/pdf') {
+    inner.innerHTML = `<iframe src="${f.dataUrl}" title="${escHtml(f.name)}"></iframe>`;
+  } else {
+    inner.innerHTML = `<div style="text-align:center;color:#fff;font-size:4rem">${fileIcon(f.type)}<div style="font-size:1rem;margin-top:12px;opacity:.7">${escHtml(f.name)}</div></div>`;
+  }
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lightboxInner').innerHTML = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+// ── Dashboard render
+async function showDashboard(client) {
+  document.getElementById('loginCard').style.display = 'none';
+  const dash = document.getElementById('dashboard');
+  dash.classList.add('show');
+
+  // Header
+  const initials = client.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  document.getElementById('dashAvatar').textContent = initials;
+  document.getElementById('dashName').textContent = 'Welcome, ' + client.name;
+  document.getElementById('dashEmail').textContent = client.clientEmail || '';
+
+  // Rep card
+  const repInit = (client.repName || '?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  document.getElementById('repAvatar').textContent = repInit;
+  document.getElementById('repName').textContent = client.repName || '—';
+  document.getElementById('repEmailText').textContent = client.repEmail || '—';
+  document.getElementById('repEmailLink').href = client.repEmail ? `mailto:${client.repEmail}` : '#';
+  document.getElementById('dashLoginUser').textContent = client.loginUser || '—';
+  document.getElementById('dashSince').textContent = client.createdAt
+    ? new Date(client.createdAt).toLocaleDateString('en-CA', { year:'numeric', month:'short' })
+    : '—';
+
+  // Files
+  _currentClient = client;
+  await PortalIDB.open();
+  const files = await PortalIDB.getFiles(client.id);
+  _lbFiles = files;
+  const container = document.getElementById('filesContainer');
+  if (!files.length) {
+    container.innerHTML = '<div class="files-empty">📂<br>No files have been shared with you yet.<br>Your rep will upload them here.</div>';
+    return;
+  }
+  container.innerHTML = `
+    <div class="files-grid">
+      ${files.map((f, i) => {
+        let preview = '';
+        if (f.type && f.type.startsWith('image/')) {
+          preview = `<img class="file-tile-preview" src="${f.dataUrl}" alt="${escHtml(f.name)}" />`;
+        } else if (f.type === 'application/pdf') {
+          preview = `<div class="file-tile-preview-icon">📕</div>`;
+        } else {
+          preview = `<div class="file-tile-preview-icon">${fileIcon(f.type)}</div>`;
+        }
+        return `
+        <div class="file-tile" onclick="openLightbox(${i})">
+          ${preview}
+          <div class="file-tile-meta" onclick="event.stopPropagation()">
+            <span class="file-tile-name" title="${escHtml(f.name)}">${escHtml(f.name)}</span>
+            <button class="file-tile-dl" onclick="(function(){const a=document.createElement('a');a.href='${f.dataUrl}';a.download='${escHtml(f.name)}';a.click()})()" title="Download">⬇</button>
+            <button class="file-tile-add" data-idx="${i}" onclick="addToCart(${i})" title="Add to order">+</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+// ── On load: check for existing session
+(async function() {
+  const sess = sessionStorage.getItem('zenan_client_session');
+  if (!sess) return;
+  try {
+    const { clientId } = JSON.parse(sess);
+    const clients = getClients();
+    const client = clients.find(c => c.id === clientId);
+    if (client) { await showDashboard(client); }
+    else { sessionStorage.removeItem('zenan_client_session'); }
+  } catch { sessionStorage.removeItem('zenan_client_session'); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zenan Glass — Custom Glass Products</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    .pour-wrap { position: relative; display: flex; }
+    .pour-tip {
+      position: absolute; right: calc(100% + 12px); top: 50%;
+      transform: translateY(-50%) translateX(4px); opacity: 0;
+      background: rgba(15,25,55,.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      color: #e8efff; font-size: .72rem; font-weight: 500; letter-spacing: .02em;
+      white-space: nowrap; padding: 6px 12px; border-radius: 8px;
+      pointer-events: none; transition: opacity .2s, transform .2s;
+      box-shadow: 0 4px 18px rgba(0,0,0,.18);
+    }
+    .pour-tip::after {
+      content: ''; position: absolute; left: 100%; top: 50%; transform: translateY(-50%);
+      border: 5px solid transparent; border-left-color: rgba(15,25,55,.72);
+    }
+    .pour-wrap:hover .pour-tip { opacity: 1; transform: translateY(-50%) translateX(0); }
+    html { scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+
+    :root {
+      --blue:  #2558B0;
+      --blue2: #3b82f6;
+      --aqua:  #0891b2;
+      --dark:  #0f172a;
+      --body:  #334155;
+      --muted: #64748b;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); color: var(--body); background: transparent; line-height: 1.6; min-height: 100vh; overflow-x: hidden; }
+
+    #bgCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    nav, main, footer { position: relative; z-index: 1; }
+
+    .grad-text {
+      background: linear-gradient(135deg, #2558B0 0%, #3b82f6 55%, #0891b2 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* ── REVEAL ── */
+    .reveal      { opacity: 0; transform: translateY(24px); transition: opacity .75s cubic-bezier(.22,1,.36,1), transform .75s cubic-bezier(.22,1,.36,1); }
+    .reveal-left { opacity: 0; transform: translateX(-24px); transition: opacity .75s cubic-bezier(.22,1,.36,1), transform .75s cubic-bezier(.22,1,.36,1); }
+    .reveal-right{ opacity: 0; transform: translateX(24px);  transition: opacity .75s cubic-bezier(.22,1,.36,1), transform .75s cubic-bezier(.22,1,.36,1); }
+    .reveal.in, .reveal-left.in, .reveal-right.in { opacity: 1; transform: translate(0); }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(5px) saturate(180%); -webkit-backdrop-filter: blur(5px) saturate(180%);
+      border-bottom: 1px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 6vw; height: 68px;
+      box-shadow: 0 2px 16px rgba(37,88,176,.06);
+    }
+    .logo-wrap { display: flex; align-items: center; text-decoration: none; }
+    .logo-wrap img { height: 52px; width: auto; display: block; }
+    .nav-links { display: flex; gap: 2px; list-style: none; margin-left: auto; }
+    .nav-links a { color: #1e3a6e; text-decoration: none; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 8px 16px; border-radius: 7px; transition: background .2s, color .2s; }
+    .nav-links a:hover { background: rgba(37,88,176,.08); color: #2558B0; }
+    .nav-links a.active { color: var(--blue); font-weight: 700; }
+    .nav-insta { display: flex !important; align-items: center; gap: 5px; }
+    .nav-insta svg { flex-shrink: 0; }
+    .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; border: none; background: none; }
+    .nav-hamburger span { display: block; width: 24px; height: 2px; background: var(--dark); border-radius: 2px; }
+    @media (max-width: 640px) {
+      .nav-hamburger { display: flex; }
+      .nav-links { display: none; flex-direction: column; gap: 0; position: absolute; top: 68px; left: 0; right: 0; background: rgba(255,255,255,.92); backdrop-filter: blur(24px); padding: 8px 0 16px; box-shadow: 0 8px 30px rgba(37,88,176,.09); }
+      .nav-links.open { display: flex; }
+      .nav-links a { border-radius: 0; padding: 12px 6vw; }
+    }
+
+    /* ── GLASS CARD BASE ── */
+    .glass-card {
+      background: rgba(255,255,255,.30);
+      backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid rgba(255,255,255,.45);
+      border-radius: 20px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 4px 24px rgba(37,88,176,.05);
+      position: relative; overflow: hidden;
+      transition: box-shadow .35s, transform .35s, background .35s;
+    }
+    .glass-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 38%;
+      background: linear-gradient(180deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 100%);
+      pointer-events: none; border-radius: inherit;
+    }
+    .glass-card:hover { background: rgba(255,255,255,.38); transform: translateY(-5px); box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 16px 44px rgba(37,88,176,.1); }
+
+    main { overflow: visible; }
+
+    /* ── HERO ── */
+    .hero-section {
+      position: relative; overflow: hidden;
+    }
+    .hero-wrap {
+      padding: 80px 6vw 80px; max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 40px;
+      align-items: center; position: relative; z-index: 1;
+    }
+    .hero-wrap > .hero { min-width: 0; flex-shrink: 0; align-self: center; }
+    .hero-glass-col { min-width: 0; }
+    .hero-sub { max-width: 460px; margin-bottom: 36px; }
+    .hero-actions { justify-content: flex-start; }
+    @media (max-width: 768px) {
+      .hero-wrap { grid-template-columns: 1fr; text-align: center; }
+      .hero-sub { max-width: 100%; margin-left: auto; margin-right: auto; }
+      .hero-actions { justify-content: center; }
+      .hero-glass-col { display: none; }
+    }
+    .hero-glass-col {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px; margin-bottom: 22px;
+      background: rgba(255,255,255,.28); border: 1px solid rgba(37,88,176,.16);
+      backdrop-filter: blur(12px); padding: 6px 16px; border-radius: 20px;
+      font-size: .78rem; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--blue);
+    }
+    .hero h1 { font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900; line-height: 1.08; color: #0f172a; margin-bottom: 18px; letter-spacing: -.02em; }
+    .hero-sub {
+      font-size: 1.05rem; max-width: 400px; margin-bottom: 32px; line-height: 1.85;
+      background: linear-gradient(120deg, #1e3a6e 0%, #2558B0 40%, #3b82f6 70%, #60a5fa 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      font-weight: 600; letter-spacing: .01em;
+      filter: drop-shadow(0 1px 6px rgba(37,88,176,.12));
+    }
+    @media (max-width: 768px) { .hero-sub { max-width: 100%; } .hero h1 { white-space: normal; font-size: clamp(2rem, 7vw, 2.8rem); } }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: nowrap; }
+    @media (max-width: 768px) { .hero-actions { justify-content: center; flex-wrap: wrap; } }
+
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 13px 32px; border-radius: 10px; font-size: .97rem; font-weight: 700; text-decoration: none; background: #2558B0; color: #fff; border: 2px solid #2558B0; cursor: pointer; box-shadow: 5px 5px 0 #FFD700; transition: transform .18s, box-shadow .18s; font-family: var(--font); }
+    .btn-primary:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #FFD700; }
+    .btn-outline { display: inline-flex; align-items: center; gap: 8px; padding: 12px 30px; border-radius: 10px; font-size: .97rem; font-weight: 700; text-decoration: none; background: #fff; border: 2px solid #2558B0; color: #2558B0; cursor: pointer; box-shadow: 5px 5px 0 #FFD700; transition: transform .18s, box-shadow .18s; font-family: var(--font); }
+    .btn-outline:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #FFD700; }
+
+
+    /* ── SECTION SHELL ── */
+    section { padding: 80px 6vw; }
+    .section-eyebrow { text-align: center; font-size: .72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--blue2); margin-bottom: 10px; }
+    .section-heading { text-align: center; font-size: clamp(1.6rem, 3vw, 2.3rem); font-weight: 800; color: #0f172a; margin-bottom: 10px; line-height: 1.2; }
+    .section-heading .blue { color: #2558B0; }
+    .section-sub { text-align: center; max-width: 520px; margin: 0 auto 52px; font-size: .97rem; line-height: 1.7; color: #0f172a; }
+
+    /* ── ABOUT BAND ── */
+    .about-band { padding: 80px 6vw; }
+    .about-band-inner { max-width: 940px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+    @media (max-width: 700px) { .about-band-inner { grid-template-columns: 1fr; gap: 36px; } }
+    .about-band-text .section-eyebrow, .about-band-text .section-heading { text-align: left; }
+    @media (max-width: 700px) { .about-band-text .section-eyebrow, .about-band-text .section-heading { text-align: center; } }
+    .about-band-text .section-heading { margin-bottom: 18px; }
+    .about-band-text p { color: #0f172a; font-size: .98rem; line-height: 1.8; margin-bottom: 14px; }
+    .about-band-text p:last-of-type { margin-bottom: 0; }
+    .about-band-link { margin-top: 26px; }
+    .about-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .stat-mini {
+      padding: 22px 18px; text-align: center; border-radius: 12px;
+      background: #fff;
+      border: 2px solid #2558B0;
+      box-shadow: 5px 5px 0 #FFD700;
+      transition: transform .18s, box-shadow .18s;
+      position: relative;
+    }
+    .stat-mini:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #FFD700; }
+    .stat-mini .num {
+      font-size: 1.9rem; font-weight: 800; line-height: 1;
+      color: #2558B0; -webkit-text-fill-color: #2558B0;
+      background: none; -webkit-background-clip: unset; background-clip: unset;
+    }
+    .stat-mini .lbl { font-size: .75rem; color: var(--muted); margin-top: 6px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; }
+
+    /* ── CATEGORIES ── */
+    .cat-cards-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      gap: 24px 16px; max-width: 1200px; margin: 0 auto;
+    }
+    @media (max-width: 900px) { .cat-cards-grid { grid-template-columns: repeat(5, 1fr); } }
+    @media (max-width: 600px) { .cat-cards-grid { grid-template-columns: repeat(3, 1fr); } }
+    .cat-card {
+      display: flex; flex-direction: column; align-items: center; gap: 0;
+      text-decoration: none; cursor: pointer;
+      transition: transform .2s;
+    }
+    .cat-card:hover { transform: translateY(-6px); }
+    .cat-icon {
+      width: 120px; height: 120px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cat-icon svg { width: 100%; height: 100%; }
+    .cat-icon img { width: 100%; height: 100%; object-fit: contain; }
+    .cat-card-label {
+      font-size: .82rem; font-weight: 700; color: var(--dark);
+      text-align: center; line-height: 1.3;
+    }
+    .cat-empty { font-size: .88rem; color: var(--muted); font-style: italic; text-align: center; }
+
+    /* ── EXPERTISE ── */
+    .expertise-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+      max-width: 1100px; margin: 0 auto;
+    }
+    @media (max-width: 860px) { .expertise-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 560px) { .expertise-grid { grid-template-columns: 1fr; } }
+    .exp-item {
+      padding: 20px 10px;
+      background: none; border: none; box-shadow: none;
+    }
+    .exp-item h3 { font-size: 1.05rem; font-weight: 700; color: var(--card-accent, #2558B0); margin-bottom: 8px; }
+    .exp-item p { font-size: .83rem; color: #0f172a; line-height: 1.65; }
+
+    /* ── SUPPLIERS ── */
+    .supplier-section .section-sub { margin-bottom: 18px; }
+    .supplier-section { padding-bottom: 40px; }
+    .process-section { padding-top: 40px; }
+    .supplier-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; max-width: 900px; margin: 0 auto; }
+    @media (max-width: 700px) { .supplier-grid { grid-template-columns: repeat(2, 1fr); } }
+    .supplier-card { padding: 20px 16px; display: flex; align-items: center; justify-content: center; min-height: 110px; background: none !important; border: none !important; box-shadow: none !important; backdrop-filter: none !important; }
+    .supplier-card img { max-width: 100%; max-height: 90px; width: auto; height: auto; display: block; mix-blend-mode: multiply; opacity: .75; }
+    .supplier-card svg { max-width: 80%; height: 52px; width: auto; display: block; opacity: .5; }
+
+    /* ── PROCESS ── */
+    .process-section .section-sub { margin-bottom: 20px; }
+    .steps-wrap { position: relative; max-width: 1060px; margin: 0 auto; }
+    .steps-connector {
+      position: absolute; top: 42px; left: calc(12.5% + 28px); right: calc(12.5% + 28px);
+      height: 2px; z-index: 0;
+      background: repeating-linear-gradient(90deg, #2558B0 0, #2558B0 8px, transparent 8px, transparent 18px);
+      background-size: 26px 2px;
+      animation: connector-flow 1.4s linear infinite;
+      opacity: .45;
+    }
+    @keyframes connector-flow { 0%{background-position:0 0} 100%{background-position:26px 0} }
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; position: relative; z-index: 1; }
+    @media (max-width: 700px) { .steps { grid-template-columns: repeat(2,1fr); } .steps-connector { display: none; } }
+    .step {
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      padding: 10px 18px 0;
+      background: none; border: none; box-shadow: none; backdrop-filter: none;
+    }
+    .step-num {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: #fff; border: 2.5px solid #2558B0;
+      color: #2558B0; font-size: 1.3rem; font-weight: 900;
+      display: grid; place-items: center; margin-bottom: 18px;
+      box-shadow: 4px 4px 0 #FFD700;
+      flex-shrink: 0;
+    }
+    .step h3 { font-size: .97rem; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+    .step p { font-size: .85rem; color: #0f172a; line-height: 1.6; }
+
+    /* ── GLASS SHOWCASE ── */
+    .glass-showcase { display: none; }
+    .showcase-stage {
+      position: relative; display: flex; align-items: center;
+      justify-content: center; gap: 0; max-width: 860px; margin: 0 auto 28px;
+    }
+    .showcase-arrow {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: none; background: transparent;
+      box-shadow: none;
+      cursor: pointer; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: transform .18s, opacity .18s;
+      user-select: none; z-index: 2;
+    }
+    .showcase-arrow:hover { transform: scale(1.15); opacity: .7; }
+    .showcase-arrow svg { width: 36px; height: 36px; stroke: rgba(37,88,176,.6); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .showcase-glass-wrap {
+      flex: 1; display: flex; justify-content: center; align-items: center;
+      position: relative; min-height: 380px;
+    }
+    .showcase-glass-img {
+      height: 460px; width: auto; position: relative; z-index: 1;
+      filter: drop-shadow(0 20px 40px rgba(37,88,176,.28));
+      pointer-events: none;
+    }
+    .design-layer {
+      position: absolute; inset: 0; display: flex;
+      align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .55s ease;
+      pointer-events: none; z-index: 2;
+    }
+    .design-layer.active { opacity: 1; }
+    .showcase-label {
+      position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+      background: #fff; border: 2px solid #2558B0;
+      box-shadow: 3px 3px 0 #FFD700;
+      padding: 7px 22px; border-radius: 30px;
+      font-size: .82rem; font-weight: 700; color: #2558B0;
+      letter-spacing: .5px; white-space: nowrap; z-index: 3;
+      transition: opacity .35s;
+    }
+    .showcase-dots {
+      display: flex; justify-content: center; gap: 8px; margin-top: 36px;
+    }
+    .showcase-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      border: 1px solid rgba(37,88,176,.25); background: transparent;
+      cursor: pointer; transition: background .25s, transform .2s;
+    }
+    .showcase-dot.active { background: rgba(37,88,176,.35); border-color: rgba(37,88,176,.35); transform: scale(1.2); }
+    .glass-selector {
+      display: flex; gap: 6px; justify-content: center; margin-top: 14px;
+    }
+    .glass-btn {
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 2px solid rgba(37,88,176,.3); background: rgba(255,255,255,.35);
+      cursor: pointer; transition: background .2s, transform .2s, border-color .2s;
+      padding: 0; display: flex; align-items: center; justify-content: center;
+      font-size: .65rem; font-weight: 700; color: rgba(37,88,176,.7);
+      font-family: 'Times New Roman', serif; letter-spacing: 0;
+    }
+    .glass-btn:hover { background: rgba(37,88,176,.15); border-color: rgba(37,88,176,.55); color: #2558B0; }
+    .glass-btn.active { background: rgba(37,88,176,.2); border-color: rgba(37,88,176,.65); color: #2558B0; transform: scale(1.15); }
+
+    .showcase-desc {
+      max-width: 420px; margin: 18px auto 0;
+      font-size: .93rem; color: var(--muted); line-height: 1.7;
+      min-height: 50px; transition: opacity .3s;
+    }
+
+    /* ── CTA BAND ── */
+    .cta-band { padding: 100px 6vw; text-align: center; }
+    .cta-band h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; color: #0f172a; margin-bottom: 12px; }
+    .cta-band h2 .blue { color: #2558B0; }
+    .cta-band p { color: #0f172a; margin-bottom: 34px; max-width: 420px; margin-left: auto; margin-right: auto; line-height: 1.75; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(5px) saturate(180%); -webkit-backdrop-filter: blur(5px) saturate(180%);
+      border-top: 1px solid rgba(255,255,255,.2);
+      box-shadow: 0 -2px 16px rgba(37,88,176,.06);
+      color: #0f172a; padding: 14px 6vw 12px; position: relative;
+    }
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; padding-bottom: 36px; border-bottom: 1px solid rgba(37,88,176,.1); }
+    .footer-logo { display: inline-flex; margin-bottom: 14px; }
+    .footer-logo img { height: 46px; width: auto; display: block; }
+    .footer-brand p { font-size: .88rem; line-height: 1.7; max-width: 280px; color: #0f172a; }
+    .footer-col h4 { color: #0f172a; font-size: .83rem; font-weight: 700; margin-bottom: 14px; letter-spacing: .08em; text-transform: uppercase; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 9px; font-size: .88rem; color: #0f172a; }
+    .footer-col a { color: #0f172a; text-decoration: none; transition: color .2s; }
+    .footer-col a:hover { color: #2558B0; }
+    .footer-contact li { display: flex; gap: 8px; align-items: flex-start; }
+    .footer-contact .ic { display: flex; align-items: center; margin-top: 3px; flex-shrink: 0; opacity: .5; }
+    .footer-bottom { max-width: 1100px; margin: 22px auto 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: .8rem; color: #0f172a; }
+    @media (max-width: 700px) { .footer-inner { grid-template-columns: 1fr; gap: 28px; } .footer-bottom { flex-direction: column; text-align: center; } }
+  </style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<nav>
+  <a href="index.html" class="logo-wrap">
+    <img src="brand_assets/Zenan logo.png" alt="Zenan Glass" />
+  </a>
+  <button class="nav-hamburger" aria-label="Toggle menu" onclick="toggleNav()">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="products.html">Products</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <a id="navLoginBtn" href="login.html" style="color:#1e3a6e;text-decoration:none;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:8px 16px;border-radius:7px;transition:background .2s,color .2s;flex-shrink:0;margin-left:4px;" onmouseover="this.style.background='rgba(37,88,176,.08)';this.style.color='#2558B0'" onmouseout="this.style.background='';this.style.color='#1e3a6e'">Log In</a>
+<script>
+(function(){
+  var btn = document.getElementById('navLoginBtn');
+  if (!btn) return;
+  if (localStorage.getItem('zenan_session')) {
+    btn.textContent = 'My Account'; btn.href = 'admin.html';
+  } else if (sessionStorage.getItem('zenan_client_session')) {
+    btn.textContent = 'My Account'; btn.href = 'client-portal.html';
+  }
+})();
+</script>
+</nav>
+<div style="position:fixed;top:84px;right:20px;z-index:199;display:flex;flex-direction:column;gap:8px;">
+  <div class="pour-wrap">
+    <button onclick="pourBeer()" style="padding:0;border:none;background:none;cursor:pointer;transition:transform .2s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img src="brand_assets/Beer screen icon.png" style="height:30px;width:auto;display:block;"></button>
+    <span class="pour-tip">Pour yourself a cold one ✦</span>
+  </div>
+  <div class="pour-wrap">
+    <button onclick="pourWine()" style="padding:0;border:none;background:none;cursor:pointer;transition:transform .2s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img src="brand_assets/Wine screen icon.png" style="height:30px;width:auto;display:block;"></button>
+    <span class="pour-tip">A glass of something fine ✦</span>
+  </div>
+</div>
+
+<main>
+
+<!-- HERO + GLASS SHOWCASE (merged) -->
+<div class="hero-section">
+  <div class="hero-wrap">
+
+    <!-- LEFT: Text -->
+    <div class="hero reveal-left">
+      <h1>Your Brand,<br><span style="color:#2558B0;">Crafted in Glass</span></h1>
+      <p class="hero-sub">Premium custom glassware and branded merchandise for businesses of all sizes — delivered with precision and care.</p>
+      <div class="hero-actions">
+        <a href="products.html" class="btn-outline">View Products ›</a>
+        <a href="gallery.html" class="btn-outline">Gallery ›</a>
+      </div>
+    </div>
+
+    <!-- RIGHT: Glass showcase -->
+    <div class="hero-glass-col reveal-right">
+      <div class="showcase-stage" style="max-width:100%;margin:0;">
+        <button class="showcase-arrow" id="prevDesign" aria-label="Previous design"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <div class="showcase-glass-wrap" id="glassWrap">
+          <img class="showcase-glass-img" id="glassImg" src="brand_assets/Glass homepage.png" alt="Custom Glass" />
+          <div class="design-layer active" id="design-0">
+            <img src="brand_assets/Print 1.png" alt="Print Design 1" style="position:absolute;height:38%;width:auto;object-fit:contain;pointer-events:none;top:15%;" />
+          </div>
+          <div class="design-layer" id="design-1">
+            <img src="brand_assets/Print 2.png" alt="Print Design 2" style="position:absolute;height:38%;width:auto;object-fit:contain;pointer-events:none;top:15%;" />
+          </div>
+          <div class="design-layer" id="design-2">
+            <img src="brand_assets/Print 4.png" alt="Print Design 4" style="position:absolute;height:38%;width:auto;object-fit:contain;pointer-events:none;top:15%;" />
+          </div>
+          <div class="design-layer" id="design-3">
+            <img src="brand_assets/Print 5.png" alt="Print Design 5" style="position:absolute;height:25%;width:auto;object-fit:contain;pointer-events:none;top:15%;" />
+          </div>
+          <div class="design-layer" id="design-4">
+            <img src="brand_assets/Print 6.png" alt="Print Design 6" style="position:absolute;height:38%;width:auto;object-fit:contain;pointer-events:none;top:15%;" />
+          </div>
+          <div class="design-layer" id="design-5">
+            <img src="brand_assets/Print 7.png" alt="Print Design 7" style="position:absolute;height:30%;width:auto;object-fit:contain;pointer-events:none;top:15%;" />
+          </div>
+          <div class="design-layer" id="design-6">
+            <img src="brand_assets/Print 3.png" alt="Print Design 3" style="position:absolute;height:10%;width:auto;object-fit:contain;pointer-events:none;top:32%;left:50%;transform:translateX(-50%);" />
+          </div>
+        </div>
+        <button class="showcase-arrow" id="nextDesign" aria-label="Next design"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+      </div>
+      <div class="showcase-dots" id="showcaseDots" style="margin-top:16px;">
+        <div class="showcase-dot active" data-idx="0"></div>
+        <div class="showcase-dot" data-idx="1"></div>
+        <div class="showcase-dot" data-idx="2"></div>
+        <div class="showcase-dot" data-idx="3"></div>
+        <div class="showcase-dot" data-idx="4"></div>
+        <div class="showcase-dot" data-idx="5"></div>
+        <div class="showcase-dot" data-idx="6"></div>
+      </div>
+      <!-- Glass selector buttons -->
+      <div class="glass-selector">
+        <button class="glass-btn active" data-glass="brand_assets/Glass homepage.png">I</button>
+        <button class="glass-btn" data-glass="brand_assets/Glass homepage 2.png">II</button>
+        <button class="glass-btn" data-glass="brand_assets/Glass homepage 3.png">III</button>
+        <button class="glass-btn" data-glass="brand_assets/Glass homepage 4.png">IV</button>
+        <button class="glass-btn" data-glass="brand_assets/Glass homepage 5.png">V</button>
+        <button class="glass-btn" data-glass="brand_assets/Glass homepage 7.png">VI</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<script>
+(function(){
+  var designs = [{},{},{},{},{},{},{}];
+  var glassImg = document.getElementById('glassImg');
+  var current = 0;
+  function go(n){
+    document.getElementById('design-'+current).classList.remove('active');
+    document.querySelectorAll('.showcase-dot')[current].classList.remove('active');
+    current = (n + designs.length) % designs.length;
+    document.getElementById('design-'+current).classList.add('active');
+    document.querySelectorAll('.showcase-dot')[current].classList.add('active');
+  }
+  document.getElementById('prevDesign').addEventListener('click', function(){ go(current-1); });
+  document.getElementById('nextDesign').addEventListener('click', function(){ go(current+1); });
+  document.querySelectorAll('.showcase-dot').forEach(function(d){
+    d.addEventListener('click', function(){ go(+this.dataset.idx); });
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key==='ArrowLeft')  go(current-1);
+    if(e.key==='ArrowRight') go(current+1);
+  });
+  document.querySelectorAll('.glass-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.glass-btn').forEach(function(b){ b.classList.remove('active'); });
+      this.classList.add('active');
+      glassImg.src = this.dataset.glass;
+    });
+  });
+})();
+</script>
+
+<!-- WHO WE ARE -->
+<section class="about-band">
+  <div class="about-band-inner">
+    <div class="about-band-text reveal-left">
+      <div class="section-eyebrow">Who We Are</div>
+      <div class="section-heading">A Partner You Can <span class="blue">Count On</span></div>
+      <p>Zenan Glass is a full-service custom glass and branded products company specializing in etched glassware, corporate gifts, and premium promotional items. We work directly with businesses to bring their vision to life.</p>
+      <p>Whether you need 50 units or 50,000, we handle every detail from concept to delivery — on time and on budget.</p>
+      <div class="about-band-link">
+        <a href="about.html" class="btn-outline">Learn Our Story ›</a>
+      </div>
+    </div>
+    <div class="about-stats reveal-right">
+      <div class="glass-card stat-mini"><div class="num" data-count="1500" data-suffix="+" style="position:relative;z-index:1;">0</div><div class="lbl">Clients Served</div></div>
+      <div class="glass-card stat-mini"><div class="num" data-count="20" data-suffix="+" style="position:relative;z-index:1;">0</div><div class="lbl">Years Experience</div></div>
+      <div class="glass-card stat-mini"><div class="num" data-count="98" data-suffix="%" style="position:relative;z-index:1;">0</div><div class="lbl">Satisfaction Rate</div></div>
+      <div class="glass-card stat-mini"><div class="num" data-count="300" data-suffix="+" style="position:relative;z-index:1;">0</div><div class="lbl">Products</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section>
+  <div class="section-eyebrow reveal">What We Offer</div>
+  <div class="section-heading reveal"><span class="blue">Product</span> Categories</div>
+  <div class="section-sub reveal">From custom glassware to branded merchandise, we produce hundreds of product types that elevate your brand.</div>
+  <div class="cat-cards-grid reveal" id="catPillsPanel">
+    <span class="cat-empty">No categories yet — add them in the admin panel.</span>
+  </div>
+</section>
+
+<!-- EXPERTISE -->
+<section>
+  <div class="section-eyebrow reveal">Our Expertise</div>
+  <div class="section-heading reveal">What We're <span class="blue">Great At</span></div>
+  <div class="expertise-grid">
+    <div class="exp-item reveal" style="--card-accent:#E8365D;"><h3>UV Printing</h3><p>Ultra-vivid full-colour UV printing directly onto any surface. Sharp detail, fade-resistant, and works on virtually any material.</p></div>
+    <div class="exp-item reveal" style="--card-accent:#D4145A;"><h3>Screen Printing</h3><p>Classic, durable screen printing for high-volume orders. Bold ink coverage on apparel, bags, and promotional products.</p></div>
+    <div class="exp-item reveal" style="--card-accent:#F05E78;"><h3>Decal Printing</h3><p>Custom cut decals and stickers for branding, packaging, and product labelling. Waterproof and built to last.</p></div>
+    <div class="exp-item reveal" style="--card-accent:#C0134A;"><h3>Nucleation</h3><p>Laser-etched nucleation points in glassware for superior carbonation and a perfect pour — ideal for beer and sparkling beverage brands.</p></div>
+    <div class="exp-item reveal" style="--card-accent:#F2436A;"><h3>Embroidery</h3><p>Premium thread embroidery for uniforms, hats, bags, and apparel. Consistent stitch quality that holds up wash after wash.</p></div>
+    <div class="exp-item reveal" style="--card-accent:#B81048;"><h3>Custom Boxes</h3><p>Branded packaging and custom boxes designed to impress. Perfect for gifting, kitting, retail, and product launches.</p></div>
+  </div>
+</section>
+
+<!-- HOW WE WORK -->
+<section class="process-section">
+  <div class="section-eyebrow reveal">Our Process</div>
+  <div class="section-heading reveal">How We <span class="blue">Work</span></div>
+  <div class="section-sub reveal" style="max-width:none;white-space:nowrap;">From your first inquiry to final delivery, we keep things simple and stress&#8209;free.</div>
+  <div class="steps-wrap">
+    <div class="steps-connector"></div>
+    <div class="steps">
+      <div class="step reveal"><div class="step-num">1</div><h3>Inquire</h3><p>Tell us what you need — product type, quantity, branding details, and timeline. We'll respond within one business day.</p></div>
+      <div class="step reveal"><div class="step-num">2</div><h3>Quote &amp; Proof</h3><p>We send a detailed quote and a digital proof for your approval. No surprises on price or design.</p></div>
+      <div class="step reveal"><div class="step-num">3</div><h3>Production</h3><p>Once approved, we handle production and keep you updated throughout. Quality checks at every stage.</p></div>
+      <div class="step reveal"><div class="step-num">4</div><h3>Delivery</h3><p>We ship directly to you or your recipients across Canada and the US with full tracking.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SUPPLIERS -->
+<section class="supplier-section">
+  <div class="section-eyebrow reveal">Trusted Brands</div>
+  <div class="section-heading reveal">Glassware <span class="blue">Suppliers</span> We Work With</div>
+  <div class="section-sub reveal">We source premium glassware from the world's leading manufacturers to ensure quality you and your customers can feel.</div>
+  <div class="supplier-grid">
+    <div class="supplier-card reveal">
+      <img src="brand_assets/suppliers/Libbey.png" alt="Libbey" />
+    </div>
+    <div class="supplier-card reveal">
+      <img src="brand_assets/suppliers/arcoroc.png" alt="Arcoroc" />
+    </div>
+    <div class="supplier-card reveal">
+      <img src="brand_assets/suppliers/Borgonovo.png" alt="Borgonovo" />
+    </div>
+    <div class="supplier-card reveal">
+      <img src="brand_assets/suppliers/Cristar.png" alt="Cristar" />
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-band reveal">
+  <h2>Ready to <span class="blue">Get Started?</span></h2>
+  <p>Tell us what you need and we'll put together a quote — no project too small, no order too large.</p>
+  <a href="products.html" class="btn-primary">Browse All Products ›</a>
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo"><img src="brand_assets/Zenan logo.png" alt="Zenan Glass" /></a>
+      <p>Premium custom glass products and branded merchandise for businesses across North America.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col footer-contact">
+      <h4>Contact Us</h4>
+      <ul>
+        <li><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> 430 Flint Road, Toronto, ON M3J 2J4</li>
+        <li><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.06 6.06l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17z"/></svg></span> <a href="tel:4163587247">416-358-7247</a></li>
+        <li><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span> <a href="mailto:luc@test">luc@test</a></li>
+        <li><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> Mon–Fri 8am–5pm</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Zenan Glass. All rights reserved.</span>
+    <span>Made with care in Canada 🍁</span>
+  </div>
+</footer>
+
+<script>
+  function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
+  document.querySelectorAll('.nav-links a').forEach(a => a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open')));
+
+  // ── DYNAMIC CATEGORY PILLS ──
+  const CAT_ICONS = {
+
+    beer: '<img src="brand_assets/beer.png" alt="Beer">',
+
+    sampler: '<img src="brand_assets/Sampler.png" alt="Sampler">',
+
+    wine: '<img src="brand_assets/Wine.png" alt="Wine">',
+
+    decanter: '<img src="brand_assets/Decanter.png" alt="Decanter">',
+
+    flute: '<img src="brand_assets/Flute.png" alt="Flute">',
+
+    stemless: '<img src="brand_assets/Stemless.png" alt="Stemless">',
+
+    stemmed: '<img src="brand_assets/Stemmed.png" alt="Stemmed">',
+
+    whisky: '<img src="brand_assets/Whisky.png" alt="Whisky">',
+
+    mug: '<img src="brand_assets/coffee mug.png" alt="Coffee Mug">',
+
+    rocks: '<img src="brand_assets/Rocks.png" alt="Rocks">',
+
+    highball: '<img src="brand_assets/Highball.png" alt="Highball">',
+
+    shot: '<img src="brand_assets/Shot.png" alt="Shot">',
+
+    barware: '<img src="brand_assets/Barware.png" alt="Barware">',
+
+    martini: '<img src="brand_assets/Martini.png" alt="Martini">',
+
+    growler: '<img src="brand_assets/Growler.png" alt="Growler">',
+
+    jar: '<img src="brand_assets/Bottle.png" alt="Glass Jars & Bottles">',
+
+    pitcher: '<img src="brand_assets/Pitcher.png" alt="Pitcher">',
+
+    bucket: '<img src="brand_assets/Bucket.png" alt="Bucket">',
+
+    shaker: '<img src="brand_assets/Shaker.png" alt="Shaker">',
+
+    tools: '<img src="brand_assets/Bar tool.png" alt="Bar Tools">',
+
+    generic: '<svg viewBox="0 0 64 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 10 L8 86 Q8 94 18 94 L46 94 Q56 94 56 86 L54 10 Z" fill="#C8E8F8" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round"/><line x1="14" y1="20" x2="12" y2="80" stroke="white" stroke-width="4" stroke-linecap="round" opacity=".35"/></svg>'
+  };
+
+  function getCatIcon(name) {
+    const k = name.toLowerCase();
+    if (k.includes('beer'))                              return CAT_ICONS.beer;
+    if (k.includes('whisk'))                             return CAT_ICONS.whisky;
+    if (k.includes('wine') && !k.includes('stemless'))   return CAT_ICONS.wine;
+    if (k.includes('stemless'))                          return CAT_ICONS.stemless;
+    if (k.includes('stemmed'))                           return CAT_ICONS.stemmed;
+    if (k.includes('flute') || k.includes('champagne'))  return CAT_ICONS.flute;
+    if (k.includes('martini') || k.includes('cocktail')) return CAT_ICONS.martini;
+    if (k.includes('barware'))                           return CAT_ICONS.barware;
+    if (k.includes('shaker'))                            return CAT_ICONS.shaker;
+    if (k.includes('bar tool') || k.includes('bar tools')) return CAT_ICONS.tools;
+    if (k.includes('shot'))                              return CAT_ICONS.shot;
+    if (k.includes('highball'))                          return CAT_ICONS.highball;
+    if (k.includes('rocks') || k.includes('old fashion')) return CAT_ICONS.rocks;
+    if (k.includes('mug') || k.includes('coffee'))       return CAT_ICONS.mug;
+    if (k.includes('decant') || k.includes('carafe'))    return CAT_ICONS.decanter;
+    if (k.includes('growler'))                           return CAT_ICONS.growler;
+    if (k.includes('jar') || k.includes('bottle'))       return CAT_ICONS.jar;
+    if (k.includes('pitcher'))                           return CAT_ICONS.pitcher;
+    if (k.includes('bucket') || k.includes('chill'))     return CAT_ICONS.bucket;
+    if (k.includes('sampler') || k.includes('flight'))   return CAT_ICONS.sampler;
+    if (k.includes('tool') || k.includes('bar'))         return CAT_ICONS.tools;
+    return CAT_ICONS.generic;
+  }
+
+  function renderCatPills() {
+    const panel = document.getElementById('catPillsPanel');
+    if (!panel) return;
+    let cats = [];
+    try { cats = JSON.parse(localStorage.getItem('zenan_categories') || '[]'); } catch {}
+    if (!cats.length) {
+      panel.innerHTML = '<span class="cat-empty">No categories yet — add them in the admin panel.</span>';
+      return;
+    }
+    panel.innerHTML = cats.map(c =>
+      `<a class="cat-card" href="products.html?cat=${encodeURIComponent(c.id)}">
+        <div class="cat-icon">${getCatIcon(c.name)}</div>
+        <div class="cat-card-label">${c.name}</div>
+      </a>`
+    ).join('');
+  }
+  renderCatPills();
+  window.addEventListener('storage', e => { if (e.key === 'zenan_categories') renderCatPills(); });
+
+  // ── DRINK EASTER EGGS ──
+  function pourDrink(cfg) {
+    const bc = document.createElement('canvas');
+    bc.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:9999;cursor:pointer;';
+    document.body.appendChild(bc);
+    const cx = bc.getContext('2d');
+    let W = bc.width = window.innerWidth, H = bc.height = window.innerHeight;
+    window.addEventListener('resize', () => { W = bc.width = window.innerWidth; H = bc.height = window.innerHeight; });
+    let fillLevel = 0, draining = false, startTime = null, drainStart = null;
+    const bubbles = [];
+    const foam = cfg.foam ? Array.from({length: 80}, () => ({
+      x: Math.random() * 2, r: 6 + Math.random() * 22, wobble: Math.random() * Math.PI * 2,
+    })) : [];
+    function addBubble() {
+      if (fillLevel < 0.04) return;
+      bubbles.push({ x: Math.random() * W, y: H - Math.random() * H * fillLevel * 0.9,
+        r: 1.5 + Math.random() * (cfg.bubbleSize || 3.5), speed: 0.6 + Math.random() * 1.8, alpha: 0.35 + Math.random() * 0.4 });
+    }
+    function draw(ts) {
+      if (!startTime) startTime = ts;
+      if (!draining) {
+        fillLevel = Math.min((ts - startTime) / 3200, 1);
+        fillLevel = 1 - Math.pow(1 - fillLevel, 2.4);
+      } else {
+        if (!drainStart) drainStart = ts;
+        fillLevel = Math.max(1 - (ts - drainStart) / 1800, 0);
+        if (fillLevel <= 0) { document.body.removeChild(bc); return; }
+      }
+      cx.clearRect(0, 0, W, H);
+      const top = H * (1 - fillLevel);
+      const g = cx.createLinearGradient(0, top, W, H);
+      cfg.gradient.forEach(([stop, color]) => g.addColorStop(stop, color));
+      cx.fillStyle = g; cx.fillRect(0, top, W, H);
+      cx.beginPath(); cx.moveTo(0, top);
+      for (let x = 0; x <= W; x += 6) {
+        const y = top + Math.sin(x / 90 + ts / 400) * 5 + Math.sin(x / 40 + ts / 250) * 3;
+        cx.lineTo(x, y);
+      }
+      cx.lineTo(W, H); cx.lineTo(0, H); cx.closePath();
+      cx.fillStyle = cfg.surfaceColor; cx.fill();
+      foam.forEach((f, i) => {
+        const fx = (f.x + i * 0.37 + ts * 0.00008) % 1.2 * W - W * 0.1;
+        const fy = top - f.r * 0.6 + Math.sin(f.wobble + ts / 600) * 4;
+        cx.beginPath(); cx.arc(fx, fy, f.r * Math.min(fillLevel * 3, 1), 0, Math.PI * 2);
+        cx.fillStyle = 'rgba(255,252,242,.92)'; cx.fill();
+        cx.strokeStyle = 'rgba(220,200,170,.35)'; cx.lineWidth = 1; cx.stroke();
+      });
+      if (Math.random() < (cfg.bubbleRate || 0.4) && !draining) addBubble();
+      for (let i = bubbles.length - 1; i >= 0; i--) {
+        const b = bubbles[i]; b.y -= b.speed;
+        if (b.y < top) { bubbles.splice(i, 1); continue; }
+        cx.beginPath(); cx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        cx.strokeStyle = `rgba(${cfg.bubbleColor},${b.alpha})`; cx.lineWidth = 1; cx.stroke();
+      }
+      if (fillLevel > 0.45 && !draining) {
+        const ta = Math.min((fillLevel - 0.45) / 0.2, 1);
+        cx.globalAlpha = ta; cx.fillStyle = '#fff';
+        cx.font = `bold ${Math.round(W * 0.06)}px -apple-system, sans-serif`;
+        cx.textAlign = 'center'; cx.textBaseline = 'middle';
+        cx.shadowColor = 'rgba(0,0,0,.18)'; cx.shadowBlur = 12;
+        cx.fillText(cfg.text, W / 2, H / 2 - 24);
+        cx.font = `${Math.round(W * 0.022)}px -apple-system, sans-serif`;
+        cx.globalAlpha = 1; cx.shadowBlur = 0;
+      }
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+    bc.addEventListener('click', () => { draining = true; });
+  }
+  function pourBeer() {
+    pourDrink({ gradient: [[0,'rgba(234,158,12,.50)'],[0.4,'rgba(210,130,8,.50)'],[1,'rgba(170,90,4,.50)']],
+      surfaceColor: 'rgba(240,165,20,.50)', foam: true, bubbleColor: '255,215,80', bubbleRate: 0.4, text: 'Cheers! 🍺' });
+  }
+  function pourWine() {
+    pourDrink({ gradient: [[0,'rgba(140,20,60,.50)'],[0.4,'rgba(110,10,40,.50)'],[1,'rgba(70,5,20,.50)']],
+      surfaceColor: 'rgba(160,30,70,.50)', foam: false, bubbleColor: '200,80,120', bubbleRate: 0.08, text: 'Santé! 🍷' });
+  }
+
+  // ── CANVAS BACKGROUND ──
+  (function () {
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, frame = 0;
+    let mouse = { x: .5, y: .5 }, targetMouse = { x: .5, y: .5 };
+    window.addEventListener('mousemove', e => { targetMouse.x = e.clientX/window.innerWidth; targetMouse.y = e.clientY/window.innerHeight; });
+    // Click ripples
+    const ripples = [];
+    window.addEventListener('click', e => { ripples.push({ x: e.clientX, y: e.clientY, r: 0, alpha: .35, hue: 200 + Math.random()*30 }); });
+
+    const orbs = [
+      { x:.15, y:.1,  r:.32, hue:210, speed:.00018, phase:0,   gold:false, depth:1   },
+      { x:.72, y:.25, r:.26, hue:195, speed:.00022, phase:1.8, gold:false, depth:.7  },
+      { x:.45, y:.6,  r:.36, hue:220, speed:.00015, phase:3.4, gold:false, depth:1.2 },
+      { x:.85, y:.7,  r:.24, hue:200, speed:.0002,  phase:0.9, gold:false, depth:.8  },
+      { x:.3,  y:.85, r:.28, hue:185, speed:.00017, phase:2.3, gold:false, depth:1   },
+      { x:.6,  y:.4,  r:.22, hue:230, speed:.00025, phase:4.1, gold:false, depth:.6  },
+      { x:.9,  y:.35, r:.20, hue:205, speed:.00019, phase:1.1, gold:false, depth:.9  },
+      { x:.2,  y:.55, r:.18, hue:215, speed:.00021, phase:2.7, gold:false, depth:1.1 },
+      { x:.5,  y:.15, r:.15, hue:190, speed:.00023, phase:0.4, gold:false, depth:.75 },
+    ];
+    const beams = [
+      { x:.25, y:.2,  angle:-.38, spread:.70, speed:.00105, phase:0,   hue:210, alpha:.18  },
+      { x:.6,  y:.55, angle: .28, spread:.58, speed:.00082, phase:2.1, hue:198, alpha:.17  },
+      { x:.8,  y:.15, angle:-.55, spread:.65, speed:.00124, phase:1.2, hue:222, alpha:.16  },
+      { x:.1,  y:.75, angle: .48, spread:.60, speed:.00091, phase:3.5, hue:190, alpha:.18  },
+      { x:.5,  y:.9,  angle:-.22, spread:.82, speed:.00068, phase:0.7, hue:215, alpha:.15  },
+      { x:.7,  y:.4,  angle: .15, spread:.50, speed:.00100, phase:1.9, hue:175, alpha:.16  },
+      { x:.35, y:.5,  angle: .62, spread:.48, speed:.00115, phase:3.0, hue:195, alpha:.14  },
+      { x:.15, y:.3,  angle: .35, spread:.65, speed:.00077, phase:4.2, hue:240, alpha:.15  },
+      { x:.9,  y:.65, angle:-.42, spread:.72, speed:.00096, phase:1.5, hue:185, alpha:.14  },
+      { x:.42, y:.08, angle: .58, spread:.55, speed:.00110, phase:2.8, hue:230, alpha:.13  },
+      { x:.55, y:.72, angle:-.30, spread:.62, speed:.00088, phase:0.4, hue:260, alpha:.15  },
+      { x:.22, y:.88, angle: .44, spread:.54, speed:.00118, phase:1.7, hue:260, alpha:.14  },
+      { x:.78, y:.32, angle:-.18, spread:.68, speed:.00074, phase:3.3, hue:260, alpha:.16  },
+    ];
+    const facets = Array.from({ length: 85 }, () => ({
+      x: Math.random(), y: Math.random(),
+      s: 8 + Math.random() * 62,
+      sides: [3,4,6][Math.floor(Math.random()*3)],
+      rot: Math.random() * Math.PI * 2,
+      rspeed: (Math.random()-.5) * .006,
+      alpha: .045 + Math.random() * .13,
+      hue: [190,210,225,240,175,260][Math.floor(Math.random()*6)] + Math.random()*20,
+      drift: { x: (Math.random()-.5)*.00058, y: (Math.random()-.5)*.00048 },
+      depth: .5 + Math.random() * .8,
+    }));
+    const sparkles = Array.from({ length: 150 }, () => ({
+      x: Math.random(), y: Math.random(),
+      life: Math.random(), speed: .007 + Math.random() * .016,
+      size: .8 + Math.random() * 3.5,
+      hue: [200,215,175,240,260][Math.floor(Math.random()*5)] + Math.random()*20,
+      type: Math.floor(Math.random()*3),
+    }));
+    const auroras = [
+      { y:.08, amp:.06, freq:.0014, speed:.00026, hue:260, alpha:.17 },
+      { y:.22, amp:.07, freq:.0012, speed:.00025, hue:205, alpha:.20 },
+      { y:.40, amp:.06, freq:.0015, speed:.00031, hue:240, alpha:.18 },
+      { y:.58, amp:.08, freq:.001,  speed:.00021, hue:175, alpha:.17 },
+      { y:.72, amp:.05, freq:.0018, speed:.00035, hue:215, alpha:.16 },
+      { y:.84, amp:.06, freq:.0016, speed:.00028, hue:260, alpha:.15 },
+      { y:.95, amp:.04, freq:.0022, speed:.00027, hue:195, alpha:.14 },
+    ];
+    // Diagonal strips — more + faster
+    const strips = [
+      { x1:.0,  y1:.10, x2:.55, y2:.0,  hue:260, a:.14, sp:.00020 },
+      { x1:.0,  y1:.15, x2:.60, y2:.0,  hue:210, a:.15, sp:.00020 },
+      { x1:.0,  y1:.35, x2:.85, y2:.0,  hue:240, a:.13, sp:.00026 },
+      { x1:.0,  y1:.50, x2:.90, y2:.08, hue:260, a:.14, sp:.00018 },
+      { x1:.0,  y1:.58, x2:1.0, y2:.12, hue:175, a:.14, sp:.00017 },
+      { x1:.0,  y1:.78, x2:1.0, y2:.35, hue:220, a:.12, sp:.00023 },
+      { x1:.12, y1:1.0, x2:.95, y2:.18, hue:260, a:.13, sp:.00021 },
+      { x1:.18, y1:1.0, x2:1.0, y2:.22, hue:195, a:.13, sp:.00028 },
+      { x1:.42, y1:1.0, x2:1.0, y2:.52, hue:230, a:.12, sp:.00022 },
+      { x1:.65, y1:1.0, x2:1.0, y2:.70, hue:205, a:.11, sp:.00024 },
+      { x1:.82, y1:1.0, x2:1.0, y2:.88, hue:260, a:.10, sp:.00019 },
+    ];
+
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+
+    function drawAurora(a) {
+      const t = frame * a.speed;
+      ctx.beginPath();
+      ctx.moveTo(0, a.y * H);
+      for(let x=0; x<=W; x+=8){
+        const y = (a.y + Math.sin(x*a.freq + t)*a.amp + Math.sin(x*a.freq*.6 + t*1.4)*a.amp*.5)*H;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+      const g = ctx.createLinearGradient(0,a.y*H-60,0,a.y*H+60);
+      g.addColorStop(0,`hsla(${a.hue},75%,80%,0)`);
+      g.addColorStop(.5,`hsla(${a.hue},80%,82%,${a.alpha})`);
+      g.addColorStop(1,`hsla(${a.hue},75%,80%,0)`);
+      ctx.fillStyle = g; ctx.fill();
+    }
+    function drawOrb(o) {
+      const t = frame*o.speed+o.phase;
+      const mx = (mouse.x-.5)*o.depth*.055, my = (mouse.y-.5)*o.depth*.055;
+      const cx = (o.x + Math.sin(t)*.09 + mx)*W;
+      const cy = (o.y + Math.cos(t*1.3)*.07 + my)*H;
+      const rad = o.r*Math.min(W,H);
+      const g = ctx.createRadialGradient(cx-rad*.2,cy-rad*.2,0, cx,cy,rad);
+      g.addColorStop(0,`hsla(${o.hue},80%,75%,.30)`);
+      g.addColorStop(.4,`hsla(${o.hue},75%,78%,.16)`);
+      g.addColorStop(.75,`hsla(${o.hue},70%,82%,.06)`);
+      g.addColorStop(1,`hsla(${o.hue},65%,85%,0)`);
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.fill();
+      // inner highlight
+      const hg = ctx.createRadialGradient(cx-rad*.3,cy-rad*.3,0,cx-rad*.3,cy-rad*.3,rad*.45);
+      hg.addColorStop(0,`rgba(255,255,255,.07)`); hg.addColorStop(1,`rgba(255,255,255,0)`);
+      ctx.fillStyle=hg; ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.fill();
+    }
+    function drawBeam(b) {
+      const t=frame*b.speed+b.phase;
+      const mx=(mouse.x-.5)*.04, my=(mouse.y-.5)*.04;
+      const cx=(b.x+Math.sin(t*.7)*.08+mx)*W, cy=(b.y+Math.cos(t*.5)*.06+my)*H;
+      const angle=b.angle+Math.sin(t)*.14, len=b.spread*W*1.8;
+      ctx.save(); ctx.translate(cx,cy); ctx.rotate(angle);
+      const bw=60+Math.sin(t*1.3)*26;
+      const g=ctx.createLinearGradient(-len/2,0,len/2,0);
+      g.addColorStop(0,`hsla(${b.hue},80%,78%,0)`);
+      g.addColorStop(.2,`hsla(${b.hue},82%,80%,${b.alpha*.6})`);
+      g.addColorStop(.5,`hsla(${b.hue},88%,85%,${b.alpha*1.8})`);
+      g.addColorStop(.8,`hsla(${b.hue},82%,80%,${b.alpha*.6})`);
+      g.addColorStop(1,`hsla(${b.hue},80%,78%,0)`);
+      ctx.fillStyle=g; ctx.fillRect(-len/2,-bw/2,len,bw); ctx.restore();
+    }
+    function drawFacet(f) {
+      f.rot+=f.rspeed; f.x+=f.drift.x; f.y+=f.drift.y;
+      if(f.x<-.05)f.x=1.05; if(f.x>1.05)f.x=-.05;
+      if(f.y<-.05)f.y=1.05; if(f.y>1.05)f.y=-.05;
+      const mx=(mouse.x-.5)*f.depth*.025, my=(mouse.y-.5)*f.depth*.025;
+      ctx.save(); ctx.translate((f.x+mx)*W, (f.y+my)*H); ctx.rotate(f.rot);
+      ctx.beginPath();
+      for(let i=0;i<f.sides;i++){
+        const a=(i/f.sides)*Math.PI*2-(f.sides===6?0:Math.PI/2);
+        const r=f.s*(.62+.38*Math.abs(Math.cos(a*(f.sides===3?1.5:2))));
+        i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+      }
+      ctx.closePath();
+      // glass fill
+      const g=ctx.createLinearGradient(-f.s,-f.s,f.s,f.s);
+      g.addColorStop(0,`hsla(${f.hue},82%,94%,${f.alpha*2})`);
+      g.addColorStop(.45,`hsla(${f.hue},74%,90%,${f.alpha})`);
+      g.addColorStop(1,`hsla(${f.hue},68%,86%,${f.alpha*.3})`);
+      ctx.fillStyle=g; ctx.fill();
+      ctx.strokeStyle=`hsla(${f.hue},65%,78%,${f.alpha*.85})`; ctx.lineWidth=.8; ctx.stroke();
+      // specular highlight
+      ctx.beginPath();
+      for(let i=0;i<f.sides;i++){
+        const a=(i/f.sides)*Math.PI*2-(f.sides===6?0:Math.PI/2);
+        const r=f.s*.4*(.62+.38*Math.abs(Math.cos(a*(f.sides===3?1.5:2))));
+        i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+      }
+      ctx.closePath();
+      ctx.strokeStyle=`rgba(255,255,255,${f.alpha*1.2})`; ctx.lineWidth=.5; ctx.stroke();
+      ctx.restore();
+    }
+    function drawMesh() {
+      const pts = facets.map(f=>({x:f.x*W,y:f.y*H,hue:f.hue,alpha:f.alpha}));
+      for(let i=0;i<pts.length;i++){
+        for(let j=i+1;j<pts.length;j++){
+          const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
+          if(d<220){
+            const a = .22*(1-d/220);
+            const g=ctx.createLinearGradient(pts[i].x,pts[i].y,pts[j].x,pts[j].y);
+            g.addColorStop(0,`hsla(${pts[i].hue},85%,72%,${a})`);
+            g.addColorStop(.5,`hsla(215,90%,80%,${a*1.5})`);
+            g.addColorStop(1,`hsla(${pts[j].hue},85%,72%,${a})`);
+            ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
+            ctx.strokeStyle=g; ctx.lineWidth=1.4; ctx.stroke();
+          }
+        }
+      }
+    }
+    function drawDiagonalLines() {
+      strips.forEach((l,i) => {
+        const pulse = Math.sin(frame*l.sp*1000 + i*1.4)*.35+.65;
+        const x1=l.x1*W, y1=l.y1*H, x2=l.x2*W, y2=l.y2*H;
+        const g=ctx.createLinearGradient(x1,y1,x2,y2);
+        g.addColorStop(0,`hsla(${l.hue},92%,78%,0)`);
+        g.addColorStop(.28,`hsla(${l.hue},95%,82%,${l.a*pulse})`);
+        g.addColorStop(.5,`hsla(${l.hue},98%,88%,${l.a*pulse*1.6})`);
+        g.addColorStop(.72,`hsla(${l.hue},95%,82%,${l.a*pulse})`);
+        g.addColorStop(1,`hsla(${l.hue},92%,78%,0)`);
+        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+        ctx.strokeStyle=g; ctx.lineWidth=2.6; ctx.stroke();
+        // second parallel strip offset for depth
+        const ox=(y2-y1)/Math.sqrt((x2-x1)**2+(y2-y1)**2)*10;
+        const oy=-(x2-x1)/Math.sqrt((x2-x1)**2+(y2-y1)**2)*10;
+        const g2=ctx.createLinearGradient(x1+ox,y1+oy,x2+ox,y2+oy);
+        g2.addColorStop(0,`hsla(${l.hue+20},88%,72%,0)`);
+        g2.addColorStop(.5,`hsla(${l.hue+20},90%,78%,${l.a*pulse*.55})`);
+        g2.addColorStop(1,`hsla(${l.hue+20},88%,72%,0)`);
+        ctx.beginPath(); ctx.moveTo(x1+ox,y1+oy); ctx.lineTo(x2+ox,y2+oy);
+        ctx.strokeStyle=g2; ctx.lineWidth=1.2; ctx.stroke();
+      });
+    }
+    function drawSparkle(s) {
+      s.life += s.speed;
+      if(s.life>1){ s.life=0; s.x=Math.random(); s.y=Math.random(); }
+      const a = Math.sin(s.life*Math.PI);
+      const px=s.x*W, py=s.y*H;
+      ctx.save(); ctx.globalAlpha = a*.65;
+      if(s.type===0){
+        ctx.fillStyle=`hsla(${s.hue},82%,88%,1)`;
+        ctx.beginPath(); ctx.arc(px,py,s.size*a,0,Math.PI*2); ctx.fill();
+      } else if(s.type===1){
+        ctx.strokeStyle=`hsla(${s.hue},78%,84%,1)`; ctx.lineWidth=.7;
+        const sz=s.size*3*a;
+        ctx.beginPath(); ctx.moveTo(px-sz,py); ctx.lineTo(px+sz,py); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px,py-sz); ctx.lineTo(px,py+sz); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px-sz*.7,py-sz*.7); ctx.lineTo(px+sz*.7,py+sz*.7); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px+sz*.7,py-sz*.7); ctx.lineTo(px-sz*.7,py+sz*.7); ctx.stroke();
+      } else {
+        // diamond
+        ctx.fillStyle=`hsla(${s.hue},85%,90%,1)`;
+        const sz=s.size*2.5*a;
+        ctx.beginPath(); ctx.moveTo(px,py-sz); ctx.lineTo(px+sz*.6,py); ctx.lineTo(px,py+sz); ctx.lineTo(px-sz*.6,py); ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+    }
+    function drawRipples() {
+      for(let i=ripples.length-1;i>=0;i--){
+        const r=ripples[i];
+        r.r += 4; r.alpha -= .008;
+        if(r.alpha<=0){ ripples.splice(i,1); continue; }
+        ctx.beginPath(); ctx.arc(r.x,r.y,r.r,0,Math.PI*2);
+        ctx.strokeStyle=`hsla(${r.hue},70%,75%,${r.alpha})`; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(r.x,r.y,r.r*.6,0,Math.PI*2);
+        ctx.strokeStyle=`hsla(${r.hue},75%,80%,${r.alpha*.6})`; ctx.lineWidth=.8; ctx.stroke();
+      }
+    }
+    function draw() {
+      frame++;
+      // smooth mouse
+      mouse.x += (targetMouse.x - mouse.x) * .04;
+      mouse.y += (targetMouse.y - mouse.y) * .04;
+
+      ctx.clearRect(0,0,W,H);
+      // Rich base gradient — vivid deep blue edges, bright centre
+      const bx = W*(0.5 + (mouse.x-.5)*.15), by = H*(0.4 + (mouse.y-.5)*.1);
+      const base = ctx.createRadialGradient(bx, by*.6, 0, W*.5, H*.5, Math.max(W,H)*.92);
+      base.addColorStop(0,'rgba(215,235,255,1)');
+      base.addColorStop(.22,'rgba(192,220,255,1)');
+      base.addColorStop(.45,'rgba(158,200,252,1)');
+      base.addColorStop(.65,'rgba(118,170,240,1)');
+      base.addColorStop(.82,'rgba(78,132,225,1)');
+      base.addColorStop(.92,'rgba(50,95,200,1)');
+      base.addColorStop(1,'rgba(32,65,170,1)');
+      ctx.fillStyle=base; ctx.fillRect(0,0,W,H);
+
+      // Corner navy vignette — stronger depth
+      const vig = ctx.createRadialGradient(W*.5,H*.5,Math.min(W,H)*.2, W*.5,H*.5,Math.max(W,H)*.85);
+      vig.addColorStop(0,'rgba(10,30,80,0)');
+      vig.addColorStop(.50,'rgba(10,30,80,.08)');
+      vig.addColorStop(.78,'rgba(8,22,70,.22)');
+      vig.addColorStop(1,'rgba(4,12,50,.38)');
+      ctx.fillStyle=vig; ctx.fillRect(0,0,W,H);
+
+      auroras.forEach(drawAurora);
+      drawDiagonalLines();
+      drawMesh();
+      orbs.forEach(drawOrb);
+      beams.forEach(drawBeam);
+      facets.forEach(drawFacet);
+      sparkles.forEach(drawSparkle);
+      drawRipples();
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  // ── SCROLL REVEAL ──
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (!e.isIntersecting) return;
+      const delay = +e.target.dataset.delay || 0;
+      setTimeout(() => e.target.classList.add('in'), delay);
+      revealObs.unobserve(e.target);
+    });
+  }, { threshold: 0.08 });
+
+  // Stagger grid items
+  document.querySelectorAll('.cat-pills-panel, .expertise-grid .glass-card, .supplier-grid .glass-card, .about-stats .glass-card, .steps .step')
+    .forEach((el, i) => { el.dataset.delay = (i % 4) * 80; });
+
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => revealObs.observe(el));
+
+  // ── COUNT-UP ANIMATION ──
+  function animateCount(el) {
+    const target = +el.dataset.count, suffix = el.dataset.suffix || '';
+    const dur = 1800, start = performance.now();
+    (function step(now) {
+      const p = Math.min((now - start) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(eased * target) + suffix;
+      if (p < 1) requestAnimationFrame(step);
+    })(start);
+  }
+  const statsObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.querySelectorAll('[data-count]').forEach(animateCount);
+      statsObs.unobserve(e.target);
+    });
+  }, { threshold: 0.3 });
+  const aboutStats = document.querySelector('.about-stats');
+  if (aboutStats) statsObs.observe(aboutStats);
+</script>
+</body>
+</html>

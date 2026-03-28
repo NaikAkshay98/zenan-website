@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(perl --version)",
+      "Bash(perl -0777 -i -pe ':*)",
+      "Bash(python -c \":*)"
+    ]
+  }
+}

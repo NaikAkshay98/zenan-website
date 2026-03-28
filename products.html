@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Products — Zenan Glass</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    .pour-wrap { position: relative; display: flex; }
+    .pour-tip {
+      position: absolute; right: calc(100% + 12px); top: 50%;
+      transform: translateY(-50%) translateX(4px); opacity: 0;
+      background: rgba(15,25,55,.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      color: #e8efff; font-size: .72rem; font-weight: 500; letter-spacing: .02em;
+      white-space: nowrap; padding: 6px 12px; border-radius: 8px;
+      pointer-events: none; transition: opacity .2s, transform .2s;
+      box-shadow: 0 4px 18px rgba(0,0,0,.18);
+    }
+    .pour-tip::after {
+      content: ''; position: absolute; left: 100%; top: 50%; transform: translateY(-50%);
+      border: 5px solid transparent; border-left-color: rgba(15,25,55,.72);
+    }
+    .pour-wrap:hover .pour-tip { opacity: 1; transform: translateY(-50%) translateX(0); }
+    html { scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+
+    :root {
+      --blue:   #2558B0;
+      --blue2:  #3b82f6;
+      --blue3:  #60a5fa;
+      --aqua:   #0891b2;
+      --blue-d: #1a4490;
+      --blue-l: #3a6ec8;
+      --blue-bg: #eef3fb;
+      --blue-bg2: #dce8f8;
+      --dark:   #0f172a;
+      --body:   #334155;
+      --muted:  #64748b;
+      --silver: #94a3b8;
+      --white:  #ffffff;
+      --off:    #f8f9fb;
+      --border: #dde3ed;
+      --glass:  rgba(255,255,255,.68);
+      --glass-border: rgba(255,255,255,.85);
+      --radius: 10px;
+      --shadow: 0 2px 16px rgba(15,30,54,.08);
+      --shadow-md: 0 6px 28px rgba(15,30,54,.12);
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font); color: var(--body); line-height: 1.6;
+      background: transparent;
+      min-height: 100vh; overflow-x: hidden;
+    }
+
+    /* ── FIXED BACKGROUND CANVAS ── */
+    #bgCanvas {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
+    }
+
+    nav, main, footer { position: relative; z-index: 1; }
+
+    .grad-text {
+      background: linear-gradient(135deg, #2558B0 0%, #3b82f6 55%, #0891b2 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(5px) saturate(180%); -webkit-backdrop-filter: blur(5px) saturate(180%);
+      border-bottom: 1px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 6vw; height: 70px;
+      box-shadow: 0 2px 16px rgba(37,88,176,.06);
+    }
+    .logo-wrap { display: flex; align-items: center; text-decoration: none; }
+    .logo-wrap img { height: 52px; width: auto; display: block; }
+
+    .nav-links { display: flex; gap: 2px; list-style: none; margin-left: auto; }
+    .nav-links a {
+      color: #1e3a6e; text-decoration: none;
+      font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      padding: 8px 16px; border-radius: 8px; transition: background .2s, color .2s;
+    }
+    .nav-links a:hover { background: rgba(37,88,176,.08); color: #2558B0; }
+    #navLoginBtn { color: #1e3a6e; text-decoration: none; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 8px 16px; border-radius: 8px; transition: background .2s, color .2s; flex-shrink: 0; margin-left: 4px; }
+    #navLoginBtn:hover { background: rgba(37,88,176,.08); color: #2558B0; }
+    .nav-links a.active { color: #2558B0; font-weight: 700; }
+    .nav-insta { display: flex !important; align-items: center; gap: 5px; }
+    .nav-insta svg { flex-shrink: 0; }
+
+    .nav-hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      cursor: pointer; padding: 4px; border: none; background: none;
+    }
+    .nav-hamburger span { display: block; width: 24px; height: 2px; background: #1e3a6e; border-radius: 2px; }
+
+    @media (max-width: 640px) {
+      .nav-hamburger { display: flex; }
+      .nav-links {
+        display: none; flex-direction: column; gap: 0;
+        position: absolute; top: 70px; left: 0; right: 0;
+        background: rgba(255,255,255,.92); backdrop-filter: blur(24px);
+        padding: 8px 0 16px;
+        box-shadow: 0 8px 30px rgba(37,88,176,.1);
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { border-radius: 0; padding: 12px 6vw; }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 100px 6vw 80px; text-align: center;
+      background: transparent;
+    }
+    .hero-content { max-width: 700px; margin: 0 auto; }
+    .hero h1 {
+      font-size: clamp(2.6rem, 6vw, 4.2rem); font-weight: 900;
+      color: #0f172a; line-height: 1.08; margin-bottom: 18px; letter-spacing: -.02em;
+    }
+    .hero p {
+      font-size: 1.05rem; max-width: 500px; margin: 0 auto; line-height: 1.85;
+      color: #0f172a; font-weight: 500;
+    }
+
+    /* ── CONTROLS PANEL ── */
+    .controls-panel {
+      margin: 0 6vw; padding: 22px 28px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .controls-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .controls-divider { display: none; }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .filter-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .filter-label { font-size: .82rem; font-weight: 700; color: var(--dark); margin-right: 4px; flex-shrink: 0; }
+    .filter-row-divider { width: 1px; height: 22px; background: rgba(37,88,176,.15); margin: 0 4px; flex-shrink: 0; }
+
+    /* Sub-row */
+    .filter-sub-row {
+      display: none; align-items: center; gap: 6px; flex-wrap: wrap;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(37,88,176,.04);
+      border: 1px solid rgba(37,88,176,.1);
+    }
+    .filter-sub-row.visible { display: flex; }
+    .filter-sub-label {
+      font-size: .68rem; font-weight: 800; color: var(--blue);
+      text-transform: uppercase; letter-spacing: .08em;
+      margin: 0 2px 0 10px; flex-shrink: 0;
+    }
+    .filter-sub-label:first-child { margin-left: 0; }
+    .filter-sub-row .filter-btn {
+      padding: 5px 13px; font-size: .78rem; font-weight: 500;
+      background: rgba(255,255,255,.85); border-color: rgba(37,88,176,.15);
+    }
+    .filter-sub-row .filter-btn:hover {
+      border-color: var(--blue); color: var(--blue);
+      background: rgba(37,88,176,.06); box-shadow: none;
+    }
+    .filter-sub-row .filter-btn.active {
+      background: rgba(37,88,176,.1); color: var(--blue);
+      border-color: var(--blue); font-weight: 700; box-shadow: none;
+    }
+
+    /* ── OZ RANGE SLIDER ── */
+    .oz-slider-bar {
+      display: none; align-items: center; gap: 16px;
+    }
+    .oz-slider-label { font-size: .83rem; font-weight: 600; color: var(--dark); white-space: nowrap; }
+    .oz-range-label { font-size: .83rem; font-weight: 600; color: var(--blue); white-space: nowrap; min-width: 80px; }
+    .range-wrap {
+      position: relative; width: 280px; height: 28px; flex-shrink: 0;
+    }
+    .range-track {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      left: 0; right: 0; height: 4px;
+      background: var(--border); border-radius: 2px;
+    }
+    .range-fill {
+      position: absolute; height: 100%;
+      background: var(--blue); border-radius: 2px;
+    }
+    .range-input {
+      position: absolute; width: 100%; top: 0; left: 0; height: 100%;
+      -webkit-appearance: none; appearance: none;
+      background: transparent; pointer-events: none; outline: none;
+    }
+    .range-input::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--blue); border: 2.5px solid var(--white);
+      box-shadow: 0 1px 5px rgba(37,88,176,.35);
+      cursor: pointer; pointer-events: all; transition: transform .15s;
+    }
+    .range-input::-webkit-slider-thumb:hover { transform: scale(1.15); }
+    .range-input::-moz-range-thumb {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--blue); border: 2.5px solid var(--white);
+      box-shadow: 0 1px 5px rgba(37,88,176,.35);
+      cursor: pointer; pointer-events: all;
+    }
+    .filter-btn {
+      padding: 7px 18px; border-radius: 20px;
+      border: 1.5px solid rgba(37,88,176,.18);
+      background: rgba(255,255,255,.8); color: #4b5563;
+      font-size: .82rem; font-weight: 600; cursor: pointer;
+      transition: all .2s;
+    }
+    .filter-btn:hover { border-color: var(--blue); color: var(--blue); background: rgba(37,88,176,.06); }
+    .filter-btn.active {
+      border-color: var(--blue); background: var(--blue);
+      color: #fff; font-weight: 700;
+      box-shadow: 0 2px 10px rgba(37,88,176,.25);
+    }
+
+    /* ── SEARCH BAR ── */
+    .search-wrap {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,.7); border: 1.5px solid rgba(37,88,176,.12);
+      border-radius: 24px; padding: 9px 18px;
+      width: 100%; max-width: 520px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .search-wrap:focus-within {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37,88,176,.1);
+      background: rgba(255,255,255,.9);
+    }
+    .search-wrap input {
+      border: none; background: none; outline: none;
+      font-size: .93rem; color: var(--dark); width: 100%;
+    }
+    .search-wrap input::placeholder { color: var(--muted); }
+    .search-clear {
+      border: none; background: none; cursor: pointer;
+      color: var(--muted); font-size: 1rem; padding: 0; line-height: 1;
+      flex-shrink: 0; transition: color .15s;
+    }
+    .search-clear:hover { color: var(--dark); }
+    .no-results {
+      text-align: center; padding: 64px 20px; color: var(--muted);
+      font-size: 1rem; display: none; grid-column: 1/-1;
+    }
+
+    /* ── PRODUCTS ── */
+    .products-section {
+      padding: 60px 6vw 64px; background: var(--white); margin-top: 0;
+    }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 22px 18px; row-gap: 40px; max-width: 1400px; margin: 0 auto;
+    }
+
+    .product-card {
+      border: none; border-radius: var(--radius);
+      background: transparent; overflow: hidden;
+      display: flex; flex-direction: column;
+      transition: transform .22s; cursor: pointer;
+    }
+    .product-card:hover { transform: translateY(-4px); }
+
+    /* ── PRODUCT DETAIL PANEL ── */
+    .detail-backdrop {
+      display: none; position: fixed; inset: 0; z-index: 300;
+      background: rgba(15,30,54,.52); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .detail-backdrop.open { display: flex; }
+    .detail-panel {
+      background: var(--white); border-radius: 18px;
+      width: 100%; max-width: 1100px; max-height: 92vh;
+      display: flex; flex-direction: column;
+      overflow: hidden; position: relative;
+      animation: fadeUp .22s ease;
+      box-shadow: 0 32px 80px rgba(15,30,54,.22);
+    }
+    .detail-close {
+      position: absolute; top: 14px; right: 16px; z-index: 10;
+      background: var(--off); border: 1px solid var(--border);
+      border-radius: 50%; width: 34px; height: 34px;
+      font-size: 1.1rem; color: var(--muted); cursor: pointer;
+      display: grid; place-items: center;
+      transition: background .15s, color .15s;
+    }
+    .detail-close:hover { background: var(--dark); color: var(--white); }
+    .detail-body {
+      display: grid; grid-template-columns: 1fr 1fr;
+      flex: 1; overflow: hidden; min-height: 0;
+    }
+    .detail-img-pane {
+      background: var(--white); padding: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border-right: none; overflow: hidden;
+    }
+    .detail-img-pane img {
+      max-width: 100%; max-height: 360px;
+      object-fit: contain; display: block;
+    }
+    .detail-info {
+      padding: 36px 30px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .detail-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .detail-name { font-size: 1.22rem; font-weight: 800; color: var(--dark); line-height: 1.3; }
+    .detail-meta { display: flex; flex-direction: column; gap: 8px; }
+    .detail-meta-item { font-size: .85rem; color: var(--muted); }
+    .detail-meta-item strong { color: var(--dark); font-weight: 700; }
+    .btn-inquire-lg {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 13px 24px; background: #fff; color: var(--blue);
+      border: 2px solid var(--blue); border-radius: 10px; font-size: .97rem; font-weight: 700;
+      font-family: var(--font); cursor: pointer; margin-top: 8px;
+      box-shadow: 5px 5px 0 #FFD700;
+      transition: transform .18s, box-shadow .18s; align-self: flex-start;
+    }
+    .btn-inquire-lg:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #FFD700; }
+
+    @media (max-width: 640px) {
+      .detail-body { grid-template-columns: 1fr; overflow-y: auto; }
+      .detail-img-pane { border-right: none; border-bottom: none; padding: 24px; max-height: 220px; }
+      .detail-info { padding: 22px 20px; }
+    }
+
+    /* Image area — white bg so glassware shows clearly */
+    .product-img {
+      aspect-ratio: 4/3;
+      background: var(--white);
+      border-bottom: none;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; position: relative; overflow: hidden;
+    }
+    .product-img .emoji { font-size: 3.4rem; line-height: 1; }
+    .product-img .img-label { font-size: .72rem; color: var(--muted); letter-spacing: .3px; }
+    .product-img .badge {
+      position: absolute; top: 10px; left: 10px;
+      background: var(--blue); color: var(--white);
+      font-size: .68rem; font-weight: 700; padding: 3px 9px; border-radius: 4px;
+      text-transform: uppercase; letter-spacing: .4px;
+    }
+    .product-img .badge.new { background: #16a34a; }
+
+    .product-body { padding: 8px 12px 0; flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .product-cat { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--blue); margin-bottom: 3px; }
+    .product-body h3 { font-size: .98rem; font-weight: 700; color: var(--blue); margin-bottom: 2px; }
+    .product-body p { font-size: .86rem; color: var(--muted); line-height: 1.55; flex: 1; }
+
+    .product-footer {
+      padding: 14px 18px; border-top: none; margin-top: 14px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .min-qty { font-size: .75rem; color: var(--muted); }
+    .min-qty strong { color: var(--dark); }
+
+    .btn-inquire {
+      padding: 8px 18px; border-radius: 7px;
+      background: var(--blue); color: var(--white);
+      font-size: .83rem; font-weight: 700; font-family: var(--font);
+      border: none; cursor: pointer;
+      transition: background .2s, transform .15s;
+    }
+    .btn-inquire:hover { background: var(--blue-d); transform: translateY(-1px); }
+
+    /* ── CTA BAND ── */
+    .cta-band {
+      background: var(--white);
+      border: none;
+      text-align: center; padding: 60px 6vw;
+    }
+    .cta-band h2 { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 800; color: #0f172a; margin-bottom: 10px; }
+    .cta-band h2 .blue { color: #2558B0; }
+    .cta-band p { color: #0f172a; margin-bottom: 30px; max-width: 420px; margin-left: auto; margin-right: auto; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px; border-radius: 10px;
+      font-size: .97rem; font-weight: 700; text-decoration: none;
+      cursor: pointer; font-family: var(--font);
+      transition: transform .18s, box-shadow .18s;
+    }
+    .btn-blue { background: #2558B0; color: #fff; border: 2px solid #2558B0; box-shadow: 5px 5px 0 #FFD700; }
+    .btn-blue:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #FFD700; }
+
+    /* ── MODAL ── */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(15,30,54,.45); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--white); border-radius: 14px; border: 1px solid var(--border);
+      width: 100%; max-width: 480px; padding: 36px;
+      position: relative; animation: fadeUp .2s ease;
+      box-shadow: 0 24px 64px rgba(15,30,54,.18);
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .modal-close {
+      position: absolute; top: 14px; right: 16px;
+      background: none; border: none; font-size: 1.3rem;
+      color: var(--muted); cursor: pointer; line-height: 1; padding: 4px;
+    }
+    .modal-close:hover { color: var(--dark); }
+    .modal h2 { font-size: 1.25rem; font-weight: 800; color: var(--dark); margin-bottom: 4px; }
+    .modal .modal-product { font-size: .88rem; color: var(--blue); font-weight: 600; margin-bottom: 22px; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: .81rem; font-weight: 600; color: var(--dark); margin-bottom: 5px; }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; padding: 10px 12px;
+      border: 1.5px solid var(--border); border-radius: 7px;
+      font-size: .92rem; font-family: var(--font); color: var(--dark);
+      background: var(--white); outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,88,176,.10);
+    }
+    .form-group textarea { resize: vertical; min-height: 85px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn-submit {
+      width: 100%; padding: 13px;
+      background: #2558B0; color: #fff;
+      font-size: .97rem; font-weight: 700; font-family: var(--font);
+      border: 2px solid #2558B0; border-radius: 10px; cursor: pointer; margin-top: 4px;
+      box-shadow: 5px 5px 0 #FFD700;
+      transition: transform .18s, box-shadow .18s;
+    }
+    .btn-submit:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #FFD700; }
+    .form-note { font-size: .77rem; color: var(--muted); text-align: center; margin-top: 10px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(5px) saturate(180%); -webkit-backdrop-filter: blur(5px) saturate(180%);
+      border-top: 1px solid rgba(255,255,255,.2);
+      color: #0f172a; padding: 14px 6vw 12px; position: relative;
+      box-shadow: 0 -2px 16px rgba(37,88,176,.06);
+    }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+      padding-bottom: 36px; border-bottom: 1px solid rgba(37,88,176,.15);
+    }
+    .footer-logo { display: inline-flex; margin-bottom: 14px; }
+    .footer-logo img { height: 46px; width: auto; display: block; }
+    .footer-brand p { font-size: .88rem; line-height: 1.7; max-width: 280px; color: #0f172a; }
+    .footer-col h4 { color: #0f172a; font-size: .78rem; font-weight: 700; margin-bottom: 14px; letter-spacing: .08em; text-transform: uppercase; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 9px; font-size: .88rem; color: #0f172a; }
+    .footer-col a { color: #0f172a; text-decoration: none; transition: color .2s; }
+    .footer-col a:hover { color: #2558B0; }
+    .footer-contact li { display: flex; gap: 8px; align-items: flex-start; }
+    .footer-contact .ic { display: flex; align-items: center; margin-top: 3px; flex-shrink: 0; opacity: .5; }
+    .footer-bottom {
+      max-width: 1100px; margin: 22px auto 0;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+      font-size: .8rem; color: #0f172a;
+    }
+
+    @media (max-width: 700px) {
+      .footer-inner { grid-template-columns: 1fr; gap: 28px; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- GLOBAL BACKGROUND CANVAS -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="logo-wrap">
+    <img src="brand_assets/Zenan logo.png" alt="Zenan Glass" />
+  </a>
+  <button class="nav-hamburger" aria-label="Toggle menu" onclick="toggleNav()">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="products.html" class="active">Products</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <a id="navLoginBtn" href="login.html">Log In</a>
+<script>
+(function(){
+  var btn = document.getElementById('navLoginBtn');
+  if (!btn) return;
+  if (localStorage.getItem('zenan_session')) {
+    btn.textContent = 'My Account'; btn.href = 'admin.html';
+  } else if (sessionStorage.getItem('zenan_client_session')) {
+    btn.textContent = 'My Account'; btn.href = 'client-portal.html';
+  }
+})();
+</script>
+</nav>
+<main>
+<div style="position:fixed;top:84px;right:20px;z-index:199;display:flex;flex-direction:column;gap:8px;">
+  <div class="pour-wrap">
+    <button onclick="pourBeer()" style="padding:0;border:none;background:none;cursor:pointer;transition:transform .2s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img src="brand_assets/Beer screen icon.png" style="height:30px;width:auto;display:block;"></button>
+    <span class="pour-tip">Pour yourself a cold one ✦</span>
+  </div>
+  <div class="pour-wrap">
+    <button onclick="pourWine()" style="padding:0;border:none;background:none;cursor:pointer;transition:transform .2s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"><img src="brand_assets/Wine screen icon.png" style="height:30px;width:auto;display:block;"></button>
+    <span class="pour-tip">A glass of something fine ✦</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Our <span style="color:#2558B0;">Products</span></h1>
+    <p>Browse our most popular custom-branded items. Inquire on anything and we'll respond within one business day.</p>
+  </div>
+</section>
+
+<!-- CONTROLS PANEL -->
+<div class="controls-panel">
+  <div class="controls-row" style="gap:12px;flex-wrap:nowrap;align-items:center;">
+    <div class="search-wrap" style="flex:0 0 auto;width:220px;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="search" id="productSearch" placeholder="Search products…" autocomplete="off" oninput="searchProducts(this.value)" />
+      <button class="search-clear" id="searchClear" onclick="clearSearch()" style="display:none" title="Clear search">✕</button>
+    </div>
+    <div class="filter-bar controls-row" id="filterBar" style="flex:1;">
+      <span class="filter-label">Filter:</span>
+      <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
+    </div>
+    <div class="oz-slider-bar controls-row" id="ozFilterBar" style="margin-top:0;padding-top:0;border-top:none;flex:0 0 auto;">
+      <span class="oz-slider-label">Oz:</span>
+      <div class="range-wrap">
+        <div class="range-track"><div class="range-fill" id="rangeFill"></div></div>
+        <input type="range" class="range-input" id="ozMin" min="0" max="90" value="0" step="1" />
+        <input type="range" class="range-input" id="ozMax" min="0" max="90" value="90" step="1" />
+      </div>
+      <span class="oz-range-label" id="ozRangeLabel">0 – 90 oz</span>
+    </div>
+  </div>
+  <div class="filter-sub-row" id="filterSubRow"></div>
+</div>
+
+<!-- PRODUCTS -->
+<section class="products-section">
+  <div class="products-grid" id="productsGrid">
+    <div id="noResults" class="no-results">No products match your search.</div>
+
+    <div class="product-card" data-cat="glassware">
+      <div class="product-img">
+        <div class="badge">Popular</div>
+        <span class="emoji">🥂</span>
+        <span class="img-label">Product image placeholder</span>
+      </div>
+      <div class="product-body">
+        <div class="product-cat">Glassware</div>
+        <h3>Etched Wine Glasses</h3>
+        <p>Elegant laser-etched wine glasses with your logo or custom design. Perfect for events, gifts, and hospitality branding.</p>
+      </div>
+      <div class="product-footer">
+        <div class="min-qty">Min: <strong>24 units</strong></div>
+        <button class="btn-inquire" onclick="openModal('Etched Wine Glasses')">Inquire</button>
+      </div>
+    </div>
+
+    <div class="product-card" data-cat="glassware">
+      <div class="product-img">
+        <span class="emoji">🍺</span>
+        <span class="img-label">Product image placeholder</span>
+      </div>
+      <div class="product-body">
+        <div class="product-cat">Glassware</div>
+        <h3>Branded Beer Mugs</h3>
+        <p>Heavy-duty glass beer mugs with deep-etched branding. Ideal for breweries, restaurants, and corporate events.</p>
+      </div>
+      <div class="product-footer">
+        <div class="min-qty">Min: <strong>24 units</strong></div>
+        <button class="btn-inquire" onclick="openModal('Branded Beer Mugs')">Inquire</button>
+      </div>
+    </div>
+
+    <div class="product-card" data-cat="gifts">
+      <div class="product-img">
+        <div class="badge new">New</div>
+        <span class="emoji">🎁</span>
+        <span class="img-label">Product image placeholder</span>
+      </div>
+      <div class="product-body">
+        <div class="product-cat">Gifts</div>
+        <h3>Executive Gift Set</h3>
+        <p>Curated gift box with branded glassware, notebook, and card — perfect for client appreciation and employee milestones.</p>
+      </div>
+      <div class="product-footer">
+        <div class="min-qty">Min: <strong>10 units</strong></div>
+        <button class="btn-inquire" onclick="openModal('Executive Gift Set')">Inquire</button>
+      </div>
+    </div>
+
+    <div class="product-card" data-cat="awards">
+      <div class="product-img">
+        <span class="emoji">🏆</span>
+        <span class="img-label">Product image placeholder</span>
+      </div>
+      <div class="product-body">
+        <div class="product-cat">Awards</div>
+        <h3>Crystal Trophy Award</h3>
+        <p>Optical crystal awards with precision laser-engraved text and logos — a prestigious choice for any recognition program.</p>
+      </div>
+      <div class="product-footer">
+        <div class="min-qty">Min: <strong>1 unit</strong></div>
+        <button class="btn-inquire" onclick="openModal('Crystal Trophy Award')">Inquire</button>
+      </div>
+    </div>
+
+    <div class="product-card" data-cat="drinkware">
+      <div class="product-img">
+        <div class="badge">Popular</div>
+        <span class="emoji">🥤</span>
+        <span class="img-label">Product image placeholder</span>
+      </div>
+      <div class="product-body">
+        <div class="product-cat">Drinkware</div>
+        <h3>Insulated Stainless Tumbler</h3>
+        <p>20 oz double-wall vacuum insulated tumbler with laser-engraved logo. Keeps drinks hot or cold for 12+ hours.</p>
+      </div>
+      <div class="product-footer">
+        <div class="min-qty">Min: <strong>24 units</strong></div>
+        <button class="btn-inquire" onclick="openModal('Insulated Stainless Tumbler')">Inquire</button>
+      </div>
+    </div>
+
+    <div class="product-card" data-cat="glassware">
+      <div class="product-img">
+        <span class="emoji">🥃</span>
+        <span class="img-label">Product image placeholder</span>
+      </div>
+      <div class="product-body">
+        <div class="product-cat">Glassware</div>
+        <h3>Engraved Whisky Glasses</h3>
+        <p>Classic double old-fashioned whisky glasses with deep-etched monogram or logo. A timeless corporate gift.</p>
+      </div>
+      <div class="product-footer">
+        <div class="min-qty">Min: <strong>12 units</strong></div>
+        <button class="btn-inquire" onclick="openModal('Engraved Whisky Glasses')">Inquire</button>
+      </div>
+    </div>
+
+    <div class="product-card" data-cat="apparel">
+      <div class="product-img">
+        <span class="emoji">👕</span>
+        <span class="img-label">Product image placeholder</span>
+      </div>
+      <div class="product-body">
+        <div class="product-cat">Apparel</div>
+        <h3>Embroidered Polo Shirts</h3>
+        <p>Premium moisture-wicking polo shirts with your logo embroidered on the chest. Available in 20+ colours and all sizes.</p>
+      </div>
+      <div class="product-footer">
+        <div class="min-qty">Min: <strong>12 units</strong></div>
+        <button class="btn-inquire" onclick="openModal('Embroidered Polo Shirts')">Inquire</button>
+      </div>
+    </div>
+
+    <div class="product-card" data-cat="awards">
+      <div class="product-img">
+        <span class="emoji">🪟</span>
+        <span class="img-label">Product image placeholder</span>
+      </div>
+      <div class="product-body">
+        <div class="product-cat">Awards</div>
+        <h3>Custom Glass Plaque</h3>
+        <p>Sleek flat glass plaques with full-colour print or etching — ideal for certificates, recognition walls, and signage.</p>
+      </div>
+      <div class="product-footer">
+        <div class="min-qty">Min: <strong>1 unit</strong></div>
+        <button class="btn-inquire" onclick="openModal('Custom Glass Plaque')">Inquire</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PRODUCT DETAIL PANEL -->
+<div class="detail-backdrop" id="detailBackdrop" onclick="closeDetailOnBackdrop(event)">
+  <div class="detail-panel" role="dialog" aria-modal="true">
+    <button class="detail-close" onclick="closeDetail()" aria-label="Close">✕</button>
+    <div class="detail-body">
+      <div class="detail-img-pane">
+        <img id="detailImg" src="" alt="" />
+      </div>
+      <div class="detail-info">
+        <div class="detail-tags" id="detailTags"></div>
+        <div class="detail-name" id="detailName"></div>
+        <div class="detail-meta" id="detailMeta"></div>
+        <button class="btn-inquire-lg" id="detailInquireBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Inquire about this product
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-band">
+  <h2>Don't See What You <span class="blue">Need?</span></h2>
+  <p>We source thousands of product types. If you have something specific in mind, reach out and we'll make it happen.</p>
+  <button class="btn btn-blue" onclick="openModal('Custom Product Inquiry')">Request a Custom Quote ›</button>
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo">
+        <img src="brand_assets/Zenan logo.png" alt="Zenan Glass" />
+      </a>
+      <p>Premium custom glass products and branded merchandise for businesses across North America.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col footer-contact">
+      <h4>Contact Us</h4>
+      <ul>
+        <li><span class="ic">📍</span> 430 Flint Road, Toronto, ON M3J 2J4</li>
+        <li><span class="ic">📞</span> <a href="tel:4163587247">416-358-7247</a></li>
+        <li><span class="ic">📠</span> Fax: 416-736-8085</li>
+        <li><span class="ic">✉️</span> <a href="mailto:luc@test">luc@test</a></li>
+        <li><span class="ic">🕐</span> Mon–Fri 8am–5pm</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Zenan Glass. All rights reserved.</span>
+    <span>Made with care in Canada 🍁</span>
+  </div>
+</footer>
+
+<!-- INQUIRE MODAL -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModalOnBackdrop(event)">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+    <h2>Request a Quote</h2>
+    <div class="modal-product" id="modalProductName"></div>
+    <form id="quoteForm" onsubmit="submitForm(event)">
+      <input type="hidden" name="access_key" value="502684a2-5885-4edf-8571-ee612d933398" />
+      <input type="hidden" name="subject" value="New Quote Request — Zenan Glass" />
+      <input type="hidden" name="from_name" value="Zenan Glass Website" />
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fname">First Name *</label>
+          <input type="text" id="fname" name="First Name" placeholder="Jane" required />
+        </div>
+        <div class="form-group">
+          <label for="lname">Last Name *</label>
+          <input type="text" id="lname" name="Last Name" placeholder="Smith" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address *</label>
+        <input type="email" id="email" name="email" placeholder="jane@company.com" required />
+      </div>
+      <div class="form-group">
+        <label for="company">Company Name</label>
+        <input type="text" id="company" name="Company Name" placeholder="Your Company Inc." />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="qty">Estimated Quantity *</label>
+          <select id="qty" name="Estimated Quantity" required>
+            <option value="" disabled selected>Select range</option>
+            <option>Under 25</option>
+            <option>25 – 100</option>
+            <option>100 – 500</option>
+            <option>500 – 1,000</option>
+            <option>1,000+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="timeline">Timeline</label>
+          <select id="timeline" name="Timeline">
+            <option value="" disabled selected>Select</option>
+            <option>ASAP</option>
+            <option>Within 2 weeks</option>
+            <option>Within a month</option>
+            <option>1–3 months</option>
+            <option>Flexible</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="message">Additional Details</label>
+        <textarea id="message" name="Additional Details" placeholder="Tell us about your branding, colours, any special requirements…"></textarea>
+      </div>
+      <button type="submit" class="btn-submit">Send Inquiry ›</button>
+      <p class="form-note">We typically respond within 1 business day.</p>
+    </form>
+  </div>
+</div>
+
+<script>
+// ── CANVAS BACKGROUND ──
+  (function () {
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, frame = 0;
+    let mouse = { x: .5, y: .5 }, targetMouse = { x: .5, y: .5 };
+    window.addEventListener('mousemove', e => { targetMouse.x = e.clientX/window.innerWidth; targetMouse.y = e.clientY/window.innerHeight; });
+    // Click ripples
+    const ripples = [];
+    window.addEventListener('click', e => { ripples.push({ x: e.clientX, y: e.clientY, r: 0, alpha: .35, hue: 200 + Math.random()*30 }); });
+
+    const orbs = [
+      { x:.15, y:.1,  r:.32, hue:210, speed:.00018, phase:0,   gold:false, depth:1   },
+      { x:.72, y:.25, r:.26, hue:195, speed:.00022, phase:1.8, gold:false, depth:.7  },
+      { x:.45, y:.6,  r:.36, hue:220, speed:.00015, phase:3.4, gold:false, depth:1.2 },
+      { x:.85, y:.7,  r:.24, hue:200, speed:.0002,  phase:0.9, gold:false, depth:.8  },
+      { x:.3,  y:.85, r:.28, hue:185, speed:.00017, phase:2.3, gold:false, depth:1   },
+      { x:.6,  y:.4,  r:.22, hue:230, speed:.00025, phase:4.1, gold:false, depth:.6  },
+      { x:.9,  y:.35, r:.20, hue:205, speed:.00019, phase:1.1, gold:false, depth:.9  },
+      { x:.2,  y:.55, r:.18, hue:215, speed:.00021, phase:2.7, gold:false, depth:1.1 },
+      { x:.5,  y:.15, r:.15, hue:190, speed:.00023, phase:0.4, gold:false, depth:.75 },
+    ];
+    const beams = [
+      { x:.25, y:.2,  angle:-.38, spread:.70, speed:.00105, phase:0,   hue:210, alpha:.18  },
+      { x:.6,  y:.55, angle: .28, spread:.58, speed:.00082, phase:2.1, hue:198, alpha:.17  },
+      { x:.8,  y:.15, angle:-.55, spread:.65, speed:.00124, phase:1.2, hue:222, alpha:.16  },
+      { x:.1,  y:.75, angle: .48, spread:.60, speed:.00091, phase:3.5, hue:190, alpha:.18  },
+      { x:.5,  y:.9,  angle:-.22, spread:.82, speed:.00068, phase:0.7, hue:215, alpha:.15  },
+      { x:.7,  y:.4,  angle: .15, spread:.50, speed:.00100, phase:1.9, hue:175, alpha:.16  },
+      { x:.35, y:.5,  angle: .62, spread:.48, speed:.00115, phase:3.0, hue:195, alpha:.14  },
+      { x:.15, y:.3,  angle: .35, spread:.65, speed:.00077, phase:4.2, hue:240, alpha:.15  },
+      { x:.9,  y:.65, angle:-.42, spread:.72, speed:.00096, phase:1.5, hue:185, alpha:.14  },
+      { x:.42, y:.08, angle: .58, spread:.55, speed:.00110, phase:2.8, hue:230, alpha:.13  },
+      { x:.55, y:.72, angle:-.30, spread:.62, speed:.00088, phase:0.4, hue:260, alpha:.15  },
+      { x:.22, y:.88, angle: .44, spread:.54, speed:.00118, phase:1.7, hue:260, alpha:.14  },
+      { x:.78, y:.32, angle:-.18, spread:.68, speed:.00074, phase:3.3, hue:260, alpha:.16  },
+    ];
+    const facets = Array.from({ length: 85 }, () => ({
+      x: Math.random(), y: Math.random(),
+      s: 8 + Math.random() * 62,
+      sides: [3,4,6][Math.floor(Math.random()*3)],
+      rot: Math.random() * Math.PI * 2,
+      rspeed: (Math.random()-.5) * .006,
+      alpha: .045 + Math.random() * .13,
+      hue: [190,210,225,240,175,260][Math.floor(Math.random()*6)] + Math.random()*20,
+      drift: { x: (Math.random()-.5)*.00058, y: (Math.random()-.5)*.00048 },
+      depth: .5 + Math.random() * .8,
+    }));
+    const sparkles = Array.from({ length: 150 }, () => ({
+      x: Math.random(), y: Math.random(),
+      life: Math.random(), speed: .007 + Math.random() * .016,
+      size: .8 + Math.random() * 3.5,
+      hue: [200,215,175,240,260][Math.floor(Math.random()*5)] + Math.random()*20,
+      type: Math.floor(Math.random()*3),
+    }));
+    const auroras = [
+      { y:.08, amp:.06, freq:.0014, speed:.00026, hue:260, alpha:.17 },
+      { y:.22, amp:.07, freq:.0012, speed:.00025, hue:205, alpha:.20 },
+      { y:.40, amp:.06, freq:.0015, speed:.00031, hue:240, alpha:.18 },
+      { y:.58, amp:.08, freq:.001,  speed:.00021, hue:175, alpha:.17 },
+      { y:.72, amp:.05, freq:.0018, speed:.00035, hue:215, alpha:.16 },
+      { y:.84, amp:.06, freq:.0016, speed:.00028, hue:260, alpha:.15 },
+      { y:.95, amp:.04, freq:.0022, speed:.00027, hue:195, alpha:.14 },
+    ];
+    // Diagonal strips
+    const strips = [
+      { x1:.0,  y1:.10, x2:.55, y2:.0,  hue:260, a:.14, sp:.00020 },
+      { x1:.0,  y1:.15, x2:.60, y2:.0,  hue:210, a:.15, sp:.00020 },
+      { x1:.0,  y1:.35, x2:.85, y2:.0,  hue:240, a:.13, sp:.00026 },
+      { x1:.0,  y1:.50, x2:.90, y2:.08, hue:260, a:.14, sp:.00018 },
+      { x1:.0,  y1:.58, x2:1.0, y2:.12, hue:175, a:.14, sp:.00017 },
+      { x1:.0,  y1:.78, x2:1.0, y2:.35, hue:220, a:.12, sp:.00023 },
+      { x1:.12, y1:1.0, x2:.95, y2:.18, hue:260, a:.13, sp:.00021 },
+      { x1:.18, y1:1.0, x2:1.0, y2:.22, hue:195, a:.13, sp:.00028 },
+      { x1:.42, y1:1.0, x2:1.0, y2:.52, hue:230, a:.12, sp:.00022 },
+      { x1:.65, y1:1.0, x2:1.0, y2:.70, hue:205, a:.11, sp:.00024 },
+      { x1:.82, y1:1.0, x2:1.0, y2:.88, hue:260, a:.10, sp:.00019 },
+    ];
+
+    function drawDiagonalLines() {
+      strips.forEach((l,i) => {
+        const pulse = Math.sin(frame*l.sp*1000 + i*1.4)*.35+.65;
+        const x1=l.x1*W, y1=l.y1*H, x2=l.x2*W, y2=l.y2*H;
+        const g=ctx.createLinearGradient(x1,y1,x2,y2);
+        g.addColorStop(0,`hsla(${l.hue},92%,78%,0)`);
+        g.addColorStop(.28,`hsla(${l.hue},95%,82%,${l.a*pulse})`);
+        g.addColorStop(.5,`hsla(${l.hue},98%,88%,${l.a*pulse*1.6})`);
+        g.addColorStop(.72,`hsla(${l.hue},95%,82%,${l.a*pulse})`);
+        g.addColorStop(1,`hsla(${l.hue},92%,78%,0)`);
+        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+        ctx.strokeStyle=g; ctx.lineWidth=3.2; ctx.stroke();
+        const ox=(y2-y1)/Math.sqrt((x2-x1)**2+(y2-y1)**2)*10;
+        const oy=-(x2-x1)/Math.sqrt((x2-x1)**2+(y2-y1)**2)*10;
+        const g2=ctx.createLinearGradient(x1+ox,y1+oy,x2+ox,y2+oy);
+        g2.addColorStop(0,`hsla(${l.hue+20},88%,72%,0)`);
+        g2.addColorStop(.5,`hsla(${l.hue+20},90%,78%,${l.a*pulse*.55})`);
+        g2.addColorStop(1,`hsla(${l.hue+20},88%,72%,0)`);
+        ctx.beginPath(); ctx.moveTo(x1+ox,y1+oy); ctx.lineTo(x2+ox,y2+oy);
+        ctx.strokeStyle=g2; ctx.lineWidth=1.2; ctx.stroke();
+      });
+    }
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+
+    function drawAurora(a) {
+      const t = frame * a.speed;
+      ctx.beginPath();
+      ctx.moveTo(0, a.y * H);
+      for(let x=0; x<=W; x+=8){
+        const y = (a.y + Math.sin(x*a.freq + t)*a.amp + Math.sin(x*a.freq*.6 + t*1.4)*a.amp*.5)*H;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+      const g = ctx.createLinearGradient(0,a.y*H-60,0,a.y*H+60);
+      g.addColorStop(0,`hsla(${a.hue},75%,80%,0)`);
+      g.addColorStop(.5,`hsla(${a.hue},80%,82%,${a.alpha})`);
+      g.addColorStop(1,`hsla(${a.hue},75%,80%,0)`);
+      ctx.fillStyle = g; ctx.fill();
+    }
+    function drawOrb(o) {
+      const t = frame*o.speed+o.phase;
+      const mx = (mouse.x-.5)*o.depth*.055, my = (mouse.y-.5)*o.depth*.055;
+      const cx = (o.x + Math.sin(t)*.09 + mx)*W;
+      const cy = (o.y + Math.cos(t*1.3)*.07 + my)*H;
+      const rad = o.r*Math.min(W,H);
+      const g = ctx.createRadialGradient(cx-rad*.2,cy-rad*.2,0, cx,cy,rad);
+      g.addColorStop(0,`hsla(${o.hue},75%,82%,.16)`);
+      g.addColorStop(.4,`hsla(${o.hue},70%,83%,.08)`);
+      g.addColorStop(.75,`hsla(${o.hue},65%,86%,.03)`);
+      g.addColorStop(1,`hsla(${o.hue},60%,88%,0)`);
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.fill();
+      const hg = ctx.createRadialGradient(cx-rad*.3,cy-rad*.3,0,cx-rad*.3,cy-rad*.3,rad*.45);
+      hg.addColorStop(0,`rgba(255,255,255,.07)`); hg.addColorStop(1,`rgba(255,255,255,0)`);
+      ctx.fillStyle=hg; ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.fill();
+    }
+    function drawBeam(b) {
+      const t=frame*b.speed+b.phase;
+      const mx=(mouse.x-.5)*.04, my=(mouse.y-.5)*.04;
+      const cx=(b.x+Math.sin(t*.7)*.08+mx)*W, cy=(b.y+Math.cos(t*.5)*.06+my)*H;
+      const angle=b.angle+Math.sin(t)*.14, len=b.spread*W*1.8;
+      ctx.save(); ctx.translate(cx,cy); ctx.rotate(angle);
+      const bw=60+Math.sin(t*1.3)*26;
+      const g=ctx.createLinearGradient(-len/2,0,len/2,0);
+      g.addColorStop(0,`hsla(${b.hue},80%,78%,0)`);
+      g.addColorStop(.2,`hsla(${b.hue},82%,80%,${b.alpha*.6})`);
+      g.addColorStop(.5,`hsla(${b.hue},88%,85%,${b.alpha*1.8})`);
+      g.addColorStop(.8,`hsla(${b.hue},82%,80%,${b.alpha*.6})`);
+      g.addColorStop(1,`hsla(${b.hue},80%,78%,0)`);
+      ctx.fillStyle=g; ctx.fillRect(-len/2,-bw/2,len,bw); ctx.restore();
+    }
+    function drawFacet(f) {
+      f.rot+=f.rspeed; f.x+=f.drift.x; f.y+=f.drift.y;
+      if(f.x<-.05)f.x=1.05; if(f.x>1.05)f.x=-.05;
+      if(f.y<-.05)f.y=1.05; if(f.y>1.05)f.y=-.05;
+      const mx=(mouse.x-.5)*f.depth*.025, my=(mouse.y-.5)*f.depth*.025;
+      ctx.save(); ctx.translate((f.x+mx)*W, (f.y+my)*H); ctx.rotate(f.rot);
+      ctx.beginPath();
+      for(let i=0;i<f.sides;i++){
+        const a=(i/f.sides)*Math.PI*2-(f.sides===6?0:Math.PI/2);
+        const r=f.s*(.62+.38*Math.abs(Math.cos(a*(f.sides===3?1.5:2))));
+        i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+      }
+      ctx.closePath();
+      const g=ctx.createLinearGradient(-f.s,-f.s,f.s,f.s);
+      g.addColorStop(0,`hsla(${f.hue},82%,94%,${f.alpha*2})`);
+      g.addColorStop(.45,`hsla(${f.hue},74%,90%,${f.alpha})`);
+      g.addColorStop(1,`hsla(${f.hue},68%,86%,${f.alpha*.3})`);
+      ctx.fillStyle=g; ctx.fill();
+      ctx.strokeStyle=`hsla(${f.hue},65%,78%,${f.alpha*.85})`; ctx.lineWidth=.8; ctx.stroke();
+      ctx.beginPath();
+      for(let i=0;i<f.sides;i++){
+        const a=(i/f.sides)*Math.PI*2-(f.sides===6?0:Math.PI/2);
+        const r=f.s*.4*(.62+.38*Math.abs(Math.cos(a*(f.sides===3?1.5:2))));
+        i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+      }
+      ctx.closePath();
+      ctx.strokeStyle=`rgba(255,255,255,${f.alpha*1.2})`; ctx.lineWidth=.5; ctx.stroke();
+      ctx.restore();
+    }
+    function drawMesh() {
+      const pts = facets.map(f=>({x:f.x*W,y:f.y*H,hue:f.hue,alpha:f.alpha}));
+      for(let i=0;i<pts.length;i++){
+        for(let j=i+1;j<pts.length;j++){
+          const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
+          if(d<180){
+            const a = .055*(1-d/180);
+            const g=ctx.createLinearGradient(pts[i].x,pts[i].y,pts[j].x,pts[j].y);
+            g.addColorStop(0,`hsla(${pts[i].hue},65%,75%,${a})`);
+            g.addColorStop(1,`hsla(${pts[j].hue},65%,75%,${a})`);
+            ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
+            ctx.strokeStyle=g; ctx.lineWidth=.6; ctx.stroke();
+          }
+        }
+      }
+    }
+    function drawSparkle(s) {
+      s.life += s.speed;
+      if(s.life>1){ s.life=0; s.x=Math.random(); s.y=Math.random(); }
+      const a = Math.sin(s.life*Math.PI);
+      const px=s.x*W, py=s.y*H;
+      ctx.save(); ctx.globalAlpha = a*.65;
+      if(s.type===0){
+        ctx.fillStyle=`hsla(${s.hue},82%,88%,1)`;
+        ctx.beginPath(); ctx.arc(px,py,s.size*a,0,Math.PI*2); ctx.fill();
+      } else if(s.type===1){
+        ctx.strokeStyle=`hsla(${s.hue},78%,84%,1)`; ctx.lineWidth=.7;
+        const sz=s.size*3*a;
+        ctx.beginPath(); ctx.moveTo(px-sz,py); ctx.lineTo(px+sz,py); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px,py-sz); ctx.lineTo(px,py+sz); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px-sz*.7,py-sz*.7); ctx.lineTo(px+sz*.7,py+sz*.7); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px+sz*.7,py-sz*.7); ctx.lineTo(px-sz*.7,py+sz*.7); ctx.stroke();
+      } else {
+        ctx.fillStyle=`hsla(${s.hue},85%,90%,1)`;
+        const sz=s.size*2.5*a;
+        ctx.beginPath(); ctx.moveTo(px,py-sz); ctx.lineTo(px+sz*.6,py); ctx.lineTo(px,py+sz); ctx.lineTo(px-sz*.6,py); ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+    }
+    function drawRipples() {
+      for(let i=ripples.length-1;i>=0;i--){
+        const r=ripples[i];
+        r.r += 4; r.alpha -= .008;
+        if(r.alpha<=0){ ripples.splice(i,1); continue; }
+        ctx.beginPath(); ctx.arc(r.x,r.y,r.r,0,Math.PI*2);
+        ctx.strokeStyle=`hsla(${r.hue},70%,75%,${r.alpha})`; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(r.x,r.y,r.r*.6,0,Math.PI*2);
+        ctx.strokeStyle=`hsla(${r.hue},75%,80%,${r.alpha*.6})`; ctx.lineWidth=.8; ctx.stroke();
+      }
+    }
+    function draw() {
+      frame++;
+      mouse.x += (targetMouse.x - mouse.x) * .04;
+      mouse.y += (targetMouse.y - mouse.y) * .04;
+      ctx.clearRect(0,0,W,H);
+      const bx = W*(0.5 + (mouse.x-.5)*.15), by = H*(0.4 + (mouse.y-.5)*.1);
+      const base = ctx.createRadialGradient(bx, by*.6, 0, W*.5, H*.5, Math.max(W,H)*.92);
+      base.addColorStop(0,'rgba(215,235,255,1)');
+      base.addColorStop(.22,'rgba(192,220,255,1)');
+      base.addColorStop(.45,'rgba(158,200,252,1)');
+      base.addColorStop(.65,'rgba(118,170,240,1)');
+      base.addColorStop(.82,'rgba(78,132,225,1)');
+      base.addColorStop(.92,'rgba(50,95,200,1)');
+      base.addColorStop(1,'rgba(32,65,170,1)');
+      ctx.fillStyle=base; ctx.fillRect(0,0,W,H);
+
+      // Corner navy vignette
+      const vig = ctx.createRadialGradient(W*.5,H*.5,Math.min(W,H)*.2, W*.5,H*.5,Math.max(W,H)*.85);
+      vig.addColorStop(0,'rgba(10,30,80,0)');
+      vig.addColorStop(.50,'rgba(10,30,80,.08)');
+      vig.addColorStop(.78,'rgba(8,22,70,.22)');
+      vig.addColorStop(1,'rgba(4,12,50,.38)');
+      ctx.fillStyle=vig; ctx.fillRect(0,0,W,H);
+
+      auroras.forEach(drawAurora);
+      drawDiagonalLines();
+      drawMesh();
+      orbs.forEach(drawOrb);
+      beams.forEach(drawBeam);
+      facets.forEach(drawFacet);
+      sparkles.forEach(drawSparkle);
+      drawRipples();
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  // ── Nav
+  function toggleNav() {
+    document.getElementById('navLinks').classList.toggle('open');
+  }
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
+  });
+
+  // ── Modal
+  function openModal(productName) {
+    document.getElementById('modalProductName').textContent = 'Inquiring about: ' + productName;
+    document.getElementById('modalBackdrop').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('modalBackdrop').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function closeModalOnBackdrop(e) {
+    if (e.target === document.getElementById('modalBackdrop')) closeModal();
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeDetail(); } });
+
+  // ── Product detail panel
+  async function openDetail(imgId) {
+    const imgs = (await ProdIDB.getAll()).filter(i => i.enabled !== false);
+    const cats = JSON.parse(localStorage.getItem('zenan_categories') || '[]');
+    const img = imgs.find(i => i.id === imgId);
+    if (!img) return;
+
+    const assignedCats = cats.filter(c => img.categories.includes(c.id));
+
+    document.getElementById('detailImg').src = img.src;
+    document.getElementById('detailImg').alt = img.name;
+
+    document.getElementById('detailTags').innerHTML = assignedCats.map(c =>
+      `<span style="display:inline-block;background:#fff;color:#2558B0;font-size:.78rem;font-weight:700;padding:5px 14px;border-radius:8px;border:2px solid #2558B0;box-shadow:3px 3px 0 #FFD700;">${c.name}</span>`
+    ).join('') || '';
+
+    document.getElementById('detailName').textContent = img.name;
+
+    const variants = img.variants && img.variants.length ? img.variants
+      : [{ id: img.id+'_v0', itemNumber: img.itemNumber||'', oz: img.oz||'' }];
+    const ozList = variants.map(v => v.oz).filter(Boolean);
+
+    let metaHtml = '';
+    if (ozList.length) {
+      metaHtml += `<div class="detail-meta-item">Available Capacities: <strong>${ozList.map(o=>o+'oz').join(', ')}</strong></div>`;
+    }
+    if (variants.some(v => v.itemNumber)) {
+      metaHtml += `<div style="margin-top:8px;display:flex;flex-direction:column;gap:3px;">` +
+        variants.filter(v => v.itemNumber || v.oz).map(v =>
+          `<div class="detail-meta-item">${img.name}${v.oz ? ' '+v.oz+'oz' : ''}${v.itemNumber ? ' — #'+v.itemNumber : ''}</div>`
+        ).join('') + `</div>`;
+    }
+    document.getElementById('detailMeta').innerHTML = metaHtml;
+
+    document.getElementById('detailInquireBtn').onclick = () => {
+      closeDetail();
+      openModal(img.name);
+    };
+
+    // Similar: same category, exclude self
+
+    document.getElementById('detailBackdrop').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDetail() {
+    document.getElementById('detailBackdrop').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeDetailOnBackdrop(e) {
+    if (e.target === document.getElementById('detailBackdrop')) closeDetail();
+  }
+  async function submitForm(e) {
+    e.preventDefault();
+    const form = e.target;
+    const btn = form.querySelector('.btn-submit');
+    const formData = new FormData(form);
+    const payload = Object.fromEntries(formData);
+    payload.access_key = '502684a2-5885-4edf-8571-ee612d933398';
+    payload.subject = 'New Quote Request — Zenan Glass';
+    payload.from_name = 'Zenan Glass Website';
+    btn.textContent = 'Sending…'; btn.disabled = true;
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json();
+      if (res.status === 200) {
+        btn.textContent = "Sent! We'll be in touch ✓";
+        btn.style.background = '#16a34a';
+        setTimeout(closeModal, 2200);
+        setTimeout(() => { btn.textContent = 'Send Inquiry ›'; btn.style.background = ''; btn.disabled = false; form.reset(); }, 2600);
+      } else { throw new Error(json.message || 'Submission failed'); }
+    } catch (err) {
+      console.error('Form error:', err);
+      btn.textContent = 'Send Inquiry ›'; btn.disabled = false;
+      alert('Something went wrong: ' + err.message);
+    }
+  }
+
+  // ── Filtering state
+  let _activeCats = new Set(), _ozMin = 0, _ozMax = 90, _searchQuery = '';
+  let _allCats = [], _typeSubMap = {}; // typeId → { name, subCats[] }
+
+  // Which sub-category keywords belong to each main type
+  const TYPE_SUB_KEYS = {
+    beer:    ['sampler','pitcher','coffee','mug','growler'],
+    wine:    ['decant','carafe','flute','champagne','stemless','stemmed'],
+    whisky:  ['rocks','highball'],
+    barware: ['shot','martini','cocktail','jar','bottle','bucket','chill','shaker','bar tool','bar tools']
+  };
+
+  // Normalize text: lowercase + strip accents for accent-insensitive matching
+  function normalize(str) {
+    return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  // Check if query matches card — fuzzy substring on all searchable fields
+  function cardMatchesSearch(card, q) {
+    if (!q) return true;
+    const fields = [
+      card.dataset.name   || '',
+      card.dataset.cat    || '',
+      card.dataset.cats   || '',
+      card.dataset.ozs    || '',
+      card.dataset.tags   || '',
+      card.querySelector('h3')?.textContent || '',
+      card.querySelector('.product-cat')?.textContent || '',
+      card.querySelector('p')?.textContent || '',
+      card.querySelector('.min-qty')?.textContent || '',
+    ].map(normalize).join(' ');
+
+    // Also match oz range queries like "12oz" or "12"
+    const ozNum = parseFloat(q);
+    if (!isNaN(ozNum)) {
+      const ozs = (card.dataset.ozs || '').split(',').map(parseFloat).filter(n => !isNaN(n));
+      if (ozs.some(oz => Math.abs(oz - ozNum) <= 2)) return true;
+    }
+
+    // Category name match — activates the matching filter type
+    const catNames = (card.dataset.cats || '').toLowerCase();
+    if (catNames.includes(q)) return true;
+
+    return normalize(fields).includes(normalize(q));
+  }
+
+  function applyFilters() {
+    let visibleCount = 0;
+    const allSelected = _activeCats.size === 0;
+
+    // Unified search + filter for ALL cards (admin and static)
+    document.querySelectorAll('.product-card').forEach(card => {
+      const isAdmin = card.hasAttribute('data-admin');
+
+      // Category filter (admin cards only — static cards always pass)
+      let catMatch = true;
+      if (isAdmin && !allSelected) {
+        const cardCats = card.dataset.cats ? card.dataset.cats.split(',') : [];
+        catMatch = cardCats.some(c => _activeCats.has(c));
+      }
+
+      // Oz filter (admin cards only)
+      let ozMatch = true;
+      if (isAdmin && (_ozMin !== 0 || _ozMax !== 90)) {
+        const ozs = (card.dataset.ozs || '').split(',').map(parseFloat).filter(n => !isNaN(n));
+        ozMatch = ozs.length === 0 || ozs.some(oz => oz >= _ozMin && oz <= _ozMax);
+      }
+
+      // Search — works across all fields, combined with active filters
+      const searchMatch = cardMatchesSearch(card, _searchQuery);
+
+      const show = catMatch && ozMatch && searchMatch;
+      card.style.display = show ? '' : 'none';
+      if (show) visibleCount++;
+    });
+
+    const noRes = document.getElementById('noResults');
+    if (noRes) noRes.style.display = visibleCount === 0 ? 'block' : 'none';
+  }
+
+  function searchProducts(q) {
+    _searchQuery = normalize(q.trim());
+    document.getElementById('searchClear').style.display = _searchQuery ? '' : 'none';
+    applyFilters();
+  }
+  function clearSearch() { document.getElementById('productSearch').value = ''; searchProducts(''); }
+
+  // Sync _activeCats from what's currently active in the UI
+  function syncActiveCats() {
+    _activeCats.clear();
+    const activeSubBtns = [...document.querySelectorAll('#filterSubRow .filter-btn.active[data-cat-id]')];
+
+    document.querySelectorAll('#filterRow1 .filter-btn.active[data-cat-id]').forEach(b => {
+      if (b.dataset.catId === 'all') return;
+      const typeId = b.dataset.catId;
+      const subCats = _typeSubMap[typeId]?.subCats || [];
+      const activeSubsForType = activeSubBtns.filter(sb =>
+        subCats.some(c => c.id === sb.dataset.catId)
+      );
+      if (activeSubsForType.length) {
+        // Sub-cats selected — only show those
+        activeSubsForType.forEach(sb => _activeCats.add(sb.dataset.catId));
+      } else {
+        // No sub-cats selected — show all products under this type
+        _activeCats.add(typeId);
+        subCats.forEach(c => _activeCats.add(c.id));
+      }
+    });
+  }
+
+  function updateSubRow() {
+    const subRow = document.getElementById('filterSubRow');
+    const activeTypes = [...document.querySelectorAll('#filterRow1 .filter-btn.active[data-cat-id]')]
+      .map(b => b.dataset.catId).filter(id => id !== 'all');
+
+    if (!activeTypes.length) { subRow.innerHTML = ''; subRow.classList.remove('visible'); return; }
+
+    // Remember which sub-cat IDs were active before rebuilding
+    const prevActive = new Set(
+      [...subRow.querySelectorAll('.filter-btn.active[data-cat-id]')].map(b => b.dataset.catId)
+    );
+
+    let html = '';
+    activeTypes.forEach(typeId => {
+      const entry = _typeSubMap[typeId];
+      if (!entry || !entry.subCats.length) return;
+      html += `<span class="filter-sub-label">${entry.name} ›</span>` +
+        entry.subCats.map(c =>
+          `<button class="filter-btn${prevActive.has(c.id) ? ' active' : ''}" data-cat-id="${c.id}" onclick="toggleSub(this)">${c.name}</button>`
+        ).join('');
+    });
+
+    if (html) { subRow.innerHTML = html; subRow.classList.add('visible'); }
+    else { subRow.innerHTML = ''; subRow.classList.remove('visible'); }
+  }
+
+  // Toggle a main type (Beer / Wine / Whisky / Barware) — multi-select
+  function toggleType(btn) {
+    const allBtn = document.querySelector('#filterRow1 .filter-btn[data-cat-id="all"]');
+    allBtn.classList.remove('active');
+    btn.classList.toggle('active');
+    // When deactivating a type, clear its sub-selections before rebuilding sub-row
+    if (!btn.classList.contains('active')) {
+      const subIds = new Set((_typeSubMap[btn.dataset.catId]?.subCats || []).map(c => c.id));
+      document.querySelectorAll('#filterSubRow .filter-btn.active').forEach(b => {
+        if (subIds.has(b.dataset.catId)) b.classList.remove('active');
+      });
+    }
+    const anyActive = !!document.querySelector('#filterRow1 .filter-btn.active[data-cat-id]:not([data-cat-id="all"])');
+    if (!anyActive) { allBtn.classList.add('active'); }
+    updateSubRow();
+    syncActiveCats();
+    applyFilters();
+  }
+
+  // Reset all — show everything
+  function selectAll() {
+    document.querySelectorAll('#filterRow1 .filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('#filterRow1 .filter-btn[data-cat-id="all"]').classList.add('active');
+    const subRow = document.getElementById('filterSubRow');
+    subRow.innerHTML = ''; subRow.classList.remove('visible');
+    _activeCats.clear();
+    applyFilters();
+  }
+
+  // Toggle a sub-category button individually
+  function toggleSub(btn) {
+    btn.classList.toggle('active');
+    syncActiveCats();
+    applyFilters();
+  }
+
+  // Used by URL ?cat= auto-select
+  function filterProducts(catId) {
+    // Check if it's a top-level type button (Beer, Wine, Whisky, Barware)
+    const typeBtn = document.querySelector(`#filterRow1 .filter-btn[data-cat-id="${CSS.escape(catId)}"]`);
+    if (typeBtn) {
+      if (!typeBtn.classList.contains('active')) toggleType(typeBtn);
+      return;
+    }
+    // Check if it's a sub-category — activate parent type then select sub
+    for (const [tid, { subCats }] of Object.entries(_typeSubMap)) {
+      if (subCats.some(c => c.id === catId)) {
+        const tBtn = document.querySelector(`#filterRow1 .filter-btn[data-cat-id="${CSS.escape(tid)}"]`);
+        if (tBtn && !tBtn.classList.contains('active')) toggleType(tBtn);
+        // Sub-row is now built — select the specific sub-cat button
+        const subBtn = document.querySelector(`#filterSubRow .filter-btn[data-cat-id="${CSS.escape(catId)}"]`);
+        if (subBtn && !subBtn.classList.contains('active')) toggleSub(subBtn);
+        return;
+      }
+    }
+    // Fallback: direct match on product data-cat attribute
+    _activeCats = new Set([catId]); applyFilters();
+  }
+
+  function initOzSlider() {
+    const minEl = document.getElementById('ozMin');
+    const maxEl = document.getElementById('ozMax');
+    const fill  = document.getElementById('rangeFill');
+    const label = document.getElementById('ozRangeLabel');
+    const MAX   = 90;
+
+    function update() {
+      let lo = parseInt(minEl.value), hi = parseInt(maxEl.value);
+      if (lo > hi) { if (this === minEl) minEl.value = hi; else maxEl.value = lo; }
+      lo = parseInt(minEl.value); hi = parseInt(maxEl.value);
+      fill.style.left  = (lo / MAX * 100) + '%';
+      fill.style.width = ((hi - lo) / MAX * 100) + '%';
+      label.textContent = lo === 0 && hi === MAX ? 'All sizes' : `${lo} – ${hi} oz`;
+      _ozMin = lo; _ozMax = hi;
+      applyFilters();
+    }
+
+    minEl.addEventListener('input', update);
+    maxEl.addEventListener('input', update);
+    update.call(minEl);
+  }
+
+  // ── Product IndexedDB reader
+  const ProdIDB = {
+    _db: null,
+    open() {
+      return new Promise((res, rej) => {
+        const req = indexedDB.open('zenan_products_db', 1);
+        req.onupgradeneeded = e => e.target.result.createObjectStore('images', { keyPath: 'id' });
+        req.onsuccess = e => { this._db = e.target.result; res(this._db); };
+        req.onerror = rej;
+      });
+    },
+    async getAll() {
+      const db = this._db || await this.open();
+      return new Promise((res, rej) => {
+        const req = db.transaction('images', 'readonly').objectStore('images').getAll();
+        req.onsuccess = () => res(req.result || []);
+        req.onerror = rej;
+      });
+    }
+  };
+
+  async function loadAdminProducts() {
+    let imgs, cats;
+    try {
+      imgs = await ProdIDB.getAll();
+      cats = JSON.parse(localStorage.getItem('zenan_categories') || '[]');
+    } catch { return; }
+
+    // Only show enabled images
+    imgs = imgs.filter(img => img.enabled !== false);
+
+    if (!imgs.length) return; // fall back to static cards
+
+    // Show oz filter bar and init slider
+    const ozBar = document.getElementById('ozFilterBar');
+    ozBar.style.display = 'flex';
+    initOzSlider();
+
+    // Build category filter bar — two-level hierarchy (type row + sub-row)
+    const bar = document.getElementById('filterBar');
+
+    _allCats = cats;
+
+    // Map type names to their TYPE_SUB_KEYS key
+    const TYPE_NAME_MAP = { beer: 'Beer', wine: 'Wine', whisky: 'Whisky', barware: 'Barware' };
+    _typeSubMap = {};
+    const typeCats = [];
+
+    for (const [key, label] of Object.entries(TYPE_NAME_MAP)) {
+      const typeCat = cats.find(c => c.name.toLowerCase() === label.toLowerCase());
+      if (!typeCat) continue;
+      const keywords = TYPE_SUB_KEYS[key] || [];
+      const subCats = cats.filter(c => {
+        const k = c.name.toLowerCase();
+        return c.id !== typeCat.id && keywords.some(kw => k.includes(kw));
+      });
+      _typeSubMap[typeCat.id] = { name: typeCat.name, subCats };
+      typeCats.push(typeCat);
+    }
+
+    const makeTypeBtn = c =>
+      `<button class="filter-btn" data-cat-id="${c.id}" onclick="toggleType(this)">${c.name}</button>`;
+
+    bar.innerHTML =
+      `<div class="filter-row" id="filterRow1">
+        <span class="filter-label">Filter:</span>
+        <button class="filter-btn active" data-cat-id="all" onclick="selectAll()">All</button>
+        ${typeCats.map(makeTypeBtn).join('')}
+      </div>`;
+
+    // Build product grid
+    const grid = document.getElementById('productsGrid');
+    grid.innerHTML = imgs.map(img => {
+      const assignedCats = cats.filter(c => img.categories.includes(c.id));
+      const catAttr = assignedCats.length ? assignedCats[0].id : 'uncategorized';
+      const variants = img.variants && img.variants.length ? img.variants
+        : [{ id: img.id+'_v0', itemNumber: img.itemNumber||'', oz: img.oz||'' }];
+      const ozList = variants.map(v => v.oz).filter(Boolean);
+      const ozAttr = ozList.join(',');
+      const ozSummary = ozList.length ? `<span style="font-size:.78rem;color:var(--muted);">${ozList.map(o=>o+'oz').join(' / ')}</span>` : '';
+
+      const safeName = String(img.name || '').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+
+      return `<div class="product-card" data-admin="1" data-cat="${catAttr}" data-cats="${assignedCats.map(c=>c.id).join(',')}" data-ozs="${ozAttr}" onclick="openDetail('${img.id}')">
+        <div class="product-img" style="background:#fff;padding:0;">
+          <img src="${img.src}" alt="${safeName}" style="width:100%;height:100%;object-fit:contain;display:block;" loading="lazy" />
+        </div>
+        <div class="product-body">
+          <h3>${img.name}</h3>
+          <div style="margin-top:2px;">${ozSummary}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Auto-apply category from URL ?cat=ID — must run AFTER grid is populated
+    const _urlCat = new URLSearchParams(window.location.search).get('cat');
+    if (_urlCat) {
+      filterProducts(_urlCat);
+      document.querySelector('.controls-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      history.replaceState(null, '', window.location.pathname);
+    }
+  }
+
+  // Load on start and on storage changes (real-time cross-tab updates)
+  loadAdminProducts();
+  window.addEventListener('storage', e => {
+    if (e.key === 'zenan_products_v' || e.key === 'zenan_categories') loadAdminProducts();
+  });
+
+
+  // ── DRINK EASTER EGGS ──
+  function pourDrink(cfg) {
+    const bc = document.createElement('canvas');
+    bc.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:9999;cursor:pointer;';
+    document.body.appendChild(bc);
+    const cx = bc.getContext('2d');
+    let W = bc.width = window.innerWidth, H = bc.height = window.innerHeight;
+    window.addEventListener('resize', () => { W = bc.width = window.innerWidth; H = bc.height = window.innerHeight; });
+    let fillLevel = 0, draining = false, startTime = null, drainStart = null;
+    const bubbles = [];
+    const foam = cfg.foam ? Array.from({length: 80}, () => ({
+      x: Math.random() * 2, r: 6 + Math.random() * 22, wobble: Math.random() * Math.PI * 2,
+    })) : [];
+    function addBubble() {
+      if (fillLevel < 0.04) return;
+      bubbles.push({ x: Math.random() * W, y: H - Math.random() * H * fillLevel * 0.9,
+        r: 1.5 + Math.random() * (cfg.bubbleSize || 3.5), speed: 0.6 + Math.random() * 1.8, alpha: 0.35 + Math.random() * 0.4 });
+    }
+    function draw(ts) {
+      if (!startTime) startTime = ts;
+      if (!draining) {
+        fillLevel = Math.min((ts - startTime) / 3200, 1);
+        fillLevel = 1 - Math.pow(1 - fillLevel, 2.4);
+      } else {
+        if (!drainStart) drainStart = ts;
+        fillLevel = Math.max(1 - (ts - drainStart) / 1800, 0);
+        if (fillLevel <= 0) { document.body.removeChild(bc); return; }
+      }
+      cx.clearRect(0, 0, W, H);
+      const top = H * (1 - fillLevel);
+      const g = cx.createLinearGradient(0, top, W, H);
+      cfg.gradient.forEach(([stop, color]) => g.addColorStop(stop, color));
+      cx.fillStyle = g; cx.fillRect(0, top, W, H);
+      cx.beginPath(); cx.moveTo(0, top);
+      for (let x = 0; x <= W; x += 6) {
+        const y = top + Math.sin(x / 90 + ts / 400) * 5 + Math.sin(x / 40 + ts / 250) * 3;
+        cx.lineTo(x, y);
+      }
+      cx.lineTo(W, H); cx.lineTo(0, H); cx.closePath();
+      cx.fillStyle = cfg.surfaceColor; cx.fill();
+      foam.forEach((f, i) => {
+        const fx = (f.x + i * 0.37 + ts * 0.00008) % 1.2 * W - W * 0.1;
+        const fy = top - f.r * 0.6 + Math.sin(f.wobble + ts / 600) * 4;
+        cx.beginPath(); cx.arc(fx, fy, f.r * Math.min(fillLevel * 3, 1), 0, Math.PI * 2);
+        cx.fillStyle = 'rgba(255,252,242,.92)'; cx.fill();
+        cx.strokeStyle = 'rgba(220,200,170,.35)'; cx.lineWidth = 1; cx.stroke();
+      });
+      if (Math.random() < (cfg.bubbleRate || 0.4) && !draining) addBubble();
+      for (let i = bubbles.length - 1; i >= 0; i--) {
+        const b = bubbles[i]; b.y -= b.speed;
+        if (b.y < top) { bubbles.splice(i, 1); continue; }
+        cx.beginPath(); cx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        cx.strokeStyle = `rgba(${cfg.bubbleColor},${b.alpha})`; cx.lineWidth = 1; cx.stroke();
+      }
+      if (fillLevel > 0.45 && !draining) {
+        const ta = Math.min((fillLevel - 0.45) / 0.2, 1);
+        cx.globalAlpha = ta; cx.fillStyle = '#fff';
+        cx.font = `bold ${Math.round(W * 0.06)}px -apple-system, sans-serif`;
+        cx.textAlign = 'center'; cx.textBaseline = 'middle';
+        cx.shadowColor = 'rgba(0,0,0,.18)'; cx.shadowBlur = 12;
+        cx.fillText(cfg.text, W / 2, H / 2 - 24);
+        cx.font = `${Math.round(W * 0.022)}px -apple-system, sans-serif`;
+        cx.globalAlpha = 1; cx.shadowBlur = 0;
+      }
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+    bc.addEventListener('click', () => { draining = true; });
+  }
+  function pourBeer() {
+    pourDrink({ gradient: [[0,'rgba(234,158,12,.50)'],[0.4,'rgba(210,130,8,.50)'],[1,'rgba(170,90,4,.50)']],
+      surfaceColor: 'rgba(240,165,20,.50)', foam: true, bubbleColor: '255,215,80', bubbleRate: 0.4, text: 'Cheers! 🍺' });
+  }
+  function pourWine() {
+    pourDrink({ gradient: [[0,'rgba(140,20,60,.50)'],[0.4,'rgba(110,10,40,.50)'],[1,'rgba(70,5,20,.50)']],
+      surfaceColor: 'rgba(160,30,70,.50)', foam: false, bubbleColor: '200,80,120', bubbleRate: 0.08, text: 'Santé! 🍷' });
+  }
+</script>
+</body>
+</html>
