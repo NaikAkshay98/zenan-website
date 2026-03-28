@@ -14,5 +14,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-28T21:46:21.380Z"
+  },
+  {
+    "id": "1774734901366jm2jkddmhhh",
+    "filename": "1774734901366jm2jkddmhhh.jpg",
+    "name": "VINA_FLUTE_7500_8oz-1 (1)",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774734901366jm2jkddmhhh.jpg",
+    "variants": [
+      {
+        "id": "1774734901366jm2jkddmhhh_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-28T21:55:01.956Z"
   }
 ]
