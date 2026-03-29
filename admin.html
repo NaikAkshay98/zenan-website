@@ -195,7 +195,7 @@
 
     .card-body { padding: 10px 12px 12px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
     .card-name { font-size: .8rem; font-weight: 600; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .gal-tag-overlay { position: absolute; bottom: 6px; left: 6px; right: 6px; display: flex; flex-wrap: wrap; gap: 4px; pointer-events: auto; }
+
 
     .card-tags { display: flex; flex-wrap: wrap; gap: 5px; min-height: 24px; }
     .tag-pill {
@@ -1276,15 +1276,17 @@ function renderGallery() {
       return `<span class="tag-pill" style="background:${cat.color}">${cat.name}<button class="tag-remove" onclick="removeGalCat('${img.id}','${cid}')" title="Remove">×</button></span>`;
     }).join('');
     return `
-    <div class="img-card" draggable="false" data-id="${img.id}"
+    <div class="img-card" data-id="${img.id}"
       ondragover="cardDragOver(event, this)"
       ondragleave="cardDragLeave(this)"
-      ondrop="galCardDrop(event, this)" style="padding-bottom:0;">
-      <div class="card-img-wrap" style="border-radius:var(--radius);">
-        <img src="${escHtml(img.src)}" alt="" loading="lazy" draggable="false" />
+      ondrop="galCardDrop(event, this)">
+      <div class="card-img-wrap">
+        <img src="${escHtml(img.src)}" alt="${escHtml(img.name)}" loading="lazy" />
         <div class="drop-overlay"><span>Drop to assign</span></div>
         <button class="card-delete" onclick="deleteGalImage('${img.id}')" title="Remove from gallery">✕</button>
-        ${tags ? `<div class="gal-tag-overlay">${tags}</div>` : ''}
+      </div>
+      <div class="card-body">
+        <div class="card-tags">${tags}</div>
       </div>
     </div>`;
   }).join('');
