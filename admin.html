@@ -116,6 +116,9 @@
       transition: background .15s, color .15s; flex-shrink: 0;
     }
     .chip-del:hover { background: #fee2e2; color: #dc2626; }
+    .chip-move { width: 18px; height: 18px; border-radius: 4px; background: none; border: none; cursor: pointer; color: var(--muted); font-size: .6rem; display: flex; align-items: center; justify-content: center; padding: 0; }
+    .chip-move:hover:not(:disabled) { background: rgba(37,88,176,.1); color: var(--blue); }
+    .chip-move:disabled { opacity: .25; cursor: default; }
     .cat-empty { font-size: .82rem; color: var(--muted); text-align: center; padding: 12px 0; }
 
     /* ── MAIN ── */
@@ -989,6 +992,25 @@ function _execDeleteCategory() {
   toast('Category deleted.');
 }
 
+// ── Category reorder
+function moveCat(id, dir) {
+  const cats = getCats();
+  const i = cats.findIndex(c => c.id === id);
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= cats.length) return;
+  [cats[i], cats[j]] = [cats[j], cats[i]];
+  saveCats(cats);
+  renderAll();
+}
+function moveGalCat(id, dir) {
+  const i = _galCats.findIndex(c => c.id === id);
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= _galCats.length) return;
+  [_galCats[i], _galCats[j]] = [_galCats[j], _galCats[i]];
+  saveGalCats(_galCats);
+  renderGalCats();
+}
+
 // ── Category assignment
 function assignCat(imgId, catId) {
   const imgs = getImages();
@@ -1058,7 +1080,7 @@ function _renderCatChips(containerId, countFn) {
   const el = document.getElementById(containerId);
   if (!el) return;
   if (!cats.length) { el.innerHTML = '<div class="cat-empty">No categories yet.</div>'; return; }
-  el.innerHTML = cats.map(cat => {
+  el.innerHTML = cats.map((cat, i) => {
     return `<div class="cat-chip" draggable="true"
       ondragstart="chipDragStart(event, '${cat.id}')"
       ondragend="chipDragEnd(event)">
@@ -1066,6 +1088,8 @@ function _renderCatChips(containerId, countFn) {
       <span class="chip-dot" style="background:${cat.color}"></span>
       <span class="chip-name">${cat.name}</span>
       <span class="chip-count">${countFn(cat.id)}</span>
+      <button class="chip-move" title="Move up" onclick="moveCat('${cat.id}',-1)"${i===0?' disabled':''}>▲</button>
+      <button class="chip-move" title="Move down" onclick="moveCat('${cat.id}',1)"${i===cats.length-1?' disabled':''}>▼</button>
       <button class="chip-del" title="Delete category" onclick="deleteCategory('${cat.id}')">✕</button>
     </div>`;
   }).join('');
@@ -1078,8 +1102,8 @@ function renderGalCats() {
   const el = document.getElementById('galCatList');
   if (!el) return;
   if (!_galCats.length) { el.innerHTML = '<div class="cat-empty">No categories yet.</div>'; return; }
-  el.innerHTML = _galCats.map(cat => {
-    const count = _galImgs.filter(i => (i.categories || []).includes(cat.id)).length;
+  el.innerHTML = _galCats.map((cat, i) => {
+    const count = _galImgs.filter(img => (img.categories || []).includes(cat.id)).length;
     return `<div class="cat-chip" draggable="true"
       ondragstart="chipDragStart(event, '${cat.id}')"
       ondragend="chipDragEnd(event)">
@@ -1087,6 +1111,8 @@ function renderGalCats() {
       <span class="chip-dot" style="background:${cat.color}"></span>
       <span class="chip-name">${cat.name}</span>
       <span class="chip-count">${count}</span>
+      <button class="chip-move" title="Move up" onclick="moveGalCat('${cat.id}',-1)"${i===0?' disabled':''}>▲</button>
+      <button class="chip-move" title="Move down" onclick="moveGalCat('${cat.id}',1)"${i===_galCats.length-1?' disabled':''}>▼</button>
       <button class="chip-del" title="Delete category" onclick="deleteGalCategory('${cat.id}')">✕</button>
     </div>`;
   }).join('');
