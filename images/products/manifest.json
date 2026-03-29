@@ -920,7 +920,9 @@
         "oz": "11"
       }
     ],
-    "categories": [],
+    "categories": [
+      "1774824850547"
+    ],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:49:13.067Z"
   },
