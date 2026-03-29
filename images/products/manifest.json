@@ -1058,5 +1058,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:49:25.175Z"
+  },
+  {
+    "id": "17748101657789mqfqis7856",
+    "filename": "17748101657789mqfqis7856.jpg",
+    "name": "STEMLESS_FLUTE_228_8.5oz-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/17748101657789mqfqis7856.jpg",
+    "variants": [
+      {
+        "id": "17748101657789mqfqis7856_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:49:26.217Z"
   }
 ]
