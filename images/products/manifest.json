@@ -82,5 +82,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:48:25.144Z"
+  },
+  {
+    "id": "1774810105649enchbxbdexi",
+    "filename": "1774810105649enchbxbdexi.jpg",
+    "name": "M1010CB_Sampler_Paddle_4hole-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774810105649enchbxbdexi.jpg",
+    "variants": [
+      {
+        "id": "1774810105649enchbxbdexi_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:48:26.015Z"
   }
 ]
