@@ -450,7 +450,9 @@
         "oz": "12.5"
       }
     ],
-    "categories": [],
+    "categories": [
+      "1774826464591"
+    ],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:48:48.877Z"
   },
