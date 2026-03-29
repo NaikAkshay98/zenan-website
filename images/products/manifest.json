@@ -1,23 +1,5 @@
 [
   {
-    "id": "1774737174880y7hrd1jd8we",
-    "filename": "1774737174880y7hrd1jd8we.jpg",
-    "name": "Perfection",
-    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774737174880y7hrd1jd8we.jpg",
-    "variants": [
-      {
-        "id": "1774737174880y7hrd1jd8we_v0",
-        "itemNumber": "C8304",
-        "oz": "21"
-      }
-    ],
-    "categories": [
-      "1774813182160"
-    ],
-    "enabled": true,
-    "uploadedAt": "2026-03-28T22:32:55.318Z"
-  },
-  {
     "id": "1774810102706qz1uluzi5s",
     "filename": "1774810102706qz1uluzi5s.jpg",
     "name": "Wood chalkboard Sampler",
