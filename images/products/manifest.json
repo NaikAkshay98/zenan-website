@@ -402,5 +402,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:48:45.109Z"
+  },
+  {
+    "id": "17748101256541a14i40ok0v",
+    "filename": "17748101256541a14i40ok0v.jpg",
+    "name": "Clear_Acrylic_Pitcher_PC60_60oz-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/17748101256541a14i40ok0v.jpg",
+    "variants": [
+      {
+        "id": "17748101256541a14i40ok0v_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:48:46.091Z"
   }
 ]
