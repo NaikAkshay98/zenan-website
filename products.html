@@ -58,10 +58,14 @@
     /* ── FIXED BACKGROUND CANVAS ── */
     #bgCanvas {
       position: fixed; inset: 0; width: 100%; height: 100%;
-      z-index: 0; pointer-events: none;
+      z-index: 0; pointer-events: none; transition: opacity .4s;
     }
 
     nav, main, footer { position: relative; z-index: 1; }
+    body.white-bg { background: #fff !important; }
+    body.white-bg #bgCanvas { opacity: 0; pointer-events: none; }
+    #bgToggleBtn { background: none; border: 1.5px solid rgba(37,88,176,.25); border-radius: 20px; padding: 5px 10px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: .72rem; font-weight: 700; color: #1e3a6e; letter-spacing: .04em; margin-left: 8px; transition: border-color .2s, background .2s; flex-shrink: 0; }
+    #bgToggleBtn:hover { border-color: var(--blue); background: rgba(37,88,176,.07); }
 
     .grad-text {
       background: linear-gradient(135deg, #2558B0 0%, #3b82f6 55%, #0891b2 100%);
@@ -507,6 +511,23 @@
   } else if (sessionStorage.getItem('zenan_client_session')) {
     btn.textContent = 'My Account'; btn.href = 'client-portal.html';
   }
+})();
+</script>
+<button id="bgToggleBtn" onclick="toggleBg()" title="Toggle background">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor" stroke="none"/></svg>
+  <span id="bgToggleLabel">White</span>
+</button>
+<script>
+(function(){
+  if (localStorage.getItem('zenan_bg') === 'white') {
+    document.body.classList.add('white-bg');
+    var l = document.getElementById('bgToggleLabel'); if(l) l.textContent = 'Original';
+  }
+  window.toggleBg = function() {
+    var isWhite = document.body.classList.toggle('white-bg');
+    localStorage.setItem('zenan_bg', isWhite ? 'white' : 'original');
+    var l = document.getElementById('bgToggleLabel'); if(l) l.textContent = isWhite ? 'Original' : 'White';
+  };
 })();
 </script>
 </nav>
