@@ -978,5 +978,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:49:19.836Z"
+  },
+  {
+    "id": "1774810160432nnsxthyv85d",
+    "filename": "1774810160432nnsxthyv85d.jpg",
+    "name": "Ypsilon_Carafe_1.25000_33oz-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774810160432nnsxthyv85d.jpg",
+    "variants": [
+      {
+        "id": "1774810160432nnsxthyv85d_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:49:20.851Z"
   }
 ]
