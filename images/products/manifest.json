@@ -722,5 +722,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:49:04.204Z"
+  },
+  {
+    "id": "1774810144807sovfg060p9n",
+    "filename": "1774810144807sovfg060p9n.jpg",
+    "name": "Hobstar_Highball_5633_16oz-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774810144807sovfg060p9n.jpg",
+    "variants": [
+      {
+        "id": "1774810144807sovfg060p9n_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:49:05.183Z"
   }
 ]
