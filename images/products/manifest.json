@@ -66,5 +66,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:48:24.240Z"
+  },
+  {
+    "id": "1774810104766xgsttedmm4",
+    "filename": "1774810104766xgsttedmm4.jpg",
+    "name": "Z_CDD4H_Wood_chalkboard_Crate_double_Decker-480x480 (1)",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774810104766xgsttedmm4.jpg",
+    "variants": [
+      {
+        "id": "1774810104766xgsttedmm4_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:48:25.144Z"
   }
 ]
