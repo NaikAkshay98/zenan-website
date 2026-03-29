@@ -49,8 +49,8 @@
 
     /* ── SIDEBAR ── */
     .sidebar { display: none; }
-    .section-layout { display: flex; gap: 0; min-height: calc(100vh - var(--header) - 48px - 24px); }
-    .section-sidebar { width: 260px; min-width: 260px; background: var(--white); border-right: 1px solid var(--border); border-radius: 12px 0 0 12px; display: flex; flex-direction: column; overflow-y: auto; }
+    .section-layout { display: flex; gap: 0; min-height: calc(100vh - var(--header) - 48px - 24px); align-items: flex-start; }
+    .section-sidebar { width: 260px; min-width: 260px; background: var(--white); border-right: 1px solid var(--border); border-radius: 12px 0 0 12px; display: flex; flex-direction: column; overflow-y: auto; position: sticky; top: calc(var(--header) + 24px); max-height: calc(100vh - var(--header) - 48px); }
     .section-content { flex: 1; padding: 0 0 0 24px; min-width: 0; }
     .s-section { padding: 18px 16px; border-bottom: 1px solid var(--border); }
     .s-title { font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
@@ -756,6 +756,18 @@
   </div>
 </div>
 
+<!-- CATEGORY DELETE CONFIRM -->
+<div class="confirm-backdrop" id="catConfirmBackdrop">
+  <div class="confirm-box">
+    <h3>Delete Category?</h3>
+    <p>This will remove the category and unassign it from all images.</p>
+    <div class="confirm-btns">
+      <button class="confirm-btn confirm-btn-cancel" onclick="closeCatConfirm()">Cancel</button>
+      <button class="confirm-btn confirm-btn-delete" id="catConfirmDeleteBtn">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── Constants
 const COLORS = ['#2558B0','#16a34a','#dc2626','#ea580c','#7c3aed','#0891b2','#db2777','#65a30d','#b45309','#374151'];
@@ -840,6 +852,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     closeConfirm();
   };
+  document.getElementById('catConfirmDeleteBtn').onclick = () => _execDeleteCategory();
 });
 
 // ── API helpers
@@ -940,20 +953,39 @@ function setCatImg(id, filename) {
   toast(`Image set for "${cat.name}".`, 'green');
 }
 
+let _pendingCatId = null;
+let _pendingCatType = 'product';
 function deleteCategory(id) {
-  const cats = getCats().filter(c => c.id !== id);
-  saveCats(cats);
-  const imgs = getImages().map(img => ({ ...img, categories: img.categories.filter(cid => cid !== id) }));
-  saveImages(imgs);
-  renderAll();
-  toast('Category deleted.');
+  _pendingCatId = id;
+  _pendingCatType = 'product';
+  document.getElementById('catConfirmBackdrop').classList.add('open');
 }
 function deleteGalCategory(id) {
-  _galCats = _galCats.filter(c => c.id !== id);
-  saveGalCats(_galCats);
-  _galImgs = _galImgs.map(img => ({ ...img, categories: (img.categories || []).filter(cid => cid !== id) }));
-  saveGalImages(_galImgs);
-  renderGallery();
+  _pendingCatId = id;
+  _pendingCatType = 'gallery';
+  document.getElementById('catConfirmBackdrop').classList.add('open');
+}
+function closeCatConfirm() {
+  _pendingCatId = null;
+  document.getElementById('catConfirmBackdrop').classList.remove('open');
+}
+function _execDeleteCategory() {
+  const id = _pendingCatId;
+  if (!id) return;
+  if (_pendingCatType === 'gallery') {
+    _galCats = _galCats.filter(c => c.id !== id);
+    saveGalCats(_galCats);
+    _galImgs = _galImgs.map(img => ({ ...img, categories: (img.categories || []).filter(cid => cid !== id) }));
+    saveGalImages(_galImgs);
+    renderGallery();
+  } else {
+    const cats = getCats().filter(c => c.id !== id);
+    saveCats(cats);
+    const imgs = getImages().map(img => ({ ...img, categories: img.categories.filter(cid => cid !== id) }));
+    saveImages(imgs);
+    renderAll();
+  }
+  closeCatConfirm();
   toast('Category deleted.');
 }
 

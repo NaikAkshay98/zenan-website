@@ -721,11 +721,11 @@
     return CAT_ICONS.generic;
   }
 
-  function renderCatPills() {
+  async function renderCatPills() {
     const panel = document.getElementById('catPillsPanel');
     if (!panel) return;
     let cats = [];
-    try { cats = JSON.parse(localStorage.getItem('zenan_categories') || '[]'); } catch {}
+    try { cats = await fetch('/api/categories').then(r => r.json()); } catch {}
     if (!cats.length) {
       panel.innerHTML = '<span class="cat-empty">No categories yet — add them in the admin panel.</span>';
       return;
@@ -738,7 +738,6 @@
     ).join('');
   }
   renderCatPills();
-  window.addEventListener('storage', e => { if (e.key === 'zenan_categories') renderCatPills(); });
 
   // ── DRINK EASTER EGGS ──
   function pourDrink(cfg) {
