@@ -625,36 +625,14 @@
 
     <!-- Gallery section -->
     <div id="gallerySection" style="display:none;">
-      <div class="section-layout">
-        <div class="section-sidebar">
-          <!-- Upload -->
-          <div class="s-section">
-            <div class="s-title">Upload Images</div>
-            <input type="file" id="galFileInput" multiple accept="image/*" onchange="handleGalUpload(event)" style="display:none" />
-            <button class="upload-btn" onclick="document.getElementById('galFileInput').click()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-              Upload Images
-            </button>
-            <div class="upload-hint">JPEG, PNG, WebP · Multiple files supported</div>
-            <div class="upload-progress" id="galProgress"></div>
-          </div>
-          <!-- Category -->
-          <div class="s-section">
-            <div class="s-title">Category</div>
-            <select class="gal-cat-select" id="galCatSelect" style="width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid #e2e8f0;font-size:.85rem;">
-              <option value="glassware">Glassware</option>
-              <option value="apparel">Apparel</option>
-            </select>
-          </div>
-          <!-- Stats -->
-          <div class="s-section">
-            <div class="main-stats" id="galStats"></div>
-          </div>
-        </div>
-        <div class="section-content">
-          <div class="img-grid" id="galGrid"></div>
-        </div>
-      </div>
+      <input type="file" id="galFileInput" multiple accept="image/*" onchange="handleGalUpload(event)" style="display:none" />
+      <select id="galCatSelect" style="display:none;">
+        <option value="glassware">Glassware</option>
+        <option value="apparel">Apparel</option>
+      </select>
+      <div class="upload-progress" id="galProgress" style="display:none;"></div>
+      <div class="main-stats" id="galStats" style="display:none;"></div>
+      <div class="img-grid" id="galGrid"></div>
     </div>
 
     <!-- Clients section -->
