@@ -226,5 +226,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:48:34.172Z"
+  },
+  {
+    "id": "1774810114691w2xyx2uuc3",
+    "filename": "1774810114691w2xyx2uuc3.jpg",
+    "name": "BS-210_Julep_Strainer_Copper-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774810114691w2xyx2uuc3.jpg",
+    "variants": [
+      {
+        "id": "1774810114691w2xyx2uuc3_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:48:35.126Z"
   }
 ]
