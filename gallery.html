@@ -334,11 +334,9 @@
 </section>
 
 <!-- FILTER BAR -->
-<div class="filter-wrap reveal">
+<div class="filter-wrap reveal" id="filterWrap">
   <span>Filter:</span>
   <button class="filter-btn active" onclick="filter('all', this)">All</button>
-  <button class="filter-btn" onclick="filter('glassware', this)">Glassware</button>
-  <button class="filter-btn" onclick="filter('apparel', this)">Apparel</button>
   <span class="filter-count" id="filterCount"></span>
 </div>
 
@@ -672,8 +670,8 @@
   document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 
   // ── GALLERY ──
-  const catLabels = { glassware:'Glassware', apparel:'Apparel' };
   let _activeFilter = 'all';
+  let _galCats = [];
 
   function visibleTiles() { return [...document.querySelectorAll('.tile:not(.hidden)')]; }
   function updateCount() { const n=visibleTiles().length; const t=n+' item'+(n!==1?'s':''); document.getElementById('galleryCount').textContent=t; const fc=document.getElementById('filterCount'); if(fc) fc.textContent=t; }
@@ -682,12 +680,34 @@
     _activeFilter = cat;
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    document.querySelectorAll('.tile').forEach(t => t.classList.toggle('hidden', cat!=='all' && t.dataset.cat!==cat));
+    document.querySelectorAll('.tile').forEach(t => {
+      const cats = (t.dataset.cats || '').split(',').filter(Boolean);
+      t.classList.toggle('hidden', cat !== 'all' && !cats.includes(cat));
+    });
     updateCount();
   }
 
+  function buildFilterButtons() {
+    const wrap = document.getElementById('filterWrap');
+    wrap.querySelectorAll('.filter-btn:not(:first-of-type)').forEach(b => b.remove());
+    const countEl = document.getElementById('filterCount');
+    _galCats.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn';
+      btn.textContent = cat.name;
+      btn.onclick = () => filter(cat.id, btn);
+      wrap.insertBefore(btn, countEl);
+    });
+  }
+
   async function loadGalleryImages() {
-    const imgs = await fetch('/api/gallery').then(r => r.json()).catch(() => []);
+    const [imgs, cats] = await Promise.all([
+      fetch('/api/gallery').then(r => r.json()).catch(() => []),
+      fetch('/api/gallery/categories').then(r => r.json()).catch(() => [])
+    ]);
+    _galCats = cats;
+    buildFilterButtons();
+
     const grid = document.getElementById('galleryGrid');
     grid.querySelectorAll('.tile[data-dynamic], .gallery-empty').forEach(t => t.remove());
     if (!imgs.length) {
@@ -702,12 +722,15 @@
     imgs.forEach(img => {
       const div = document.createElement('div');
       div.className = 'tile';
-      div.dataset.cat = img.category;
+      div.dataset.cats = (img.categories || []).join(',');
       div.dataset.title = img.name;
       div.dataset.dynamic = '1';
       div.innerHTML = `<img src="${img.src}" alt="${img.name.replace(/"/g,'&quot;')}" />`;
       div.onclick = () => openLightbox(div);
-      if (_activeFilter !== 'all' && div.dataset.cat !== _activeFilter) div.classList.add('hidden');
+      if (_activeFilter !== 'all') {
+        const tileCats = (div.dataset.cats || '').split(',').filter(Boolean);
+        if (!tileCats.includes(_activeFilter)) div.classList.add('hidden');
+      }
       grid.appendChild(div);
     });
     updateCount();
