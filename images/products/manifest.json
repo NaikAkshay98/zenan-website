@@ -354,5 +354,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:48:42.216Z"
+  },
+  {
+    "id": "1774810122755qj1w0xwi33i",
+    "filename": "1774810122755qj1w0xwi33i.jpg",
+    "name": "Vino_Gondola_Clear_G-2C_2-Bottles-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774810122755qj1w0xwi33i.jpg",
+    "variants": [
+      {
+        "id": "1774810122755qj1w0xwi33i_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:48:43.188Z"
   }
 ]
