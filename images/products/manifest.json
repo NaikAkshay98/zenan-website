@@ -610,5 +610,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:48:57.425Z"
+  },
+  {
+    "id": "1774810138022siqzp445o6",
+    "filename": "1774810138022siqzp445o6.jpg",
+    "name": "3055_Cocktail_Coupe_8.5oz-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774810138022siqzp445o6.jpg",
+    "variants": [
+      {
+        "id": "1774810138022siqzp445o6_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:48:58.400Z"
   }
 ]
