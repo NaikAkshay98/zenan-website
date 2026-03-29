@@ -194,5 +194,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:48:32.225Z"
+  },
+  {
+    "id": "1774810112739idl86kufwra",
+    "filename": "1774810112739idl86kufwra.jpg",
+    "name": "Spoon_Twisted_StainlessSteel_Hoffman_12inch-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774810112739idl86kufwra.jpg",
+    "variants": [
+      {
+        "id": "1774810112739idl86kufwra_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:48:33.185Z"
   }
 ]
