@@ -530,5 +530,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:48:52.842Z"
+  },
+  {
+    "id": "17748101333485uce38h4sp3",
+    "filename": "17748101333485uce38h4sp3.jpg",
+    "name": "Clear_Growler_GROW_CLEAR_64oz-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/17748101333485uce38h4sp3.jpg",
+    "variants": [
+      {
+        "id": "17748101333485uce38h4sp3_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:48:53.719Z"
   }
 ]
