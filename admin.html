@@ -1191,8 +1191,6 @@ async function renderGallery() {
   const catColor = { glassware: '#2558B0', apparel: '#7c3aed' };
   const catName  = { glassware: 'Glassware', apparel: 'Apparel' };
 
-  document.getElementById('galStats').textContent = `${imgs.length} image${imgs.length !== 1 ? 's' : ''} in gallery`;
-
   if (!imgs.length) {
     grid.innerHTML = `<div class="empty-state">
       <div class="es-icon">🖼️</div>
