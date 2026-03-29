@@ -792,8 +792,15 @@ function removeVariant(imgId, variantId) {
 
 // ── Delete confirm dialog
 let _pendingDeleteId = null;
+let _pendingDeleteType = 'product'; // 'product' | 'gallery'
 function confirmDelete(imgId) {
   _pendingDeleteId = imgId;
+  _pendingDeleteType = 'product';
+  document.getElementById('confirmBackdrop').classList.add('open');
+}
+function confirmDeleteGal(imgId) {
+  _pendingDeleteId = imgId;
+  _pendingDeleteType = 'gallery';
   document.getElementById('confirmBackdrop').classList.add('open');
 }
 function closeConfirm() {
@@ -803,10 +810,16 @@ function closeConfirm() {
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('confirmDeleteBtn').onclick = async () => {
     if (_pendingDeleteId) {
-      await API.del('/api/products/' + _pendingDeleteId);
-      _imgs = _imgs.filter(i => i.id !== _pendingDeleteId);
-      renderAll();
-      toast('Image deleted.');
+      if (_pendingDeleteType === 'gallery') {
+        await API.del('/api/gallery/' + _pendingDeleteId);
+        renderGallery();
+        toast('Image removed from gallery.');
+      } else {
+        await API.del('/api/products/' + _pendingDeleteId);
+        _imgs = _imgs.filter(i => i.id !== _pendingDeleteId);
+        renderAll();
+        toast('Image deleted.');
+      }
     }
     closeConfirm();
   };
@@ -1170,11 +1183,8 @@ async function handleGalUpload(e) {
 }
 
 // ── Gallery: delete
-async function deleteGalImage(id) {
-  if (!confirm('Remove this image from the gallery?')) return;
-  await API.del('/api/gallery/' + id);
-  renderGallery();
-  toast('Image removed from gallery.');
+function deleteGalImage(id) {
+  confirmDeleteGal(id);
 }
 
 // ── Gallery: change category
