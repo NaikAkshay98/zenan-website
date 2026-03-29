@@ -1,23 +1,5 @@
 [
   {
-    "id": "1774736761998y8r9z9xod2j",
-    "filename": "1774736761998y8r9z9xod2j.jpg",
-    "name": "Zombie",
-    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774736761998y8r9z9xod2j.jpg",
-    "variants": [
-      {
-        "id": "1774736761998y8r9z9xod2j_v0",
-        "itemNumber": "96",
-        "oz": "12"
-      }
-    ],
-    "categories": [
-      "1774754936262"
-    ],
-    "enabled": true,
-    "uploadedAt": "2026-03-28T22:26:02.498Z"
-  },
-  {
     "id": "1774737174880y7hrd1jd8we",
     "filename": "1774737174880y7hrd1jd8we.jpg",
     "name": "Perfection",
