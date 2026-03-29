@@ -379,7 +379,10 @@
     "name": "original-960335ae794e9607dc54178c1e235c57",
     "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/gallery/1774809901623c0q5f30dgfp.jpg",
     "category": "glassware",
-    "uploadedAt": "2026-03-29T18:45:02.053Z"
+    "uploadedAt": "2026-03-29T18:45:02.053Z",
+    "categories": [
+      "1774755398122"
+    ]
   },
   {
     "id": "1774809902609twu6eatylj9",
