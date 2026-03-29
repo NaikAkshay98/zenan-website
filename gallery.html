@@ -686,30 +686,8 @@
     updateCount();
   }
 
-  // ── IndexedDB reader
-  const GalIDB = {
-    _db: null,
-    open() {
-      if (this._db) return Promise.resolve(this._db);
-      return new Promise((res, rej) => {
-        const req = indexedDB.open('zenan_gallery_db', 1);
-        req.onupgradeneeded = e => e.target.result.createObjectStore('images', { keyPath: 'id' });
-        req.onsuccess = e => { this._db = e.target.result; res(this._db); };
-        req.onerror = rej;
-      });
-    },
-    async getAll() {
-      const db = await this.open();
-      return new Promise((res, rej) => {
-        const req = db.transaction('images', 'readonly').objectStore('images').getAll();
-        req.onsuccess = () => res(req.result);
-        req.onerror = rej;
-      });
-    }
-  };
-
   async function loadGalleryImages() {
-    const imgs = await GalIDB.getAll();
+    const imgs = await fetch('/api/gallery').then(r => r.json()).catch(() => []);
     const grid = document.getElementById('galleryGrid');
     grid.querySelectorAll('.tile[data-dynamic], .gallery-empty').forEach(t => t.remove());
     if (!imgs.length) {
@@ -736,7 +714,6 @@
   }
 
   loadGalleryImages();
-  window.addEventListener('storage', e => { if (e.key === 'zenan_gallery_v') loadGalleryImages(); });
   let currentIdx = 0;
   function openLightbox(el) { currentIdx=visibleTiles().indexOf(el); renderLightbox(el); document.getElementById('lightbox').classList.add('open'); document.body.style.overflow='hidden'; }
   function renderLightbox(el) {
