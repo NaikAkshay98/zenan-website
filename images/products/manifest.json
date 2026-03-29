@@ -114,5 +114,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:48:26.906Z"
+  },
+  {
+    "id": "1774810107801q2ntar7wx5o",
+    "filename": "1774810107801q2ntar7wx5o.jpg",
+    "name": "181801_Hawthorn_Strainer_Stainless_Steel-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774810107801q2ntar7wx5o.jpg",
+    "variants": [
+      {
+        "id": "1774810107801q2ntar7wx5o_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:48:28.228Z"
   }
 ]
