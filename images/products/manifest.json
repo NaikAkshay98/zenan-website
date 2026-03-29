@@ -242,5 +242,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:48:35.126Z"
+  },
+  {
+    "id": "1774810115706hq0i3kecnqe",
+    "filename": "1774810115706hq0i3kecnqe.jpg",
+    "name": "Japanese_Jigger_JJ3060_30-60ml-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774810115706hq0i3kecnqe.jpg",
+    "variants": [
+      {
+        "id": "1774810115706hq0i3kecnqe_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:48:36.186Z"
   }
 ]
