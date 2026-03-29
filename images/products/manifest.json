@@ -946,5 +946,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:49:17.945Z"
+  },
+  {
+    "id": "1774810158486hpzqxphsc",
+    "filename": "1774810158486hpzqxphsc.jpg",
+    "name": "22166-Viticole_ISO_7-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774810158486hpzqxphsc.jpg",
+    "variants": [
+      {
+        "id": "1774810158486hpzqxphsc_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:49:18.863Z"
   }
 ]
