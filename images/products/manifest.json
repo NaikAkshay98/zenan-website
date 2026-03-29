@@ -578,5 +578,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:48:55.486Z"
+  },
+  {
+    "id": "1774810135978kxuc47i7ei",
+    "filename": "1774810135978kxuc47i7ei.jpg",
+    "name": "Vina_Martini_7507_12oz-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774810135978kxuc47i7ei.jpg",
+    "variants": [
+      {
+        "id": "1774810135978kxuc47i7ei_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:48:56.456Z"
   }
 ]
