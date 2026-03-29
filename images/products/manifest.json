@@ -802,5 +802,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:49:09.154Z"
+  },
+  {
+    "id": "1774810149692rfy0vjj5mqf",
+    "filename": "1774810149692rfy0vjj5mqf.jpg",
+    "name": "C_Handle_Black_11oz_3419-BK-3-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/1774810149692rfy0vjj5mqf.jpg",
+    "variants": [
+      {
+        "id": "1774810149692rfy0vjj5mqf_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:49:10.109Z"
   }
 ]
