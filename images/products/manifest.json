@@ -594,5 +594,21 @@
     "categories": [],
     "enabled": true,
     "uploadedAt": "2026-03-29T18:48:56.456Z"
+  },
+  {
+    "id": "17748101369881b3wy2uz9qi",
+    "filename": "17748101369881b3wy2uz9qi.jpg",
+    "name": "Embassy_Martini_3779_9.25oz-480x480",
+    "src": "https://raw.githubusercontent.com/NaikAkshay98/zenan-website/main/images/products/17748101369881b3wy2uz9qi.jpg",
+    "variants": [
+      {
+        "id": "17748101369881b3wy2uz9qi_v0",
+        "itemNumber": "",
+        "oz": ""
+      }
+    ],
+    "categories": [],
+    "enabled": true,
+    "uploadedAt": "2026-03-29T18:48:57.425Z"
   }
 ]
