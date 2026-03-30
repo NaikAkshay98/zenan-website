@@ -771,6 +771,18 @@
   </div>
 </div>
 
+<!-- CLIENT DELETE CONFIRM -->
+<div class="confirm-backdrop" id="clientConfirmBackdrop">
+  <div class="confirm-box">
+    <h3>Delete Client?</h3>
+    <p>This will permanently remove the client and all their files.</p>
+    <div class="confirm-btns">
+      <button class="confirm-btn confirm-btn-cancel" onclick="closeClientConfirm()">Cancel</button>
+      <button class="confirm-btn confirm-btn-delete" id="clientConfirmDeleteBtn">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── Constants
 const COLORS = ['#2558B0','#16a34a','#dc2626','#ea580c','#7c3aed','#0891b2','#db2777','#65a30d','#b45309','#374151'];
@@ -856,6 +868,7 @@ document.addEventListener('DOMContentLoaded', () => {
     closeConfirm();
   };
   document.getElementById('catConfirmDeleteBtn').onclick = () => _execDeleteCategory();
+  document.getElementById('clientConfirmDeleteBtn').onclick = () => _execDeleteClient();
 });
 
 // ── API helpers
@@ -1434,11 +1447,12 @@ function logout() {
   }
   // Load products and categories from server
   try {
-    [_imgs, _cats, _galImgs, _galCats] = await Promise.all([
+    [_imgs, _cats, _galImgs, _galCats, _clients] = await Promise.all([
       API.get('/api/products'),
       API.get('/api/categories'),
       API.get('/api/gallery'),
-      API.get('/api/gallery/categories')
+      API.get('/api/gallery/categories'),
+      API.get('/api/clients')
     ]);
   } catch(e) { toast('Could not connect to server.', 'red'); }
   renderAll();
@@ -1603,9 +1617,10 @@ const ClientIDB = {
   }
 };
 
-// Clients metadata stored in localStorage
-function getClients() { return DB.get('zenan_clients', []); }
-function saveClients(clients) { DB.set('zenan_clients', clients); }
+// Clients — server-backed in-memory cache
+let _clients = [];
+function getClients() { return _clients; }
+function saveClients(clients) { _clients = clients; API.post('/api/clients/sync', clients); }
 
 // Modal state
 let _editClientId = null;
@@ -1683,23 +1698,26 @@ async function saveClient() {
   const loginPass   = document.getElementById('cmLoginPass').value;
   if (!name) { toast('Client name is required.', 'red'); return; }
 
-  await ClientIDB.open();
-  const clients = getClients();
-  let clientId = _editClientId || (Date.now().toString() + Math.random().toString(36).slice(2));
+  const clients  = getClients();
+  const clientId = _editClientId || (Date.now().toString() + Math.random().toString(36).slice(2));
 
+  // Upload pending files to server
+  const uploadedFiles = [];
   for (const f of _pendingFiles) {
-    const fileId = Date.now().toString() + Math.random().toString(36).slice(2);
-    await ClientIDB.saveFile({ id: fileId, clientId, name: f.name, size: f.size, type: f.type, dataUrl: f.dataUrl, addedAt: Date.now() });
-    writeFileToClientFolder(name, f.name, f.dataUrl); // also write to project folder
+    try {
+      const res = await API.post('/api/clients/upload', { clientId, name: f.name, size: f.size, type: f.type, data: f.dataUrl });
+      if (res.success) uploadedFiles.push(res.file);
+    } catch(e) { toast(`Failed to upload ${f.name}`, 'red'); }
   }
 
-  const record = { id: clientId, name, clientEmail, repName, repEmail, loginUser, loginPass, createdAt: Date.now() };
   if (_editClientId) {
     const idx = clients.findIndex(c => c.id === _editClientId);
-    if (idx > -1) { clients[idx] = { ...clients[idx], name, clientEmail, repName, repEmail, loginUser, loginPass }; }
+    if (idx > -1) {
+      const existing = clients[idx];
+      clients[idx] = { ...existing, name, clientEmail, repName, repEmail, loginUser, loginPass, files: [...(existing.files || []), ...uploadedFiles] };
+    }
   } else {
-    clients.push(record);
-    ensureClientFolder(name); // create folder immediately on new client
+    clients.push({ id: clientId, name, clientEmail, repName, repEmail, loginUser, loginPass, createdAt: Date.now(), files: uploadedFiles });
   }
   saveClients(clients);
   closeClientModal();
@@ -1707,66 +1725,69 @@ async function saveClient() {
   renderClients();
 }
 
-async function deleteClient(clientId) {
-  if (!confirm('Delete this client and all their files?')) return;
-  await ClientIDB.open();
-  await ClientIDB.deleteClientFiles(clientId);
-  saveClients(getClients().filter(c => c.id !== clientId));
-  toast('Client deleted.');
-  renderClients();
+let _pendingClientDeleteId = null;
+function deleteClient(clientId) {
+  _pendingClientDeleteId = clientId;
+  document.getElementById('clientConfirmBackdrop').classList.add('open');
+}
+function closeClientConfirm() {
+  _pendingClientDeleteId = null;
+  document.getElementById('clientConfirmBackdrop').classList.remove('open');
+}
+async function _execDeleteClient() {
+  const id = _pendingClientDeleteId;
+  if (!id) return;
+  try {
+    await API.del('/api/clients/' + id);
+    _clients = _clients.filter(c => c.id !== id);
+    closeClientConfirm();
+    toast('Client deleted.');
+    renderClients();
+  } catch(e) { toast('Could not delete client.', 'red'); closeClientConfirm(); }
 }
 
 async function deleteClientFile(fileId, clientId) {
-  await ClientIDB.open();
-  await ClientIDB.deleteFile(fileId);
-  renderClientCard(clientId);
+  try {
+    await API.del('/api/clients/file/' + fileId);
+    const client = _clients.find(c => c.id === clientId);
+    if (client) client.files = (client.files || []).filter(f => f.id !== fileId);
+    renderClientCard(clientId);
+    toast('File removed.', 'green');
+  } catch(e) { toast('Could not delete file.', 'red'); }
 }
 
-async function downloadFile(fileId) {
-  await ClientIDB.open();
-  const db = ClientIDB._db || await ClientIDB.open();
-  const req = db.transaction('files','readonly').objectStore('files').get(fileId);
-  req.onsuccess = () => {
-    const f = req.result;
-    if (!f) return;
-    const a = document.createElement('a');
-    a.href = f.dataUrl;
-    a.download = f.name;
-    a.click();
-  };
+function downloadFile(fileId) {
+  let f = null;
+  for (const c of _clients) { f = (c.files || []).find(fi => fi.id === fileId); if (f) break; }
+  if (!f) return;
+  const a = document.createElement('a');
+  a.href = f.src; a.download = f.name; a.target = '_blank'; a.click();
 }
 
-async function renderClientCard(clientId) {
+function renderClientCard(clientId) {
   const card = document.querySelector(`.client-card[data-id="${clientId}"]`);
   if (!card) return;
-  await ClientIDB.open();
-  const c = getClients().find(x => x.id === clientId);
+  const c = _clients.find(x => x.id === clientId);
   if (!c) return;
-  const files = await ClientIDB.getFiles(clientId);
-  card.querySelector('.client-details').innerHTML = buildClientDetailsHtml(c, files);
+  card.querySelector('.client-details').innerHTML = buildClientDetailsHtml(c, c.files || []);
 }
 
 function openLightbox(fileId) {
-  ClientIDB.open().then(() => {
-    const db = ClientIDB._db;
-    const req = db.transaction('files','readonly').objectStore('files').get(fileId);
-    req.onsuccess = () => {
-      const f = req.result;
-      if (!f) return;
-      const inner = document.getElementById('fileLightboxInner');
-      const dlBtn = document.getElementById('fileLightboxDl');
-      document.getElementById('fileLightboxName').textContent = f.name;
-      dlBtn.onclick = () => downloadFile(fileId);
-      if (f.type && f.type.startsWith('image/')) {
-        inner.innerHTML = `<img src="${f.dataUrl}" alt="${escHtml(f.name)}" />`;
-      } else if (f.type === 'application/pdf') {
-        inner.innerHTML = `<iframe src="${f.dataUrl}" title="${escHtml(f.name)}"></iframe>`;
-      } else {
-        inner.innerHTML = `<div style="text-align:center;color:#fff;font-size:4rem">${fileIcon(f.type)}<div style="font-size:1rem;margin-top:12px;opacity:.7">${escHtml(f.name)}</div></div>`;
-      }
-      document.getElementById('fileLightbox').classList.add('open');
-    };
-  });
+  let f = null;
+  for (const c of _clients) { f = (c.files || []).find(fi => fi.id === fileId); if (f) break; }
+  if (!f) return;
+  const inner = document.getElementById('fileLightboxInner');
+  const dlBtn = document.getElementById('fileLightboxDl');
+  document.getElementById('fileLightboxName').textContent = f.name;
+  dlBtn.onclick = () => downloadFile(fileId);
+  if (f.type && f.type.startsWith('image/')) {
+    inner.innerHTML = `<img src="${f.src}" alt="${escHtml(f.name)}" />`;
+  } else if (f.type === 'application/pdf') {
+    inner.innerHTML = `<iframe src="${f.src}" title="${escHtml(f.name)}"></iframe>`;
+  } else {
+    inner.innerHTML = `<div style="text-align:center;color:#fff;font-size:4rem">${fileIcon(f.type)}<div style="font-size:1rem;margin-top:12px;opacity:.7">${escHtml(f.name)}</div></div>`;
+  }
+  document.getElementById('fileLightbox').classList.add('open');
 }
 
 function closeLightbox(e) {
@@ -1782,12 +1803,12 @@ function closeLightboxForce() {
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightboxForce(); });
 
-function buildFileTile(f) {
+function buildFileTile(f, clientId) {
   let preview = '';
   if (f.type && f.type.startsWith('image/')) {
-    preview = `<img class="client-file-preview" src="${f.dataUrl}" alt="${escHtml(f.name)}" />`;
+    preview = `<img class="client-file-preview" src="${f.src}" alt="${escHtml(f.name)}" />`;
   } else if (f.type === 'application/pdf') {
-    preview = `<iframe class="client-file-preview-pdf" src="${f.dataUrl}" title="${escHtml(f.name)}"></iframe>`;
+    preview = `<div class="client-file-preview-icon">📕</div>`;
   } else {
     preview = `<div class="client-file-preview-icon">${fileIcon(f.type)}</div>`;
   }
@@ -1797,14 +1818,14 @@ function buildFileTile(f) {
     <div class="client-file-meta" onclick="event.stopPropagation()">
       <span class="client-file-name-sm" title="${escHtml(f.name)}">${escHtml(f.name)}</span>
       <button class="client-file-dl" onclick="downloadFile('${f.id}')" title="Download">⬇</button>
-      <button class="client-file-del" onclick="deleteClientFile('${f.id}','${f.clientId}')" title="Remove">✕</button>
+      <button class="client-file-del" onclick="deleteClientFile('${f.id}','${clientId}')" title="Remove">✕</button>
     </div>
   </div>`;
 }
 
 function buildClientDetailsHtml(c, files) {
   const filesHtml = files.length
-    ? `<div class="client-files-grid">${files.map(buildFileTile).join('')}</div>`
+    ? `<div class="client-files-grid">${files.map(f => buildFileTile(f, c.id)).join('')}</div>`
     : '<p style="font-size:.78rem;color:var(--muted);margin-bottom:10px;">No files attached.</p>';
   return `
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.78rem;margin-bottom:14px;">
@@ -1833,21 +1854,20 @@ function toggleClientCard(clientId) {
   card.classList.toggle('open');
 }
 
-async function renderClients() {
+function renderClients() {
   const q = (document.getElementById('clientSearch')?.value || '').toLowerCase();
   const clients = getClients().filter(c =>
     c.name.toLowerCase().includes(q) || (c.clientEmail || c.email || '').toLowerCase().includes(q)
   ).sort((a,b) => b.createdAt - a.createdAt);
 
-  await ClientIDB.open();
   const grid = document.getElementById('clientsGrid');
   if (!clients.length) {
     grid.innerHTML = '<div class="client-empty">No clients yet. Click <strong>Add Client</strong> to get started.</div>';
     return;
   }
 
-  const cards = await Promise.all(clients.map(async c => {
-    const files = await ClientIDB.getFiles(c.id);
+  grid.innerHTML = clients.map(c => {
+    const files    = c.files || [];
     const initials = c.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
     return `
     <div class="client-card" data-id="${c.id}">
@@ -1867,8 +1887,7 @@ async function renderClients() {
         ${buildClientDetailsHtml(c, files)}
       </div>
     </div>`;
-  }));
-  grid.innerHTML = cards.join('');
+  }).join('');
 }
 
 // Quick file attach from card (without opening full modal)
@@ -1876,22 +1895,25 @@ function addFileToClient(clientId) {
   const inp = document.createElement('input');
   inp.type = 'file'; inp.multiple = true;
   inp.onchange = async e => {
-    await ClientIDB.open();
+    let added = 0;
     for (const file of e.target.files) {
       await new Promise(res => {
         const reader = new FileReader();
         reader.onload = async ev => {
-          const fileId = Date.now().toString() + Math.random().toString(36).slice(2);
-          await ClientIDB.saveFile({ id: fileId, clientId, name: file.name, size: file.size, type: file.type, dataUrl: ev.target.result, addedAt: Date.now() });
-          const client = getClients().find(c => c.id === clientId);
-          if (client) writeFileToClientFolder(client.name, file.name, ev.target.result);
+          try {
+            const result = await API.post('/api/clients/upload', { clientId, name: file.name, size: file.size, type: file.type, data: ev.target.result });
+            if (result.success) {
+              const client = _clients.find(c => c.id === clientId);
+              if (client) { if (!client.files) client.files = []; client.files.push(result.file); }
+              added++;
+            }
+          } catch(err) { toast(`Failed: ${file.name}`, 'red'); }
           res();
         };
         reader.readAsDataURL(file);
       });
     }
-    toast('File(s) attached.', 'green');
-    renderClients();
+    if (added) { toast(`${added} file(s) attached.`, 'green'); renderClientCard(clientId); }
   };
   inp.click();
 }

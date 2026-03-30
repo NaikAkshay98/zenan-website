@@ -575,8 +575,8 @@ const PortalIDB = {
   }
 };
 
-function getClients() {
-  try { return JSON.parse(localStorage.getItem('zenan_clients')) || []; } catch { return []; }
+async function fetchClients() {
+  try { return await fetch('/api/clients').then(r => r.json()); } catch { return []; }
 }
 
 // ── Auth
@@ -585,10 +585,10 @@ function togglePortalPass() {
   inp.type = inp.type === 'password' ? 'text' : 'password';
 }
 
-function portalLogin() {
+async function portalLogin() {
   const user = document.getElementById('portalUser').value.trim();
   const pass = document.getElementById('portalPass').value;
-  const clients = getClients();
+  const clients = await fetchClients();
   const match = clients.find(c => c.loginUser === user && c.loginPass === pass);
   if (!match) {
     document.getElementById('loginError').classList.add('show');
@@ -638,7 +638,7 @@ function addToCart(idx) {
   if (!f) return;
   const existing = _cart.find(c => c.id === f.id);
   if (existing) { existing.qty++; }
-  else { _cart.push({ id: f.id, name: f.name, type: f.type, dataUrl: f.dataUrl, qty: 1 }); }
+  else { _cart.push({ id: f.id, name: f.name, type: f.type, src: f.src, qty: 1 }); }
   renderCart();
   // Flash the + button green
   const btn = document.querySelector(`.file-tile-add[data-idx="${idx}"]`);
@@ -717,12 +717,12 @@ function openLightbox(idx) {
   const inner = document.getElementById('lightboxInner');
   document.getElementById('lightboxName').textContent = f.name;
   document.getElementById('lightboxDl').onclick = () => {
-    const a = document.createElement('a'); a.href = f.dataUrl; a.download = f.name; a.click();
+    const a = document.createElement('a'); a.href = f.src; a.download = f.name; a.target = '_blank'; a.click();
   };
   if (f.type && f.type.startsWith('image/')) {
-    inner.innerHTML = `<img src="${f.dataUrl}" alt="${escHtml(f.name)}" />`;
+    inner.innerHTML = `<img src="${f.src}" alt="${escHtml(f.name)}" />`;
   } else if (f.type === 'application/pdf') {
-    inner.innerHTML = `<iframe src="${f.dataUrl}" title="${escHtml(f.name)}"></iframe>`;
+    inner.innerHTML = `<iframe src="${f.src}" title="${escHtml(f.name)}"></iframe>`;
   } else {
     inner.innerHTML = `<div style="text-align:center;color:#fff;font-size:4rem">${fileIcon(f.type)}<div style="font-size:1rem;margin-top:12px;opacity:.7">${escHtml(f.name)}</div></div>`;
   }
@@ -760,8 +760,7 @@ async function showDashboard(client) {
 
   // Files
   _currentClient = client;
-  await PortalIDB.open();
-  const files = await PortalIDB.getFiles(client.id);
+  const files = client.files || [];
   _lbFiles = files;
   const container = document.getElementById('filesContainer');
   if (!files.length) {
@@ -773,7 +772,7 @@ async function showDashboard(client) {
       ${files.map((f, i) => {
         let preview = '';
         if (f.type && f.type.startsWith('image/')) {
-          preview = `<img class="file-tile-preview" src="${f.dataUrl}" alt="${escHtml(f.name)}" />`;
+          preview = `<img class="file-tile-preview" src="${f.src}" alt="${escHtml(f.name)}" />`;
         } else if (f.type === 'application/pdf') {
           preview = `<div class="file-tile-preview-icon">📕</div>`;
         } else {
@@ -784,7 +783,7 @@ async function showDashboard(client) {
           ${preview}
           <div class="file-tile-meta" onclick="event.stopPropagation()">
             <span class="file-tile-name" title="${escHtml(f.name)}">${escHtml(f.name)}</span>
-            <button class="file-tile-dl" onclick="(function(){const a=document.createElement('a');a.href='${f.dataUrl}';a.download='${escHtml(f.name)}';a.click()})()" title="Download">⬇</button>
+            <button class="file-tile-dl" onclick="(function(){const a=document.createElement('a');a.href='${f.src}';a.download='${escHtml(f.name)}';a.target='_blank';a.click()})()" title="Download">⬇</button>
             <button class="file-tile-add" data-idx="${i}" onclick="addToCart(${i})" title="Add to order">+</button>
           </div>
         </div>`;
@@ -798,7 +797,7 @@ async function showDashboard(client) {
   if (!sess) return;
   try {
     const { clientId } = JSON.parse(sess);
-    const clients = getClients();
+    const clients = await fetchClients();
     const client = clients.find(c => c.id === clientId);
     if (client) { await showDashboard(client); }
     else { sessionStorage.removeItem('zenan_client_session'); }

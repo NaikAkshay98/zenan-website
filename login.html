@@ -127,7 +127,7 @@
 
     function showErr(msg) { document.getElementById('errMsg').textContent = msg; }
 
-    function doLogin(e) {
+    async function doLogin(e) {
       e.preventDefault();
       const u = document.getElementById('lUser').value.trim();
       const p = document.getElementById('lPass').value;
@@ -141,14 +141,16 @@
         return;
       }
 
-      // 2. Check clients
-      const clients = JSON.parse(localStorage.getItem('zenan_clients') || '[]');
-      const client = clients.find(c => c.loginUser === u && c.loginPass === p);
-      if (client) {
-        sessionStorage.setItem('zenan_client_session', JSON.stringify({ clientId: client.id }));
-        window.location.href = 'client-portal.html';
-        return;
-      }
+      // 2. Check clients via server API
+      try {
+        const clients = await fetch('/api/clients').then(r => r.json());
+        const client = clients.find(c => c.loginUser === u && c.loginPass === p);
+        if (client) {
+          sessionStorage.setItem('zenan_client_session', JSON.stringify({ clientId: client.id }));
+          window.location.href = 'client-portal.html';
+          return;
+        }
+      } catch(e) { /* fall through */ }
 
       showErr('Incorrect username or password.');
     }
