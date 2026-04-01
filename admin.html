@@ -884,12 +884,12 @@ let _cats = [];
 let _galImgs = [];
 let _galCats = [];
 const getImages     = () => _imgs;
-const saveImages    = (v) => { _imgs = v; API.post('/api/products/sync', v); };
+const saveImages    = (v) => { _imgs = v; API.post('/api/products', v); };
 const getCats       = () => _cats;
-const saveCats      = (v) => { _cats = v; API.post('/api/categories/sync', v); };
-const saveGalImages = (v) => { _galImgs = v; API.post('/api/gallery/sync', v); };
+const saveCats      = (v) => { _cats = v; API.post('/api/categories', v); };
+const saveGalImages = (v) => { _galImgs = v; API.post('/api/gallery', v); };
 const getGalCats    = () => _galCats;
-const saveGalCats   = (v) => { _galCats = v; API.post('/api/gallery/categories-sync', v); };
+const saveGalCats   = (v) => { _galCats = v; API.post('/api/gallery/categories', v); };
 
 // ── Image compression
 function compressImage(file, maxW = 1400, quality = 0.82) {
@@ -1620,7 +1620,7 @@ const ClientIDB = {
 // Clients — server-backed in-memory cache
 let _clients = [];
 function getClients() { return _clients; }
-function saveClients(clients) { _clients = clients; API.post('/api/clients/sync', clients); }
+function saveClients(clients) { _clients = clients; API.post('/api/clients', clients); }
 
 // Modal state
 let _editClientId = null;
