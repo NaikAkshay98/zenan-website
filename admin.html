@@ -207,12 +207,13 @@
       padding: 3px 8px; border-radius: 20px;
       font-size: .7rem; font-weight: 700; color: var(--white);
     }
-    .tag-pill .tag-x {
+    .tag-pill .tag-x, .tag-pill .tag-remove {
       background: none; border: none; color: rgba(255,255,255,.75); cursor: pointer;
       font-size: .8rem; line-height: 1; padding: 0 1px; font-family: var(--font);
+      -webkit-appearance: none; appearance: none;
       transition: color .15s;
     }
-    .tag-pill .tag-x:hover { color: var(--white); }
+    .tag-pill .tag-x:hover, .tag-pill .tag-remove:hover { color: var(--white); }
 
     .card-assign-btn {
       align-self: flex-start; padding: 4px 10px; border-radius: 6px;
