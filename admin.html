@@ -853,8 +853,6 @@ function closeConfirm() {
   document.getElementById('confirmBackdrop').classList.remove('open');
 }
 document.addEventListener('DOMContentLoaded', () => {
-  const savedTab = sessionStorage.getItem('zenan_admin_tab');
-  if (savedTab && savedTab !== 'products') switchSection(savedTab);
   document.getElementById('confirmDeleteBtn').onclick = async () => {
     if (_pendingDeleteId) {
       if (_pendingDeleteType === 'gallery') {
@@ -1461,6 +1459,8 @@ function logout() {
     ]);
   } catch(e) { toast('Could not connect to server.', 'red'); }
   renderAll();
+  const savedTab = sessionStorage.getItem('zenan_admin_tab');
+  if (savedTab && savedTab !== 'products') switchSection(savedTab);
   restoreProjectFolder();
 })();
 
