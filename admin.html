@@ -853,6 +853,8 @@ function closeConfirm() {
   document.getElementById('confirmBackdrop').classList.remove('open');
 }
 document.addEventListener('DOMContentLoaded', () => {
+  const savedTab = sessionStorage.getItem('zenan_admin_tab');
+  if (savedTab && savedTab !== 'products') switchSection(savedTab);
   document.getElementById('confirmDeleteBtn').onclick = async () => {
     if (_pendingDeleteId) {
       if (_pendingDeleteType === 'gallery') {
@@ -1288,6 +1290,7 @@ function switchSection(section) {
   document.getElementById('productsSection').style.display = section === 'products' ? '' : 'none';
   document.getElementById('gallerySection').style.display = section === 'gallery' ? '' : 'none';
   document.getElementById('clientsSection').style.display = section === 'clients' ? '' : 'none';
+  sessionStorage.setItem('zenan_admin_tab', section);
   if (section === 'gallery') renderGallery();
   if (section === 'clients') renderClients();
 }
