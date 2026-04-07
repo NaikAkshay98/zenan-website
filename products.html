@@ -1173,7 +1173,7 @@
     document.getElementById('detailImg').alt = img.name;
 
     document.getElementById('detailTags').innerHTML = assignedCats.map(c =>
-      `<span style="display:inline-block;background:#fff;color:#2558B0;font-size:.78rem;font-weight:700;padding:5px 14px;border-radius:8px;border:2px solid #2558B0;box-shadow:3px 3px 0 #FFD700;">${c.name}</span>`
+      `<span style="font-size:.78rem;font-weight:700;color:#2558B0;text-transform:uppercase;letter-spacing:.06em;">${c.name}</span>`
     ).join('') || '';
 
     document.getElementById('detailName').textContent = img.name;
