@@ -630,12 +630,9 @@ function updateQty(id, val) {
 function renderCart() {
   const badge = document.getElementById('cartBadge');
   const itemsEl = document.getElementById('cartItems');
-  const emptyEl = document.getElementById('cartEmpty');
   badge.textContent = _cart.length;
   if (!_cart.length) {
-    emptyEl.style.display = '';
-    itemsEl.innerHTML = '';
-    itemsEl.appendChild(emptyEl);
+    itemsEl.innerHTML = '<div class="cart-empty" id="cartEmpty">No items added yet. Click the <strong>+</strong> button on a file above.</div>';
     return;
   }
   itemsEl.innerHTML = _cart.map(item => `
