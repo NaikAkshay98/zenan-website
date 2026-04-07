@@ -1330,6 +1330,31 @@
   }
   function clearSearch() { document.getElementById('productSearch').value = ''; searchProducts(''); }
 
+  function saveFilterState() {
+    const typeIds = [...document.querySelectorAll('#filterRow1 .filter-btn.active[data-cat-id]')]
+      .map(b => b.dataset.catId).filter(id => id !== 'all');
+    const subIds = [...document.querySelectorAll('#filterSubRow .filter-btn.active[data-cat-id]')]
+      .map(b => b.dataset.catId);
+    localStorage.setItem('zenan_filter', JSON.stringify({ typeIds, subIds }));
+  }
+
+  function restoreFilterState() {
+    const saved = JSON.parse(localStorage.getItem('zenan_filter') || 'null');
+    if (!saved || !saved.typeIds.length) return;
+    const allBtn = document.querySelector('#filterRow1 .filter-btn[data-cat-id="all"]');
+    saved.typeIds.forEach(id => {
+      const btn = document.querySelector(`#filterRow1 .filter-btn[data-cat-id="${CSS.escape(id)}"]`);
+      if (btn) { btn.classList.add('active'); allBtn.classList.remove('active'); }
+    });
+    updateSubRow();
+    saved.subIds.forEach(id => {
+      const btn = document.querySelector(`#filterSubRow .filter-btn[data-cat-id="${CSS.escape(id)}"]`);
+      if (btn) btn.classList.add('active');
+    });
+    syncActiveCats();
+    applyFilters();
+  }
+
   // Sync _activeCats from what's currently active in the UI
   function syncActiveCats() {
     _activeCats.clear();
@@ -1396,6 +1421,7 @@
     updateSubRow();
     syncActiveCats();
     applyFilters();
+    saveFilterState();
   }
 
   // Reset all — show everything
@@ -1406,6 +1432,7 @@
     subRow.innerHTML = ''; subRow.classList.remove('visible');
     _activeCats.clear();
     applyFilters();
+    saveFilterState();
   }
 
   // Toggle a sub-category button individually
@@ -1413,6 +1440,7 @@
     btn.classList.toggle('active');
     syncActiveCats();
     applyFilters();
+    saveFilterState();
   }
 
   // Used by URL ?cat= auto-select
@@ -1542,6 +1570,8 @@
       filterProducts(_urlCat);
       document.querySelector('.controls-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       history.replaceState(null, '', window.location.pathname);
+    } else {
+      restoreFilterState();
     }
   }
 
