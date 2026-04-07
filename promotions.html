@@ -69,15 +69,8 @@
     /* ── HERO ── */
     .hero { padding: 80px 6vw 48px; text-align: center; }
     .hero-content { max-width: 700px; margin: 0 auto; }
-    .breadcrumb-pill {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(255,255,255,.28); border: 1px solid rgba(37,88,176,.14);
-      backdrop-filter: blur(12px); padding: 5px 16px; border-radius: 20px;
-      font-size: .78rem; color: var(--muted); margin-bottom: 24px;
-    }
-    .breadcrumb-pill a { color: var(--blue2); text-decoration: none; font-weight: 600; }
     .hero h1 {
-      font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 900; color: #0f172a; line-height: 1.08; margin-bottom: 18px; letter-spacing: -.02em;
+      font-size: clamp(2.6rem, 6vw, 4.2rem); font-weight: 900; color: #0f172a; line-height: 1.08; margin-bottom: 18px; letter-spacing: -.02em;
     }
     .hero p {
       font-size: 1.05rem; max-width: 480px; margin: 0 auto; line-height: 1.85; margin-bottom: 32px;
@@ -108,7 +101,7 @@
     }
     .promo-card:hover { transform: translateY(-4px); box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 16px 40px rgba(37,88,176,.14); }
     .promo-thumb {
-      width: 100%; height: 200px; object-fit: cover; display: block;
+      width: 100%; height: 220px; object-fit: contain; display: block; background: #f8fafc;
       transition: transform .3s;
     }
     .promo-card:hover .promo-thumb { transform: scale(1.04); }
@@ -260,8 +253,7 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-content reveal">
-    <div class="breadcrumb-pill"><a href="index.html">Home</a> / Promotions</div>
-    <h1>Promotions <span class="grad-text">&amp; Offers</span></h1>
+    <h1>Our <span style="color:#2558B0;">Promotions</span></h1>
     <p>Exclusive deals, seasonal specials, and new collections. Check here for the latest from Zenan Glass.</p>
   </div>
 </section>
@@ -739,8 +731,7 @@
   // ── PROMOTIONS ──
   // Add your flyers here. Each entry needs: title, src (image URL or PDF URL), fileType ('image/jpeg' or 'application/pdf')
   const PROMOTIONS = [
-    // { title: 'Summer Sale 2025', src: 'images/promotions/summer-sale.jpg', fileType: 'image/jpeg' },
-    // { title: 'New Arrivals Flyer', src: 'images/promotions/new-arrivals.pdf', fileType: 'application/pdf' },
+    { title: 'Soccer Collection', src: 'brand_assets/Zenan Soccer Flyer (Akshay).jpg', fileType: 'image/jpeg' },
   ];
 
   function loadPromotions() {
