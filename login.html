@@ -57,14 +57,18 @@
     .hint code { background: var(--white); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; font-size: .8rem; color: var(--dark); font-weight: 600; }
 
     .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
-    .back-link { display: block; text-align: center; font-size: .83rem; color: var(--muted); text-decoration: none; transition: color .2s; }
+    .back-link { display: block; text-align: center; font-size: .83rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: color .2s; }
     .back-link:hover { color: var(--blue); }
+    .pass-wrap { position: relative; }
+    .pass-wrap input { padding-right: 40px; }
+    .pass-eye { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); padding: 0; display: flex; align-items: center; transition: color .15s; }
+    .pass-eye:hover { color: var(--blue); }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="logo">
-      <img src="brand_assets/Zenan logo.png" alt="Zenan Glass" />
+      <a href="index.html"><img src="brand_assets/Zenan logo.png" alt="Zenan Glass" /></a>
     </div>
 
     <!-- LOGIN -->
@@ -75,7 +79,12 @@
       </div>
       <div class="form-group">
         <label for="lPass">Password</label>
-        <input type="password" id="lPass" placeholder="Enter password" autocomplete="current-password" required />
+        <div class="pass-wrap">
+          <input type="password" id="lPass" placeholder="Enter password" autocomplete="current-password" required />
+          <button type="button" class="pass-eye" onclick="togglePass()" id="passEye" aria-label="Toggle password">
+            <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
       </div>
       <button type="submit" class="btn-submit">Login →</button>
     </form>
@@ -123,6 +132,18 @@
         .filter(c => c.loginUser)
         .map(c => `<span><strong style="color:var(--dark)">${c.name}:</strong> <code>${c.loginUser}</code> / <code>${c.loginPass || '—'}</code></span>`)
         .join('');
+    }
+
+    function togglePass() {
+      const inp = document.getElementById('lPass');
+      const icon = document.getElementById('eyeIcon');
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+      } else {
+        inp.type = 'password';
+        icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+      }
     }
 
     function showErr(msg) { document.getElementById('errMsg').textContent = msg; }
