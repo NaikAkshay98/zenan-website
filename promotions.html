@@ -737,40 +737,37 @@
   document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 
   // ── PROMOTIONS ──
-  let _currentPromo = null;
+  // Add your flyers here. Each entry needs: title, src (image URL or PDF URL), fileType ('image/jpeg' or 'application/pdf')
+  const PROMOTIONS = [
+    // { title: 'Summer Sale 2025', src: 'images/promotions/summer-sale.jpg', fileType: 'image/jpeg' },
+    // { title: 'New Arrivals Flyer', src: 'images/promotions/new-arrivals.pdf', fileType: 'application/pdf' },
+  ];
 
-  async function loadPromotions() {
+  function loadPromotions() {
     const grid = document.getElementById('promosGrid');
-    try {
-      const promos = await fetch('/api/categories?type=promotions').then(r => r.json()).catch(() => []);
-      if (!Array.isArray(promos) || !promos.length) {
-        grid.innerHTML = '<div class="promos-empty"><div class="empty-icon">🏷️</div><p>No promotions available right now. Check back soon!</p></div>';
-        return;
-      }
-      grid.innerHTML = promos.map(p => {
-        const isImage = p.fileType && p.fileType.startsWith('image/');
-        const date = p.uploadedAt ? new Date(p.uploadedAt).toLocaleDateString('en-CA', { year:'numeric', month:'short', day:'numeric' }) : '';
-        return `
-          <div class="promo-card" onclick="openPromoModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">
-            ${isImage
-              ? `<img class="promo-thumb" src="${p.src}" alt="${p.title}" />`
-              : `<div class="promo-pdf-thumb"><div class="promo-pdf-icon">📄</div><div class="promo-pdf-label">PDF Flyer</div></div>`
-            }
-            <div class="promo-info">
-              <div class="promo-title">${p.title}</div>
-              ${date ? `<div class="promo-date">${date}</div>` : ''}
-              <button class="promo-view-btn" onclick="event.stopPropagation();openPromoModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">View Flyer →</button>
-            </div>
-          </div>`;
-      }).join('');
-    } catch(e) {
-      grid.innerHTML = '<div class="promos-empty"><div class="empty-icon">⚠️</div><p>Could not load promotions.</p></div>';
+    if (!PROMOTIONS.length) {
+      grid.innerHTML = '<div class="promos-empty"><div class="empty-icon">🏷️</div><p>No promotions available right now. Check back soon!</p></div>';
+      return;
     }
+    grid.innerHTML = PROMOTIONS.map((p, i) => {
+      const isImage = p.fileType && p.fileType.startsWith('image/');
+      return `
+        <div class="promo-card" onclick="openPromoModal(${i})">
+          ${isImage
+            ? `<img class="promo-thumb" src="${p.src}" alt="${p.title}" />`
+            : `<div class="promo-pdf-thumb"><div class="promo-pdf-icon">📄</div><div class="promo-pdf-label">PDF Flyer</div></div>`
+          }
+          <div class="promo-info">
+            <div class="promo-title">${p.title}</div>
+            <button class="promo-view-btn" onclick="event.stopPropagation();openPromoModal(${i})">View Flyer →</button>
+          </div>
+        </div>`;
+    }).join('');
   }
 
-  function openPromoModal(promo) {
-    if (typeof promo === 'string') promo = JSON.parse(promo);
-    _currentPromo = promo;
+  function openPromoModal(idx) {
+    const promo = PROMOTIONS[idx];
+    if (!promo) return;
     document.getElementById('promoModalTitle').textContent = promo.title;
     document.getElementById('promoModalDl').href = promo.src;
     const body = document.getElementById('promoModalBody');

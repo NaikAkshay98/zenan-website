@@ -590,7 +590,6 @@
       <button class="stab active" data-section="products" onclick="switchSection('products')">Products</button>
       <button class="stab" data-section="gallery" onclick="switchSection('gallery')">Gallery</button>
       <button class="stab" data-section="clients" onclick="switchSection('clients')">Clients</button>
-      <button class="stab" data-section="promotions" onclick="switchSection('promotions')">Promotions</button>
     </div>
 
     <!-- Products section -->
@@ -675,29 +674,6 @@
       <div class="clients-grid" id="clientsGrid"></div>
     </div>
 
-    <!-- Promotions section -->
-    <div id="promotionsSection" style="display:none;">
-      <input type="file" id="promoFileInput" accept="image/*,.pdf" onchange="handlePromoUpload(event)" style="display:none" />
-      <div class="section-layout">
-        <div class="section-sidebar">
-          <div class="s-section">
-            <div class="s-title">Upload Flyer</div>
-            <input type="text" id="promoTitle" placeholder="Promotion title…" maxlength="80"
-              style="width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:7px;font-size:.88rem;font-family:var(--font);color:var(--dark);outline:none;transition:border-color .2s;margin-bottom:10px;box-sizing:border-box;"
-              onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'" />
-            <button class="upload-btn" onclick="document.getElementById('promoFileInput').click()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-              Upload Flyer
-            </button>
-            <div class="upload-hint">JPEG, PNG, PDF supported</div>
-            <div class="upload-progress" id="promoProgress"></div>
-          </div>
-        </div>
-        <div class="section-content">
-          <div id="promosAdminGrid"></div>
-        </div>
-      </div>
-    </div>
 
   </main>
 
@@ -917,8 +893,6 @@ const saveCats      = (v) => { _cats = v; API.post('/api/categories', v); };
 const saveGalImages = (v) => { _galImgs = v; API.post('/api/gallery', v); };
 const getGalCats    = () => _galCats;
 const saveGalCats   = (v) => { _galCats = v; API.post('/api/gallery/categories', v); };
-let _promos = [];
-const savePromos    = (v) => { _promos = v; API.post('/api/categories?type=promotions', v); };
 
 // ── Image compression
 function compressImage(file, maxW = 1400, quality = 0.82) {
@@ -1315,11 +1289,9 @@ function switchSection(section) {
   document.getElementById('productsSection').style.display = section === 'products' ? '' : 'none';
   document.getElementById('gallerySection').style.display = section === 'gallery' ? '' : 'none';
   document.getElementById('clientsSection').style.display = section === 'clients' ? '' : 'none';
-  document.getElementById('promotionsSection').style.display = section === 'promotions' ? '' : 'none';
   sessionStorage.setItem('zenan_admin_tab', section);
   if (section === 'gallery') renderGallery();
   if (section === 'clients') renderClients();
-  if (section === 'promotions') renderPromos();
 }
 
 // ── Gallery: upload
@@ -1351,68 +1323,6 @@ async function handleGalUpload(e) {
 }
 
 // ── Promotions: upload
-async function handlePromoUpload(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const title = document.getElementById('promoTitle').value.trim() || file.name.replace(/\.[^.]+$/, '');
-  const prog = document.getElementById('promoProgress');
-  prog.style.display = 'block'; prog.textContent = 'Uploading…';
-  try {
-    const ext = (file.name.match(/\.[^.]+$/) || ['.jpg'])[0].toLowerCase();
-    const dataUrl = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = ev => resolve(ev.target.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-    const base64 = dataUrl.split(',')[1];
-    const res = await API.post('/api/categories?type=promotions-upload', { title, data: base64, fileType: file.type, ext });
-    if (res.success) {
-      _promos.push(res.promo);
-      renderPromos();
-      toast('Promotion added!', 'green');
-      document.getElementById('promoTitle').value = '';
-    } else { toast('Upload failed: ' + (res.error || 'Unknown error'), 'red'); }
-  } catch(err) { toast('Upload failed: ' + err.message, 'red'); }
-  prog.style.display = 'none';
-  e.target.value = '';
-}
-
-// ── Promotions: delete
-function deletePromo(id) {
-  if (!confirm('Delete this promotion?')) return;
-  _promos = _promos.filter(p => p.id !== id);
-  savePromos(_promos);
-  renderPromos();
-  toast('Promotion deleted.', 'green');
-}
-
-// ── Promotions: render
-function renderPromos() {
-  const grid = document.getElementById('promosAdminGrid');
-  if (!_promos || !_promos.length) {
-    grid.innerHTML = '<div style="padding:48px;text-align:center;color:var(--muted);font-size:.95rem;">No promotions uploaded yet. Use the sidebar to add a flyer.</div>';
-    return;
-  }
-  grid.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;padding:4px 0;">' +
-    _promos.map(p => {
-      const isImage = p.fileType && p.fileType.startsWith('image/');
-      return `<div style="background:var(--white);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);">
-        ${isImage
-          ? `<img src="${p.src}" alt="${p.title}" style="width:100%;height:160px;object-fit:cover;display:block;" />`
-          : `<div style="height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--off);"><span style="font-size:3rem;">📄</span><span style="font-size:.72rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;">PDF</span></div>`
-        }
-        <div style="padding:12px 14px;">
-          <div style="font-weight:700;font-size:.88rem;color:var(--dark);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.title}</div>
-          <div style="display:flex;gap:8px;align-items:center;">
-            <a href="${p.src}" target="_blank" style="font-size:.78rem;color:var(--blue);font-weight:600;text-decoration:none;">View ↗</a>
-            <button onclick="deletePromo('${p.id}')" style="margin-left:auto;background:rgba(220,38,38,.08);color:#dc2626;border:1px solid rgba(220,38,38,.18);border-radius:6px;padding:3px 10px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:var(--font);-webkit-appearance:none;appearance:none;">Delete</button>
-          </div>
-        </div>
-      </div>`;
-    }).join('') + '</div>';
-}
-
 // ── Gallery: delete
 function deleteGalImage(id) {
   confirmDeleteGal(id);
@@ -1542,13 +1452,12 @@ function logout() {
   }
   // Load products and categories from server
   try {
-    [_imgs, _cats, _galImgs, _galCats, _clients, _promos] = await Promise.all([
+    [_imgs, _cats, _galImgs, _galCats, _clients] = await Promise.all([
       API.get('/api/products'),
       API.get('/api/categories'),
       API.get('/api/gallery'),
       API.get('/api/gallery/categories'),
-      API.get('/api/clients'),
-      API.get('/api/categories?type=promotions')
+      API.get('/api/clients')
     ]);
   } catch(e) { toast('Could not connect to server.', 'red'); }
   renderAll();
