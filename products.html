@@ -1174,7 +1174,7 @@
 
     document.getElementById('detailTags').innerHTML = assignedCats.map(c =>
       `<span style="font-size:.78rem;font-weight:700;color:#2558B0;text-transform:uppercase;letter-spacing:.06em;">${c.name}</span>`
-    ).join('') || '';
+    ).join('<span style="color:#aab;margin:0 6px;font-weight:400;">/</span>') || '';
 
     document.getElementById('detailName').textContent = img.name;
 
