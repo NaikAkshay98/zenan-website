@@ -713,21 +713,14 @@ async function showDashboard(client) {
   dash.classList.add('show');
 
   // Header
-  const initials = client.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-  document.getElementById('dashAvatar').textContent = initials;
   document.getElementById('dashName').textContent = 'Welcome, ' + client.name;
   document.getElementById('dashEmail').textContent = client.clientEmail || '';
 
   // Rep card
-  const repInit = (client.repName || '?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-  document.getElementById('repAvatar').textContent = repInit;
   document.getElementById('repName').textContent = client.repName || '—';
   document.getElementById('repEmailText').textContent = client.repEmail || '—';
   document.getElementById('repEmailLink').href = client.repEmail ? `mailto:${client.repEmail}` : '#';
   document.getElementById('dashLoginUser').textContent = client.loginUser || '—';
-  document.getElementById('dashSince').textContent = client.createdAt
-    ? new Date(client.createdAt).toLocaleDateString('en-CA', { year:'numeric', month:'short' })
-    : '—';
 
   // Files
   _currentClient = client;
