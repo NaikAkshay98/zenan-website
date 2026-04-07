@@ -87,7 +87,7 @@
 
     .promo-item {
       display: flex; flex-direction: row; align-items: center;
-      gap: 60px; cursor: pointer;
+      gap: 60px;
     }
     .promo-item-image { flex: 0 0 58%; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 40px rgba(10,30,80,.18); }
     .promo-item-image img { width: 100%; height: auto; display: block; transition: transform .4s; }
@@ -117,46 +117,6 @@
     .promos-empty .empty-icon { font-size: 3rem; margin-bottom: 16px; }
     .promos-empty p { font-size: 1rem; }
 
-    /* ── MODAL ── */
-    .promo-modal-backdrop {
-      display: none; position: fixed; inset: 0; z-index: 400;
-      background: rgba(0,0,0,.80); backdrop-filter: blur(8px);
-      align-items: center; justify-content: center; padding: 16px;
-    }
-    .promo-modal-backdrop.open { display: flex; }
-    .promo-modal {
-      position: relative; background: #fff; border-radius: 16px; overflow: hidden;
-      max-width: 900px; width: 100%; max-height: 92vh;
-      display: flex; flex-direction: column;
-      box-shadow: 0 32px 80px rgba(0,0,0,.45);
-      animation: modalIn .18s ease;
-    }
-    @keyframes modalIn { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
-    .promo-modal-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 20px; border-bottom: 1px solid #e2e8f0;
-      flex-shrink: 0;
-    }
-    .promo-modal-title { font-size: 1rem; font-weight: 800; color: var(--dark); }
-    .promo-modal-close {
-      background: rgba(15,23,42,.07); border: none; cursor: pointer;
-      width: 32px; height: 32px; border-radius: 50%; font-size: 1rem;
-      display: grid; place-items: center; transition: background .2s; color: var(--dark);
-    }
-    .promo-modal-close:hover { background: rgba(15,23,42,.15); }
-    .promo-modal-body { flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; background: #f8fafc; min-height: 300px; }
-    .promo-modal-body img { max-width: 100%; max-height: 80vh; display: block; object-fit: contain; }
-    .promo-modal-body iframe { width: 100%; height: 80vh; border: none; }
-    .promo-modal-footer {
-      padding: 12px 20px; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; justify-content: flex-end; flex-shrink: 0;
-    }
-    .promo-dl-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 8px 18px; background: var(--blue); color: #fff;
-      border-radius: 8px; font-size: .88rem; font-weight: 700; text-decoration: none;
-      transition: background .2s;
-    }
-    .promo-dl-btn:hover { background: #1a4490; }
 
     /* ── FOOTER ── */
     footer {
@@ -283,22 +243,6 @@
   </div>
 </footer>
 
-<!-- PROMO MODAL -->
-<div class="promo-modal-backdrop" id="promoModalBackdrop" onclick="closeModalOnBackdrop(event)">
-  <div class="promo-modal">
-    <div class="promo-modal-header">
-      <div class="promo-modal-title" id="promoModalTitle"></div>
-      <button class="promo-modal-close" onclick="closePromoModal()">✕</button>
-    </div>
-    <div class="promo-modal-body" id="promoModalBody"></div>
-    <div class="promo-modal-footer">
-      <a class="promo-dl-btn" id="promoModalDl" href="#" target="_blank" download>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Download
-      </a>
-    </div>
-  </div>
-</div>
 
 <script>
   function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
@@ -760,7 +704,7 @@
     grid.innerHTML = '<div class="promos-list">' + PROMOTIONS.map((p, i) => {
       const isImage = p.fileType && p.fileType.startsWith('image/');
       return `
-        <div class="promo-item" onclick="openPromoModal(${i})">
+        <div class="promo-item">
           ${isImage
             ? `<div class="promo-item-image"><img src="${p.src}" alt="${p.title}" /></div>`
             : `<div class="promo-item-image promo-pdf-block"><div class="pdf-icon">📄</div><div class="pdf-label">PDF Flyer</div></div>`
@@ -773,35 +717,6 @@
     }).join('') + '</div>';
   }
 
-  function openPromoModal(idx) {
-    const promo = PROMOTIONS[idx];
-    if (!promo) return;
-    document.getElementById('promoModalTitle').textContent = promo.title;
-    document.getElementById('promoModalDl').href = promo.src;
-    const body = document.getElementById('promoModalBody');
-    const isImage = promo.fileType && promo.fileType.startsWith('image/');
-    if (isImage) {
-      body.innerHTML = `<img src="${promo.src}" alt="${promo.title}" />`;
-    } else {
-      body.innerHTML = `<iframe src="${promo.src}" title="${promo.title}"></iframe>`;
-    }
-    document.getElementById('promoModalBackdrop').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closePromoModal() {
-    document.getElementById('promoModalBackdrop').classList.remove('open');
-    document.getElementById('promoModalBody').innerHTML = '';
-    document.body.style.overflow = '';
-  }
-
-  function closeModalOnBackdrop(e) {
-    if (e.target === document.getElementById('promoModalBackdrop')) closePromoModal();
-  }
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && document.getElementById('promoModalBackdrop').classList.contains('open')) closePromoModal();
-  });
 
   loadPromotions();
 </script>
