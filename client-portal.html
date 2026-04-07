@@ -256,7 +256,6 @@
   <!-- DASHBOARD -->
   <div class="dashboard" id="dashboard">
     <div class="dash-header">
-      <div class="dash-avatar" id="dashAvatar"></div>
       <div class="dash-welcome">
         <h1 id="dashName"></h1>
         <p id="dashEmail"></p>
@@ -268,7 +267,6 @@
       <!-- Rep card -->
       <div class="dash-card">
         <div class="dash-card-title">Your Sales Rep</div>
-        <div class="rep-avatar" id="repAvatar"></div>
         <div class="rep-name" id="repName">—</div>
         <a class="rep-email" id="repEmailLink" href="#" onclick="return false">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
@@ -278,10 +276,6 @@
         <div class="rep-meta-row">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <span>Account: <strong id="dashLoginUser"></strong></span>
-        </div>
-        <div class="rep-meta-row">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <span>Member since <strong id="dashSince"></strong></span>
         </div>
       </div>
 
@@ -579,6 +573,7 @@ async function portalLogin() {
 
 function portalLogout() {
   sessionStorage.removeItem('zenan_client_session');
+  sessionStorage.removeItem('zenan_cart');
   window.location.href = 'login.html';
 }
 
@@ -604,8 +599,11 @@ function escHtml(s) {
 }
 
 // ── Cart
-let _cart = []; // { id, name, type, dataUrl, qty }
+let _cart = [];
 let _currentClient = null;
+
+function saveCart() { sessionStorage.setItem('zenan_cart', JSON.stringify(_cart)); }
+function loadCart() { try { _cart = JSON.parse(sessionStorage.getItem('zenan_cart') || '[]'); } catch { _cart = []; } }
 
 function addToCart(idx) {
   const f = _lbFiles[idx];
@@ -613,7 +611,7 @@ function addToCart(idx) {
   const existing = _cart.find(c => c.id === f.id);
   if (existing) { existing.qty++; }
   else { _cart.push({ id: f.id, name: f.name, type: f.type, src: f.src, qty: 1 }); }
-  renderCart();
+  saveCart(); renderCart();
   // Flash the + button green
   const btn = document.querySelector(`.file-tile-add[data-idx="${idx}"]`);
   if (btn) { btn.classList.add('added'); btn.textContent = '✓'; setTimeout(() => { btn.classList.remove('added'); btn.textContent = '+'; }, 1200); }
@@ -621,12 +619,12 @@ function addToCart(idx) {
 
 function removeFromCart(id) {
   _cart = _cart.filter(c => c.id !== id);
-  renderCart();
+  saveCart(); renderCart();
 }
 
 function updateQty(id, val) {
   const item = _cart.find(c => c.id === id);
-  if (item) { item.qty = Math.max(1, parseInt(val) || 1); }
+  if (item) { item.qty = Math.max(1, parseInt(val) || 1); saveCart(); }
 }
 
 function renderCart() {
@@ -772,7 +770,7 @@ async function showDashboard(client) {
     const { clientId } = JSON.parse(sess);
     const clients = await fetchClients();
     const client = clients.find(c => c.id === clientId);
-    if (client) { await showDashboard(client); }
+    if (client) { loadCart(); await showDashboard(client); renderCart(); }
     else { sessionStorage.removeItem('zenan_client_session'); window.location.href = 'login.html'; }
   } catch { sessionStorage.removeItem('zenan_client_session'); window.location.href = 'login.html'; }
 })();
