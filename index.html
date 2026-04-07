@@ -72,6 +72,8 @@
     .nav-links a { color: #1e3a6e; text-decoration: none; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 8px 16px; border-radius: 7px; transition: background .2s, color .2s; }
     .nav-links a:hover { background: rgba(37,88,176,.08); color: #2558B0; }
     .nav-links a.active { color: var(--blue); font-weight: 700; }
+    .nav-new-badge { display: inline-block; margin-left: 5px; padding: 1px 6px; background: #e8281a; color: #fff; font-size: .58rem; font-weight: 800; letter-spacing: .06em; border-radius: 4px; vertical-align: middle; line-height: 1.6; text-transform: uppercase; animation: badgePulse 2s ease-in-out infinite; }
+    @keyframes badgePulse { 0%,100% { opacity:1; } 50% { opacity:.65; } }
     .nav-insta { display: flex !important; align-items: center; gap: 5px; }
     .nav-insta svg { flex-shrink: 0; }
     .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; border: none; background: none; }
@@ -377,7 +379,7 @@
     <li><a href="index.html" class="active">Home</a></li>
     <li><a href="products.html">Products</a></li>
     <li><a href="gallery.html">Gallery</a></li>
-    <li><a href="promotions.html">Promotions</a></li>
+    <li><a href="promotions.html">Promotions <span class="nav-new-badge">New</span></a></li>
     <li><a href="about.html">About Us</a></li>
     <li><a href="contact.html">Contact</a></li>
   </ul>
