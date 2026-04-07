@@ -463,7 +463,7 @@
       if(f.x<-.05)f.x=1.05; if(f.x>1.05)f.x=-.05;
       if(f.y<-.05)f.y=1.05; if(f.y>1.05)f.y=-.05;
       const mx=(mouse.x-.5)*f.depth*.025, my=(mouse.y-.5)*f.depth*.025;
-      ctx.save(); ctx.translate((f.x+mx)*W,(f.y+my)*H); ctx.rotate(f.rot);
+      ctx.save(); ctx.translate((f.x+mx)*W, (f.y+my)*H); ctx.rotate(f.rot);
       ctx.beginPath();
       for(let i=0;i<f.sides;i++){
         const a=(i/f.sides)*Math.PI*2-(f.sides===6?0:Math.PI/2);
@@ -472,52 +472,92 @@
       }
       ctx.closePath();
       const g=ctx.createLinearGradient(-f.s,-f.s,f.s,f.s);
-      g.addColorStop(0,`hsla(${f.hue},75%,82%,${f.alpha*2.0})`);
-      g.addColorStop(.45,`hsla(${f.hue},72%,85%,${f.alpha*1.2})`);
-      g.addColorStop(1,`hsla(${f.hue},68%,88%,${f.alpha*0.8})`);
+      g.addColorStop(0,`hsla(${f.hue},82%,94%,${f.alpha*2})`);
+      g.addColorStop(.45,`hsla(${f.hue},74%,90%,${f.alpha})`);
+      g.addColorStop(1,`hsla(${f.hue},68%,86%,${f.alpha*.3})`);
       ctx.fillStyle=g; ctx.fill();
-      ctx.strokeStyle=`hsla(${f.hue},72%,78%,${f.alpha*2.5})`; ctx.lineWidth=.8; ctx.stroke();
+      ctx.strokeStyle=`hsla(${f.hue},65%,78%,${f.alpha*.85})`; ctx.lineWidth=.8; ctx.stroke();
+      ctx.beginPath();
+      for(let i=0;i<f.sides;i++){
+        const a=(i/f.sides)*Math.PI*2-(f.sides===6?0:Math.PI/2);
+        const r=f.s*.4*(.62+.38*Math.abs(Math.cos(a*(f.sides===3?1.5:2))));
+        i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+      }
+      ctx.closePath();
+      ctx.strokeStyle=`rgba(255,255,255,${f.alpha*1.2})`; ctx.lineWidth=.5; ctx.stroke();
       ctx.restore();
     }
     function drawMesh() {
-      const pts=facets.map(f=>({x:f.x*W,y:f.y*H}));
-      for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
-        const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
-        if(d<160){ const a=.09*(1-d/160); ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y); ctx.strokeStyle=`rgba(180,200,240,${a})`; ctx.lineWidth=.6; ctx.stroke(); }
+      const pts = facets.map(f=>({x:f.x*W,y:f.y*H,hue:f.hue,alpha:f.alpha}));
+      for(let i=0;i<pts.length;i++){
+        for(let j=i+1;j<pts.length;j++){
+          const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
+          if(d<180){
+            const a = .055*(1-d/180);
+            const g=ctx.createLinearGradient(pts[i].x,pts[i].y,pts[j].x,pts[j].y);
+            g.addColorStop(0,`hsla(${pts[i].hue},65%,75%,${a})`);
+            g.addColorStop(1,`hsla(${pts[j].hue},65%,75%,${a})`);
+            ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
+            ctx.strokeStyle=g; ctx.lineWidth=.6; ctx.stroke();
+          }
+        }
       }
     }
     function drawSparkle(s) {
-      s.life+=s.speed;
+      s.life += s.speed;
       if(s.life>1){ s.life=0; s.x=Math.random(); s.y=Math.random(); }
-      const a=Math.sin(s.life*Math.PI), px=s.x*W, py=s.y*H;
-      ctx.save(); ctx.globalAlpha=a*.55;
+      const a = Math.sin(s.life*Math.PI);
+      const px=s.x*W, py=s.y*H;
+      ctx.save(); ctx.globalAlpha = a*.65;
       if(s.type===0){
-        ctx.fillStyle=`hsla(${s.hue},80%,80%,1)`; ctx.beginPath(); ctx.arc(px,py,s.size*a,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle=`hsla(${s.hue},82%,88%,1)`;
+        ctx.beginPath(); ctx.arc(px,py,s.size*a,0,Math.PI*2); ctx.fill();
       } else if(s.type===1){
-        ctx.strokeStyle=`hsla(${s.hue},75%,78%,1)`; ctx.lineWidth=.7;
-        const sz=s.size*2.5*a;
+        ctx.strokeStyle=`hsla(${s.hue},78%,84%,1)`; ctx.lineWidth=.7;
+        const sz=s.size*3*a;
         ctx.beginPath(); ctx.moveTo(px-sz,py); ctx.lineTo(px+sz,py); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(px,py-sz); ctx.lineTo(px,py+sz); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px-sz*.7,py-sz*.7); ctx.lineTo(px+sz*.7,py+sz*.7); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px+sz*.7,py-sz*.7); ctx.lineTo(px-sz*.7,py+sz*.7); ctx.stroke();
       } else {
-        ctx.fillStyle=`hsla(${s.hue},78%,80%,1)`;
-        const sz=s.size*2*a;
+        ctx.fillStyle=`hsla(${s.hue},85%,90%,1)`;
+        const sz=s.size*2.5*a;
         ctx.beginPath(); ctx.moveTo(px,py-sz); ctx.lineTo(px+sz*.6,py); ctx.lineTo(px,py+sz); ctx.lineTo(px-sz*.6,py); ctx.closePath(); ctx.fill();
       }
       ctx.restore();
     }
     function drawRipples() {
       for(let i=ripples.length-1;i>=0;i--){
-        const r=ripples[i]; r.r+=3; r.alpha-=.006;
+        const r=ripples[i];
+        r.r += 4; r.alpha -= .008;
         if(r.alpha<=0){ ripples.splice(i,1); continue; }
         ctx.beginPath(); ctx.arc(r.x,r.y,r.r,0,Math.PI*2);
-        ctx.strokeStyle=`hsla(${r.hue},80%,75%,${r.alpha})`; ctx.lineWidth=1.2; ctx.stroke();
+        ctx.strokeStyle=`hsla(${r.hue},70%,75%,${r.alpha})`; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(r.x,r.y,r.r*.6,0,Math.PI*2);
+        ctx.strokeStyle=`hsla(${r.hue},75%,80%,${r.alpha*.6})`; ctx.lineWidth=.8; ctx.stroke();
       }
     }
     function draw() {
       frame++;
-      mouse.x+=(targetMouse.x-mouse.x)*.04; mouse.y+=(targetMouse.y-mouse.y)*.04;
+      mouse.x += (targetMouse.x - mouse.x) * .04;
+      mouse.y += (targetMouse.y - mouse.y) * .04;
       ctx.clearRect(0,0,W,H);
-      ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+      const bx = W*(0.5 + (mouse.x-.5)*.15), by = H*(0.4 + (mouse.y-.5)*.1);
+      const base = ctx.createRadialGradient(bx, by*.6, 0, W*.5, H*.5, Math.max(W,H)*.92);
+      base.addColorStop(0,'rgba(215,235,255,1)');
+      base.addColorStop(.22,'rgba(192,220,255,1)');
+      base.addColorStop(.45,'rgba(158,200,252,1)');
+      base.addColorStop(.65,'rgba(118,170,240,1)');
+      base.addColorStop(.82,'rgba(78,132,225,1)');
+      base.addColorStop(.92,'rgba(50,95,200,1)');
+      base.addColorStop(1,'rgba(32,65,170,1)');
+      ctx.fillStyle=base; ctx.fillRect(0,0,W,H);
+      const vig = ctx.createRadialGradient(W*.5,H*.5,Math.min(W,H)*.2, W*.5,H*.5,Math.max(W,H)*.85);
+      vig.addColorStop(0,'rgba(10,30,80,0)');
+      vig.addColorStop(.50,'rgba(10,30,80,.08)');
+      vig.addColorStop(.78,'rgba(8,22,70,.22)');
+      vig.addColorStop(1,'rgba(4,12,50,.38)');
+      ctx.fillStyle=vig; ctx.fillRect(0,0,W,H);
       auroras.forEach(drawAurora);
       drawDiagonalLines();
       drawMesh();
@@ -714,7 +754,7 @@
   // ── PROMOTIONS ──
   // Add your flyers here. Each entry needs: title, src (image URL or PDF URL), fileType ('image/jpeg' or 'application/pdf')
   const PROMOTIONS = [
-    { title: 'Soccer Collection', src: 'brand_assets/Zenan Soccer Flyer (Akshay).jpg', fileType: 'image/jpeg' },
+    { title: 'Soccer Collection', src: 'brand_assets/Zenan%20Soccer%20Flyer%20(Akshay).jpg', fileType: 'image/jpeg' },
   ];
 
   function loadPromotions() {
