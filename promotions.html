@@ -80,56 +80,46 @@
       filter: drop-shadow(0 1px 6px rgba(37,88,176,.12));
     }
 
-    /* ── PROMOTIONS GRID ── */
+    /* ── PROMOTIONS ── */
     main { overflow: visible; }
-    .promos-section { padding: 0 6vw 80px; max-width: 1248px; margin: 0 auto; }
-    .promos-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 24px;
-    }
-    @media (max-width: 640px) { .promos-grid { grid-template-columns: 1fr; } }
+    .promos-section { padding: 0 6vw 80px; }
+    .promos-list { display: flex; flex-direction: column; gap: 48px; max-width: 1000px; margin: 0 auto; }
 
-    .promo-card {
-      background: rgba(255,255,255,.30);
+    .promo-item {
+      background: rgba(255,255,255,.28);
       backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%);
-      border: 1px solid rgba(255,255,255,.45);
-      border-radius: 16px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 4px 24px rgba(37,88,176,.07);
-      overflow: hidden; cursor: pointer;
+      border: 1.5px solid rgba(15,30,80,.22);
+      border-radius: 16px; overflow: hidden; cursor: pointer;
       transition: box-shadow .3s, transform .3s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 4px 24px rgba(37,88,176,.06);
     }
-    .promo-card:hover { transform: translateY(-4px); box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 16px 40px rgba(37,88,176,.14); }
-    .promo-thumb {
-      width: 100%; height: 220px; object-fit: contain; display: block; background: #f8fafc;
-      transition: transform .3s;
+    .promo-item:hover { transform: translateY(-4px); box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 18px 44px rgba(37,88,176,.13); }
+    .promo-item img { width: 100%; display: block; transition: transform .3s; }
+    .promo-item:hover img { transform: scale(1.02); }
+    .promo-item-footer {
+      padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid rgba(15,30,80,.10);
     }
-    .promo-card:hover .promo-thumb { transform: scale(1.04); }
-    .promo-pdf-thumb {
-      width: 100%; height: 200px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 10px;
-      background: linear-gradient(135deg, rgba(37,88,176,.06), rgba(59,130,246,.06));
-    }
-    .promo-pdf-icon { font-size: 3.5rem; line-height: 1; }
-    .promo-pdf-label { font-size: .78rem; color: var(--muted); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
-    .promo-info { padding: 16px 18px; }
-    .promo-title { font-size: .97rem; font-weight: 800; color: var(--dark); margin-bottom: 4px; }
-    .promo-date { font-size: .75rem; color: var(--muted); }
+    .promo-item-title { font-size: .97rem; font-weight: 800; color: var(--dark); }
     .promo-view-btn {
-      display: inline-flex; align-items: center; gap: 5px; margin-top: 10px;
-      padding: 6px 14px; background: var(--blue); color: #fff;
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 7px 16px; background: var(--blue); color: #fff;
       border-radius: 7px; font-size: .78rem; font-weight: 700;
       border: none; cursor: pointer; font-family: var(--font);
       transition: background .2s;
     }
     .promo-view-btn:hover { background: #1a4490; }
 
-    /* Empty state */
-    .promos-empty {
-      grid-column: 1 / -1; text-align: center; padding: 80px 20px;
-      color: var(--muted);
+    .promo-pdf-block {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px; padding: 60px 20px;
+      background: linear-gradient(135deg, rgba(37,88,176,.04), rgba(59,130,246,.04));
     }
+    .promo-pdf-block .pdf-icon { font-size: 4rem; line-height: 1; }
+    .promo-pdf-block .pdf-label { font-size: .8rem; color: var(--muted); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+
+    /* Empty state */
+    .promos-empty { text-align: center; padding: 80px 20px; color: var(--muted); }
     .promos-empty .empty-icon { font-size: 3rem; margin-bottom: 16px; }
     .promos-empty p { font-size: 1rem; }
 
@@ -258,14 +248,9 @@
   </div>
 </section>
 
-<!-- PROMOTIONS GRID -->
+<!-- PROMOTIONS -->
 <section class="promos-section">
-  <div class="promos-grid" id="promosGrid">
-    <div class="promos-empty">
-      <div class="empty-icon">🏷️</div>
-      <p>Loading promotions…</p>
-    </div>
-  </div>
+  <div id="promosGrid"></div>
 </section>
 
 </main>
@@ -532,9 +517,7 @@
       frame++;
       mouse.x+=(targetMouse.x-mouse.x)*.04; mouse.y+=(targetMouse.y-mouse.y)*.04;
       ctx.clearRect(0,0,W,H);
-      const bg=ctx.createLinearGradient(0,0,W,H);
-      bg.addColorStop(0,'#f0f4ff'); bg.addColorStop(.5,'#f8faff'); bg.addColorStop(1,'#eef2ff');
-      ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
       auroras.forEach(drawAurora);
       drawDiagonalLines();
       drawMesh();
@@ -740,20 +723,20 @@
       grid.innerHTML = '<div class="promos-empty"><div class="empty-icon">🏷️</div><p>No promotions available right now. Check back soon!</p></div>';
       return;
     }
-    grid.innerHTML = PROMOTIONS.map((p, i) => {
+    grid.innerHTML = '<div class="promos-list">' + PROMOTIONS.map((p, i) => {
       const isImage = p.fileType && p.fileType.startsWith('image/');
       return `
-        <div class="promo-card" onclick="openPromoModal(${i})">
+        <div class="promo-item" onclick="openPromoModal(${i})">
           ${isImage
-            ? `<img class="promo-thumb" src="${p.src}" alt="${p.title}" />`
-            : `<div class="promo-pdf-thumb"><div class="promo-pdf-icon">📄</div><div class="promo-pdf-label">PDF Flyer</div></div>`
+            ? `<img src="${p.src}" alt="${p.title}" />`
+            : `<div class="promo-pdf-block"><div class="pdf-icon">📄</div><div class="pdf-label">PDF Flyer</div></div>`
           }
-          <div class="promo-info">
-            <div class="promo-title">${p.title}</div>
+          <div class="promo-item-footer">
+            <div class="promo-item-title">${p.title}</div>
             <button class="promo-view-btn" onclick="event.stopPropagation();openPromoModal(${i})">View Flyer →</button>
           </div>
         </div>`;
-    }).join('');
+    }).join('') + '</div>';
   }
 
   function openPromoModal(idx) {
