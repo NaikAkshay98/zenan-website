@@ -2,106 +2,127 @@
   {
     "id": "1774754936262",
     "name": "Beer",
-    "color": "#2558B0"
+    "color": "#2558B0",
+    "parentId": null
   },
   {
     "id": "1774813182160",
     "name": "Wine",
-    "color": "#16a34a"
+    "color": "#16a34a",
+    "parentId": null
   },
   {
     "id": "1774824850547",
     "name": "Whisky",
-    "color": "#b45309"
+    "color": "#b45309",
+    "parentId": null
   },
   {
     "id": "1774826464591",
     "name": "Barware",
-    "color": "#374151"
+    "color": "#374151",
+    "parentId": null
   },
   {
     "id": "1774813193039",
     "name": "Sampler",
-    "color": "#2558B0"
+    "color": "#2558B0",
+    "parentId": "1774754936262"
   },
   {
     "id": "1774826125043",
     "name": "Decanters & Carafes",
-    "color": "#16a34a"
+    "color": "#16a34a",
+    "parentId": "1774813182160"
   },
   {
     "id": "1774826133792",
     "name": "Flutes",
-    "color": "#16a34a"
+    "color": "#16a34a",
+    "parentId": "1774813182160"
   },
   {
     "id": "1774826141414",
     "name": "Stemless",
-    "color": "#16a34a"
+    "color": "#16a34a",
+    "parentId": "1774813182160"
   },
   {
     "id": "1774826149558",
     "name": "Stemmed",
-    "color": "#16a34a"
+    "color": "#16a34a",
+    "parentId": "1774813182160"
   },
   {
     "id": "1774826406866",
     "name": "Pitchers",
-    "color": "#2558B0"
+    "color": "#2558B0",
+    "parentId": "1774754936262"
   },
   {
     "id": "1774826411408",
     "name": "Growlers",
-    "color": "#2558B0"
+    "color": "#2558B0",
+    "parentId": "1774754936262"
   },
   {
     "id": "1774826510262",
     "name": "Martini & Cocktail",
-    "color": "#374151"
+    "color": "#374151",
+    "parentId": "1774826464591"
   },
   {
     "id": "1774826603460",
     "name": "Shots",
-    "color": "#374151"
+    "color": "#374151",
+    "parentId": "1774826464591"
   },
   {
     "id": "1774826667601",
     "name": "Rocks",
-    "color": "#b45309"
+    "color": "#b45309",
+    "parentId": "1774824850547"
   },
   {
     "id": "1774826677804",
     "name": "HighBall",
-    "color": "#b45309"
+    "color": "#b45309",
+    "parentId": "1774824850547"
   },
   {
     "id": "1774826871266",
     "name": "Coffee Mugs",
-    "color": "#2558B0"
+    "color": "#2558B0",
+    "parentId": "1774754936262"
   },
   {
     "id": "1774826974684",
     "name": "Glass Jars & Bottles",
-    "color": "#374151"
+    "color": "#374151",
+    "parentId": "1774826464591"
   },
   {
     "id": "1774827077456",
     "name": "Buckets & Chillers",
-    "color": "#374151"
+    "color": "#374151",
+    "parentId": "1774826464591"
   },
   {
     "id": "1774827132424",
     "name": "Bar Shakers",
-    "color": "#374151"
+    "color": "#374151",
+    "parentId": "1774826464591"
   },
   {
     "id": "1774827179927",
     "name": "Bar Tools",
-    "color": "#374151"
+    "color": "#374151",
+    "parentId": "1774826464591"
   },
   {
     "id": "1775608919111",
     "name": "New",
-    "color": "#ea580c"
+    "color": "#ea580c",
+    "parentId": null
   }
 ]
