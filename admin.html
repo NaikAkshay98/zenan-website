@@ -76,6 +76,9 @@
       transition: border-color .2s;
     }
     .cat-input-row input:focus { border-color: var(--blue); }
+    .cat-parent-select { width: 100%; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 7px; font-size: .83rem; font-family: var(--font); color: var(--dark); margin-bottom: 6px; outline: none; transition: border-color .2s; }
+    .cat-parent-select:focus { border-color: var(--blue); }
+    .chip-parent { font-size: .7rem; color: var(--muted); margin-left: 2px; }
     .cat-add-btn {
       padding: 8px 12px; background: var(--blue); color: var(--white);
       border: none; border-radius: 7px; font-size: .82rem; font-weight: 700;
@@ -611,6 +614,9 @@
           <div class="s-section" style="flex:1;">
             <div class="s-title">Categories</div>
             <div class="color-swatches" id="colorSwatches"></div>
+            <select id="catParentSelect" class="cat-parent-select">
+              <option value="">Top-level filter (no parent)</option>
+            </select>
             <div class="cat-input-row">
               <input type="text" id="catInput" placeholder="Category name…" maxlength="30" onkeydown="if(event.key==='Enter')addCategory()" />
               <button class="cat-add-btn" onclick="addCategory()">Add</button>
@@ -944,9 +950,12 @@ function _addCategoryFromInput(inputId) {
   if (!name) { input.focus(); return; }
   const cats = getCats();
   if (cats.find(c => c.name.toLowerCase() === name.toLowerCase())) { toast('Category already exists.'); return; }
-  cats.push({ id: Date.now().toString(), name, color: selectedColor });
+  const parentSelect = document.getElementById('catParentSelect');
+  const parentId = parentSelect ? parentSelect.value : '';
+  cats.push({ id: Date.now().toString(), name, color: selectedColor, parentId: parentId || null });
   saveCats(cats);
   input.value = '';
+  if (parentSelect) parentSelect.value = '';
   renderAll();
   toast(`Category "${name}" added.`, 'green');
 }
@@ -1096,13 +1105,25 @@ function _renderCatChips(containerId, countFn) {
   const el = document.getElementById(containerId);
   if (!el) return;
   if (!cats.length) { el.innerHTML = '<div class="cat-empty">No categories yet.</div>'; return; }
+
+  // Refresh parent dropdown
+  const parentSelect = document.getElementById('catParentSelect');
+  if (parentSelect) {
+    const currentVal = parentSelect.value;
+    const topLevel = cats.filter(c => !c.parentId);
+    parentSelect.innerHTML = '<option value="">Top-level filter (no parent)</option>' +
+      topLevel.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    parentSelect.value = currentVal;
+  }
+
   el.innerHTML = cats.map((cat, i) => {
+    const parent = cat.parentId ? cats.find(c => c.id === cat.parentId) : null;
     return `<div class="cat-chip" draggable="true"
       ondragstart="chipDragStart(event, '${cat.id}')"
       ondragend="chipDragEnd(event)">
       <span class="drag-handle">⠿</span>
       <span class="chip-dot" style="background:${cat.color}"></span>
-      <span class="chip-name">${cat.name}</span>
+      <span class="chip-name">${cat.name}${parent ? `<span class="chip-parent"> ↳ ${parent.name}</span>` : ''}</span>
       <span class="chip-count">${countFn(cat.id)}</span>
       <button class="chip-move" title="Move up" onclick="moveCat('${cat.id}',-1)"${i===0?' disabled':''}>▲</button>
       <button class="chip-move" title="Move down" onclick="moveCat('${cat.id}',1)"${i===cats.length-1?' disabled':''}>▼</button>

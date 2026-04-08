@@ -1247,14 +1247,6 @@
   let _activeCats = new Set(), _ozMin = 0, _ozMax = 90, _searchQuery = '';
   let _allCats = [], _typeSubMap = {}; // typeId → { name, subCats[] }
 
-  // Which sub-category keywords belong to each main type
-  const TYPE_SUB_KEYS = {
-    beer:    ['sampler','pitcher','coffee','mug','growler'],
-    wine:    ['decant','carafe','flute','champagne','stemless','stemmed'],
-    whisky:  ['rocks','highball'],
-    barware: ['shot','martini','cocktail','jar','bottle','bucket','chill','shaker','bar tool','bar tools']
-  };
-
   // Normalize text: lowercase + strip accents for accent-insensitive matching
   function normalize(str) {
     return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -1485,22 +1477,13 @@
 
     _allCats = cats;
 
-    // Map type names to their TYPE_SUB_KEYS key
-    const TYPE_NAME_MAP = { beer: 'Beer', wine: 'Wine', whisky: 'Whisky', barware: 'Barware' };
+    // Build parent/child hierarchy from parentId field
     _typeSubMap = {};
-    const typeCats = [];
-
-    for (const [key, label] of Object.entries(TYPE_NAME_MAP)) {
-      const typeCat = cats.find(c => c.name.toLowerCase() === label.toLowerCase());
-      if (!typeCat) continue;
-      const keywords = TYPE_SUB_KEYS[key] || [];
-      const subCats = cats.filter(c => {
-        const k = c.name.toLowerCase();
-        return c.id !== typeCat.id && keywords.some(kw => k.includes(kw));
-      });
-      _typeSubMap[typeCat.id] = { name: typeCat.name, subCats };
-      typeCats.push(typeCat);
-    }
+    const typeCats = cats.filter(c => !c.parentId);
+    typeCats.forEach(parent => {
+      const subCats = cats.filter(c => c.parentId === parent.id);
+      _typeSubMap[parent.id] = { name: parent.name, subCats };
+    });
 
     const makeTypeBtn = c =>
       `<button class="filter-btn" data-cat-id="${c.id}" onclick="toggleType(this)">${c.name}</button>`;
