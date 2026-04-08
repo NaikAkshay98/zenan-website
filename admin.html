@@ -1481,6 +1481,48 @@ function logout() {
       API.get('/api/clients')
     ]);
   } catch(e) { toast('Could not connect to server.', 'red'); }
+
+  // ── One-time migration: assign parentId using old keyword rules
+  (function migrateCategoryParents() {
+    const cats = getCats();
+    const needsMigration = cats.some(c => c.parentId === undefined);
+    if (!needsMigration) return;
+
+    const TYPE_NAME_MAP = { beer: 'Beer', wine: 'Wine', whisky: 'Whisky', barware: 'Barware' };
+    const TYPE_SUB_KEYS = {
+      beer:    ['sampler','pitcher','coffee','mug','growler'],
+      wine:    ['decant','carafe','flute','champagne','stemless','stemmed'],
+      whisky:  ['rocks','highball'],
+      barware: ['shot','martini','cocktail','jar','bottle','bucket','chill','shaker','bar tool','bar tools']
+    };
+
+    // Find top-level parent cats by exact name match
+    const parentMap = {}; // key (beer/wine/etc) → cat id
+    for (const [key, label] of Object.entries(TYPE_NAME_MAP)) {
+      const parent = cats.find(c => c.name.toLowerCase() === label.toLowerCase());
+      if (parent) parentMap[key] = parent.id;
+    }
+
+    const migrated = cats.map(c => {
+      if (c.parentId !== undefined) return c; // already has parentId, skip
+      // Check if this cat is a top-level parent itself
+      const isParent = Object.values(TYPE_NAME_MAP).some(label => c.name.toLowerCase() === label.toLowerCase());
+      if (isParent) return { ...c, parentId: null };
+      // Check if it matches sub-category keywords
+      const k = c.name.toLowerCase();
+      for (const [key, keywords] of Object.entries(TYPE_SUB_KEYS)) {
+        if (parentMap[key] && keywords.some(kw => k.includes(kw))) {
+          return { ...c, parentId: parentMap[key] };
+        }
+      }
+      // No match — treat as top-level
+      return { ...c, parentId: null };
+    });
+
+    saveCats(migrated);
+    console.log('Category migration complete.');
+  })();
+
   renderAll();
   const savedTab = sessionStorage.getItem('zenan_admin_tab');
   if (savedTab && savedTab !== 'products') switchSection(savedTab);
