@@ -89,13 +89,13 @@
     .promos-list { display: flex; flex-direction: column; gap: 72px; max-width: 1200px; margin: 0 auto; }
 
     .promo-item {
-      display: flex; flex-direction: row; align-items: center;
+      display: flex; flex-direction: row; align-items: flex-start;
       gap: 60px;
     }
     .promo-item-image { flex: 0 0 58%; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 40px rgba(10,30,80,.18); }
     .promo-item-image img { width: 100%; height: auto; display: block; transition: transform .4s; }
     .promo-item:hover .promo-item-image img { transform: scale(1.02); }
-    .promo-item-footer { margin-top: auto;
+    .promo-item-footer {
       flex: 1;
       display: flex; flex-direction: column; justify-content: flex-start;
     }
