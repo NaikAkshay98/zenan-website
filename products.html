@@ -484,6 +484,17 @@
       .footer-bottom { flex-direction: column; text-align: center; }
       .form-row { grid-template-columns: 1fr; }
     }
+
+    /* ── MOBILE ── */
+    @media (max-width: 900px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 540px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) {
+      .hero { padding: 60px 5vw 48px; }
+      .controls-panel { margin: 0 3vw; padding: 14px 12px; }
+      .products-section { padding: 40px 4vw 48px; }
+      .oz-slider-bar { flex-wrap: wrap; }
+      .range-wrap { width: 100%; }
+    }
   </style>
 </head>
 <body>
