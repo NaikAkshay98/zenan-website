@@ -47,10 +47,9 @@
     .nav-links { display: flex; gap: 2px; list-style: none; margin-left: auto; }
     .nav-links a { color: #1e3a6e; text-decoration: none; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 8px 16px; border-radius: 7px; transition: background .2s, color .2s; }
     .nav-links a:hover { background: rgba(37,88,176,.08); color: #2558B0; }
-    .nav-links a.active { color: var(--blue); }
     .nav-promo-wrap { position: relative; display: inline-block; }
     .nav-new-badge { position: absolute; top: -13px; right: -10px; padding: 2px 6px; background: linear-gradient(135deg, rgba(255,80,60,.96) 0%, rgba(200,20,10,.92) 100%); color: #fff; font-size: .55rem; font-weight: 800; letter-spacing: .05em; border-radius: 4px; line-height: 1.5; text-transform: uppercase; white-space: nowrap; pointer-events: none; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); border: 1px solid rgba(255,160,140,.5); box-shadow: 0 1px 8px rgba(220,40,20,.45), inset 0 1px 0 rgba(255,255,255,.4); animation: badgePulse 2.5s ease-in-out infinite; }
-    @keyframes badgePulse { 0%,100% { opacity:1; } 50% { opacity:.78; } }
+    @keyframes badgePulse { 0%,100%{opacity:1;}50%{opacity:.78;} }
     .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; border: none; background: none; }
     .nav-hamburger span { display: block; width: 24px; height: 2px; background: var(--dark); border-radius: 2px; }
     @media (max-width: 640px) {
@@ -60,24 +59,23 @@
       .nav-links a { border-radius: 0; padding: 12px 6vw; }
     }
 
-    /* ── HERO ── */
-    .hero { padding: 52px 6vw 36px; text-align: center; }
+    /* ── HERO (compact) ── */
+    .hero { padding: 28px 6vw 20px; text-align: center; }
     .breadcrumb-pill {
       display: inline-flex; align-items: center; gap: 6px;
       background: rgba(255,255,255,.28); border: 1px solid rgba(37,88,176,.14);
-      backdrop-filter: blur(12px); padding: 5px 16px; border-radius: 20px;
-      font-size: .78rem; color: var(--muted); margin-bottom: 20px;
+      backdrop-filter: blur(12px); padding: 4px 14px; border-radius: 20px;
+      font-size: .78rem; color: var(--muted); margin-bottom: 12px;
     }
     .breadcrumb-pill a { color: var(--blue2); text-decoration: none; font-weight: 600; }
-    .hero h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900; color: #0f172a; line-height: 1.1; margin-bottom: 10px; }
-    .hero p { font-size: .98rem; color: #1e3a6e; max-width: 480px; margin: 0 auto; line-height: 1.7; font-weight: 500; }
+    .hero h1 { font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 900; color: #0f172a; line-height: 1.1; }
 
     /* ── MAIN LAYOUT ── */
     main { flex: 1; overflow: visible; }
     .try-wrap {
-      max-width: 1200px; margin: 0 auto;
-      padding: 20px 6vw 80px;
-      display: grid; grid-template-columns: 1fr 360px; gap: 40px; align-items: start;
+      max-width: 1280px; margin: 0 auto;
+      padding: 16px 4vw 40px;
+      display: grid; grid-template-columns: 1fr 380px; gap: 28px; align-items: start;
     }
     @media (max-width: 860px) { .try-wrap { grid-template-columns: 1fr; } }
 
@@ -88,7 +86,7 @@
       border: 1px solid rgba(255,255,255,.7);
       border-radius: 20px;
       box-shadow: 0 8px 40px rgba(37,88,176,.1), inset 0 1px 0 rgba(255,255,255,.9);
-      padding: 28px; display: flex; flex-direction: column; align-items: center; gap: 16px;
+      padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 12px;
     }
     .canvas-wrap {
       position: relative; width: 100%;
@@ -97,177 +95,144 @@
       overflow: hidden;
       box-shadow: 0 4px 24px rgba(37,88,176,.08);
     }
-    #previewCanvas {
-      display: block; width: 100%; height: auto;
-      cursor: default;
-    }
+    #previewCanvas { display: block; width: 100%; height: auto; cursor: default; }
     #previewCanvas.has-logo { cursor: move; }
 
     .canvas-hint {
       font-size: .95rem; font-weight: 700; color: #1e3a6e; text-align: center; line-height: 1.5;
     }
-    .canvas-hint strong { color: var(--blue); }
 
-    /* No product state */
-    .no-product {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 14px; padding: 80px 20px; text-align: center;
-    }
-    .no-product .icon { font-size: 3.5rem; }
-    .no-product p { color: var(--muted); font-size: .95rem; }
-
-    /* ── CONTROLS PANEL ── */
+    /* ── CONTROLS PANEL — single sticky card ── */
     .controls-panel {
-      display: flex; flex-direction: column; gap: 20px;
+      position: sticky;
+      top: 84px; /* nav 68px + 16px gap */
     }
 
     .ctrl-card {
-      background: rgba(255,255,255,.55);
+      background: rgba(255,255,255,.65);
       backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%);
-      border: 1px solid rgba(255,255,255,.7);
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(37,88,176,.07), inset 0 1px 0 rgba(255,255,255,.9);
-      padding: 22px 20px;
+      border: 1px solid rgba(255,255,255,.75);
+      border-radius: 18px;
+      box-shadow: 0 6px 32px rgba(37,88,176,.1), inset 0 1px 0 rgba(255,255,255,.95);
+      padding: 18px 18px;
+      display: flex; flex-direction: column; gap: 0;
     }
-    .ctrl-label {
-      font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px;
-      color: var(--blue); margin-bottom: 14px; display: flex; align-items: center; gap: 7px;
-    }
-    .ctrl-label svg { opacity: .7; }
 
-    /* Product info */
-    .product-info { display: flex; align-items: center; gap: 14px; }
+    .ctrl-divider { height: 1px; background: rgba(37,88,176,.09); margin: 13px 0; }
+
+    .ctrl-section-label {
+      font-size: .63rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px;
+      color: var(--blue); margin-bottom: 9px;
+    }
+
+    /* Product row */
+    .product-row { display: flex; align-items: center; gap: 12px; }
     .product-thumb {
-      width: 60px; height: 60px; border-radius: 10px; overflow: hidden;
+      width: 48px; height: 48px; border-radius: 8px; overflow: hidden;
       background: #f8f9fb; border: 1px solid var(--border); flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
     }
     .product-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
-    .product-info-text .name { font-size: .95rem; font-weight: 700; color: var(--dark); }
-    .product-info-text .sub { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+    .product-name-text { font-size: .88rem; font-weight: 700; color: var(--dark); line-height: 1.3; }
 
     /* Upload */
     .upload-btn {
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      width: 100%; padding: 14px 20px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 11px 14px; border-radius: 10px;
       background: #fff; color: var(--blue);
-      border: 2px solid var(--blue); font-size: .95rem; font-weight: 700;
+      border: 2px solid var(--blue); font-size: .88rem; font-weight: 700;
       font-family: var(--font); cursor: pointer;
-      box-shadow: 5px 5px 0 #FFD700;
+      box-shadow: 4px 4px 0 #FFD700;
       transition: transform .18s, box-shadow .18s;
     }
-    .upload-btn:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #FFD700; }
-    .upload-formats { font-size: .74rem; color: var(--muted); text-align: center; margin-top: 8px; }
+    .upload-btn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 #FFD700; }
+    .upload-formats { font-size: .68rem; color: var(--muted); text-align: center; margin-top: 6px; }
 
-    /* Logo name chip */
     .logo-chip {
-      display: none; align-items: center; gap: 8px; margin-top: 10px;
+      display: none; align-items: center; gap: 7px; margin-top: 8px;
       background: rgba(37,88,176,.07); border: 1px solid rgba(37,88,176,.15);
-      border-radius: 8px; padding: 8px 12px;
+      border-radius: 7px; padding: 6px 10px;
     }
     .logo-chip.visible { display: flex; }
-    .logo-chip .chip-name { font-size: .82rem; color: var(--dark); font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .logo-chip .chip-remove { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 1rem; line-height: 1; padding: 0; transition: color .15s; }
+    .logo-chip .chip-name { font-size: .78rem; color: var(--dark); font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .logo-chip .chip-remove { background: none; border: none; cursor: pointer; color: var(--muted); font-size: .9rem; line-height: 1; padding: 0; transition: color .15s; }
     .logo-chip .chip-remove:hover { color: var(--dark); }
 
-    /* Sliders */
-    .slider-group { display: flex; flex-direction: column; gap: 14px; }
-    .slider-row { display: flex; flex-direction: column; gap: 6px; }
+    /* Sliders + D-pad side by side */
+    .adjust-row { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+    .slider-group { display: flex; flex-direction: column; gap: 11px; }
+    .slider-row { display: flex; flex-direction: column; gap: 5px; }
     .slider-header { display: flex; justify-content: space-between; align-items: center; }
-    .slider-lbl { font-size: .82rem; font-weight: 600; color: var(--dark); }
-    .slider-val { font-size: .82rem; font-weight: 700; color: var(--blue); min-width: 36px; text-align: right; }
+    .slider-lbl { font-size: .8rem; font-weight: 600; color: var(--dark); }
+    .slider-val { font-size: .8rem; font-weight: 700; color: var(--blue); min-width: 34px; text-align: right; }
     input[type=range] {
       -webkit-appearance: none; appearance: none;
-      width: 100%; height: 5px; border-radius: 3px;
+      width: 100%; height: 4px; border-radius: 2px;
       background: rgba(37,88,176,.15); outline: none; cursor: pointer;
     }
     input[type=range]::-webkit-slider-thumb {
       -webkit-appearance: none; appearance: none;
-      width: 18px; height: 18px; border-radius: 50%;
-      background: var(--blue); border: 2.5px solid #fff;
-      box-shadow: 0 1px 5px rgba(37,88,176,.35); cursor: pointer;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--blue); border: 2px solid #fff;
+      box-shadow: 0 1px 4px rgba(37,88,176,.35); cursor: pointer;
       transition: transform .15s;
     }
     input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
     input[type=range]::-moz-range-thumb {
-      width: 18px; height: 18px; border-radius: 50%;
-      background: var(--blue); border: 2.5px solid #fff;
-      box-shadow: 0 1px 5px rgba(37,88,176,.35); cursor: pointer;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--blue); border: 2px solid #fff; cursor: pointer;
     }
-    input[type=range]:disabled { opacity: .35; cursor: not-allowed; }
+    input[type=range]:disabled { opacity: .3; cursor: not-allowed; }
     input[type=range]:disabled::-webkit-slider-thumb { cursor: not-allowed; }
 
-    /* Flip row */
-    .flip-row { display: flex; gap: 8px; margin-top: 4px; }
-
-    /* D-pad arrow controls */
-    .dpad-wrap { display: flex; flex-direction: column; align-items: center; gap: 0; margin-top: 14px; }
-    .dpad-row { display: flex; gap: 0; }
+    /* D-pad */
+    .dpad-wrap { display: flex; flex-direction: column; align-items: center; }
+    .dpad-row { display: flex; }
     .dpad-btn {
-      width: 42px; height: 42px; border-radius: 8px;
+      width: 34px; height: 34px; border-radius: 7px;
       background: rgba(255,255,255,.7); border: 1.5px solid rgba(37,88,176,.18);
-      color: var(--body); cursor: pointer; font-family: var(--font);
+      color: var(--body); cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: background .15s, border-color .15s, transform .1s;
       margin: 2px;
     }
     .dpad-btn:hover:not(:disabled) { border-color: var(--blue); background: rgba(37,88,176,.08); color: var(--blue); transform: scale(1.1); }
-    .dpad-btn:active:not(:disabled) { transform: scale(.95); }
-    .dpad-btn:disabled { opacity: .3; cursor: not-allowed; }
+    .dpad-btn:active:not(:disabled) { transform: scale(.93); }
+    .dpad-btn:disabled { opacity: .28; cursor: not-allowed; }
     .dpad-center {
-      width: 42px; height: 42px; margin: 2px;
+      width: 34px; height: 34px; margin: 2px;
       display: flex; align-items: center; justify-content: center;
-      color: rgba(37,88,176,.25); font-size: .65rem; font-weight: 700; letter-spacing: .05em;
+      color: rgba(37,88,176,.28); font-size: .6rem;
     }
-    .dpad-label { font-size: .7rem; color: var(--muted); margin-top: 6px; text-align: center; }
-    .flip-btn {
-      flex: 1; padding: 9px 12px; border-radius: 8px; font-size: .82rem; font-weight: 700;
-      background: rgba(255,255,255,.7); border: 1.5px solid rgba(37,88,176,.18);
-      color: var(--body); cursor: pointer; font-family: var(--font);
-      transition: border-color .2s, background .2s;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-    }
-    .flip-btn:hover { border-color: var(--blue); background: rgba(37,88,176,.06); color: var(--blue); }
-    .flip-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .dpad-label { font-size: .62rem; color: var(--muted); text-align: center; margin-top: 3px; }
 
-    /* Action buttons */
-    .action-btns { display: flex; flex-direction: column; gap: 10px; }
-    .btn-reset {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%; padding: 11px 20px; border-radius: 10px;
-      background: rgba(255,255,255,.7); border: 1.5px solid rgba(37,88,176,.2);
-      color: var(--body); font-size: .9rem; font-weight: 700; font-family: var(--font);
-      cursor: pointer; transition: border-color .2s, background .2s;
+    /* Action row — 3 buttons side by side */
+    .action-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .btn-action {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; padding: 10px 6px; border-radius: 10px;
+      font-size: .72rem; font-weight: 700; font-family: var(--font); cursor: pointer;
+      transition: transform .18s, box-shadow .18s; text-decoration: none;
+      text-align: center; line-height: 1.2; border: 2px solid transparent;
     }
-    .btn-reset:hover { border-color: var(--blue); background: rgba(37,88,176,.06); color: var(--blue); }
-    .btn-download {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%; padding: 13px 20px; border-radius: 10px;
-      background: #fff; color: var(--blue);
-      border: 2px solid var(--blue); font-size: .92rem; font-weight: 700;
-      font-family: var(--font); cursor: pointer;
-      box-shadow: 5px 5px 0 #FFD700;
-      transition: transform .18s, box-shadow .18s;
+    .btn-action svg { flex-shrink: 0; }
+    .btn-action.reset {
+      background: rgba(255,255,255,.7); border-color: rgba(37,88,176,.2); color: var(--body);
     }
-    .btn-download:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #FFD700; }
-    .btn-inquire {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%; padding: 13px 20px; border-radius: 10px;
-      background: var(--blue); color: #fff;
-      border: 2px solid var(--blue); font-size: .92rem; font-weight: 700;
-      font-family: var(--font); cursor: pointer; text-decoration: none;
-      box-shadow: 5px 5px 0 #FFD700;
-      transition: transform .18s, box-shadow .18s;
+    .btn-action.reset:hover { border-color: var(--blue); background: rgba(37,88,176,.06); color: var(--blue); }
+    .btn-action.download {
+      background: #fff; color: var(--blue); border-color: var(--blue);
+      box-shadow: 4px 4px 0 #FFD700;
     }
-    .btn-inquire:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #FFD700; }
+    .btn-action.download:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 #FFD700; }
+    .btn-action.inquire {
+      background: var(--blue); color: #fff; border-color: var(--blue);
+      box-shadow: 4px 4px 0 #FFD700;
+    }
+    .btn-action.inquire:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 #FFD700; }
 
     /* Disclaimer */
-    .disclaimer {
-      max-width: 1200px; margin: 0 auto 48px; padding: 0 6vw;
-      background: rgba(255,255,255,.35); border: 1px solid rgba(37,88,176,.1);
-      border-radius: 12px; padding: 14px 20px;
-      font-size: .78rem; color: var(--muted); text-align: center; line-height: 1.6;
-    }
+    .ctrl-disclaimer { font-size: .68rem; color: var(--muted); text-align: center; line-height: 1.5; }
 
     /* ── FOOTER ── */
     footer { margin-top: auto;
@@ -290,7 +255,14 @@
     .footer-contact .ic { display: flex; align-items: center; margin-top: 3px; flex-shrink: 0; opacity: .5; }
     .footer-bottom { max-width: 1100px; margin: 22px auto 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: .8rem; color: #0f172a; }
     @media (max-width: 700px) { .footer-inner { grid-template-columns: 1fr; gap: 28px; } .footer-bottom { flex-direction: column; text-align: center; } }
-    @media (max-width: 640px) { .hero { padding: 36px 5vw 24px; } .try-wrap { padding: 16px 5vw 60px; gap: 24px; } }
+    @media (max-width: 640px) {
+      .hero { padding: 24px 5vw 14px; }
+      .try-wrap { padding: 12px 5vw 40px; gap: 20px; }
+      .controls-panel { position: static; }
+      .adjust-row { grid-template-columns: 1fr; }
+      .dpad-wrap { flex-direction: row; align-items: center; gap: 8px; }
+      .dpad-label { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -326,11 +298,8 @@
 
 <!-- HERO -->
 <div class="hero">
-  <div class="breadcrumb-pill">
-    <a href="products.html">← Back to Products</a>
-  </div>
+  <div class="breadcrumb-pill"><a href="products.html">← Back to Products</a></div>
   <h1>Try Your <span class="grad-text">Logo</span></h1>
-  <p>Upload your logo and see how it looks on the product. Drag it, resize it, adjust the opacity — then download your preview or send it to us.</p>
 </div>
 
 <main>
@@ -338,159 +307,123 @@
 
   <!-- LEFT: CANVAS PREVIEW -->
   <div class="canvas-panel">
-    <div class="canvas-wrap" id="canvasWrap">
+    <div class="canvas-wrap">
       <canvas id="previewCanvas" width="800" height="700"></canvas>
     </div>
     <div class="canvas-hint" id="canvasHint">
-      Upload your logo on the right — then <strong>drag it</strong> to position it anywhere on the product.
+      Upload your logo — then <strong>drag</strong> or use the arrows to position it.
     </div>
   </div>
 
-  <!-- RIGHT: CONTROLS -->
+  <!-- RIGHT: ALL CONTROLS IN ONE CARD -->
   <div class="controls-panel">
-
-    <!-- Product info -->
     <div class="ctrl-card">
-      <div class="ctrl-label">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-        Selected Product
-      </div>
-      <div class="product-info">
+
+      <!-- Product -->
+      <div class="product-row">
         <div class="product-thumb"><img id="productThumb" src="" alt="" /></div>
-        <div class="product-info-text">
-          <div class="name" id="productName">Loading…</div>
-          <div class="sub">Click a product to change</div>
-        </div>
+        <div class="product-name-text" id="productName">Loading…</div>
       </div>
-    </div>
 
-    <!-- Upload -->
-    <div class="ctrl-card">
-      <div class="ctrl-label">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-        Upload Your Logo
-      </div>
+      <div class="ctrl-divider"></div>
+
+      <!-- Upload -->
+      <div class="ctrl-section-label">Upload Your Logo</div>
       <input type="file" id="logoInput" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none" />
       <button class="upload-btn" onclick="document.getElementById('logoInput').click()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
         Choose Logo File
       </button>
-      <div class="upload-formats">PNG, JPG, SVG, WEBP supported</div>
+      <div class="upload-formats">PNG · JPG · SVG · WEBP</div>
       <div class="logo-chip" id="logoChip">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue);flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue);flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>
         <span class="chip-name" id="logoChipName"></span>
-        <button class="chip-remove" onclick="resetLogo()" title="Remove logo">✕</button>
+        <button class="chip-remove" onclick="resetLogo()" title="Remove">✕</button>
       </div>
-    </div>
 
-    <!-- Adjust -->
-    <div class="ctrl-card">
-      <div class="ctrl-label">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-        Adjust Logo
-      </div>
-      <div class="slider-group">
-        <div class="slider-row">
-          <div class="slider-header">
-            <span class="slider-lbl">Size</span>
-            <span class="slider-val" id="sizeVal">50%</span>
+      <div class="ctrl-divider"></div>
+
+      <!-- Sliders + D-pad side by side -->
+      <div class="ctrl-section-label">Adjust</div>
+      <div class="adjust-row">
+        <div class="slider-group">
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-lbl">Size</span>
+              <span class="slider-val" id="sizeVal">50%</span>
+            </div>
+            <input type="range" id="sizeSlider" min="5" max="120" value="50" step="1" disabled oninput="onSizeChange(this.value)" />
           </div>
-          <input type="range" id="sizeSlider" min="5" max="120" value="50" step="1" disabled oninput="onSizeChange(this.value)" />
-        </div>
-        <div class="slider-row">
-          <div class="slider-header">
-            <span class="slider-lbl">Opacity</span>
-            <span class="slider-val" id="opacityVal">100%</span>
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-lbl">Opacity</span>
+              <span class="slider-val" id="opacityVal">100%</span>
+            </div>
+            <input type="range" id="opacitySlider" min="10" max="100" value="100" step="1" disabled oninput="onOpacityChange(this.value)" />
           </div>
-          <input type="range" id="opacitySlider" min="10" max="100" value="100" step="1" disabled oninput="onOpacityChange(this.value)" />
         </div>
-      </div>
-      <!-- D-pad nudge -->
-      <div class="dpad-wrap">
-        <div class="dpad-row">
-          <button class="dpad-btn" id="dpadUp" disabled onclick="nudgeLogo(0,-10)" title="Move up">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-          </button>
+        <div class="dpad-wrap">
+          <div class="dpad-row">
+            <button class="dpad-btn" id="dpadUp" disabled onclick="nudgeLogo(0,-10)" title="Up">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+            </button>
+          </div>
+          <div class="dpad-row">
+            <button class="dpad-btn" id="dpadLeft" disabled onclick="nudgeLogo(-10,0)" title="Left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div class="dpad-center">✥</div>
+            <button class="dpad-btn" id="dpadRight" disabled onclick="nudgeLogo(10,0)" title="Right">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+          <div class="dpad-row">
+            <button class="dpad-btn" id="dpadDown" disabled onclick="nudgeLogo(0,10)" title="Down">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+          <div class="dpad-label">Move</div>
         </div>
-        <div class="dpad-row">
-          <button class="dpad-btn" id="dpadLeft" disabled onclick="nudgeLogo(-10,0)" title="Move left">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-          </button>
-          <div class="dpad-center">✥</div>
-          <button class="dpad-btn" id="dpadRight" disabled onclick="nudgeLogo(10,0)" title="Move right">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-        </div>
-        <div class="dpad-row">
-          <button class="dpad-btn" id="dpadDown" disabled onclick="nudgeLogo(0,10)" title="Move down">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-        </div>
-        <div class="dpad-label">Nudge logo position</div>
       </div>
 
-      <div class="flip-row" style="margin-top:14px;">
-        <button class="flip-btn" id="flipHBtn" disabled onclick="flipH()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-          Flip H
-        </button>
-        <button class="flip-btn" id="flipVBtn" disabled onclick="flipV()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 7 19 3 15 7"/><path d="M19 3v14a4 4 0 0 1-4 4H5"/><polyline points="1 17 5 21 9 17"/><path d="M5 21V7a4 4 0 0 1 4-4h6"/></svg>
-          Flip V
-        </button>
-      </div>
-    </div>
+      <div class="ctrl-divider"></div>
 
-    <!-- Actions -->
-    <div class="ctrl-card">
-      <div class="ctrl-label">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        Actions
-      </div>
-      <div class="action-btns">
-        <button class="btn-reset" onclick="resetLogo()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.37"/></svg>
-          Reset Logo
+      <!-- Actions — all 3 in one row -->
+      <div class="action-row">
+        <button class="btn-action reset" onclick="resetLogo()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.37"/></svg>
+          Reset
         </button>
-        <button class="btn-download" onclick="downloadPreview()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download Preview
+        <button class="btn-action download" onclick="downloadPreview()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download
         </button>
-        <a class="btn-inquire" id="inquireBtn" href="contact.html">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          Inquire About This Product
+        <a class="btn-action inquire" href="contact.html">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Inquire
         </a>
       </div>
-    </div>
 
+      <div class="ctrl-divider"></div>
+
+      <!-- Disclaimer -->
+      <div class="ctrl-disclaimer">⚠️ Approximate preview only. Actual print placement and colour may vary.</div>
+
+    </div><!-- /ctrl-card -->
   </div><!-- /controls-panel -->
-</div><!-- /try-wrap -->
 
-<div class="disclaimer" style="max-width:1200px;margin:0 auto 48px;padding:14px 6vw;">
-  ⚠️ This is an approximate visual preview only. Actual print placement, colour reproduction, and sizing may vary. Contact us for a professional proof.
-</div>
+</div><!-- /try-wrap -->
 </main>
 
 <div id="site-footer"></div>
 
-<!-- BACKGROUND CANVAS SCRIPT -->
 <script src="brand_assets/bg.js" defer></script>
 <script>
-(function(){
-  if (localStorage.getItem('zenan_bg') === 'white') {
-    document.body.classList.add('white-bg');
-  }
-})();
+(function(){ if (localStorage.getItem('zenan_bg') === 'white') document.body.classList.add('white-bg'); })();
 </script>
-
-<!-- NAV TOGGLE -->
 <script>
-function toggleNav() {
-  document.getElementById('navLinks').classList.toggle('open');
-}
+function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
 </script>
-
-<!-- FOOTER -->
 <script>
 fetch('footer.html').then(r => r.text()).then(html => { document.getElementById('site-footer').outerHTML = html; });
 </script>
@@ -500,237 +433,158 @@ fetch('footer.html').then(r => r.text()).then(html => { document.getElementById(
 (function() {
 
   // ── State ──
-  var productSrc = '';
-  var productName = '';
+  var productSrc = '', productName = '';
   var productImg = new Image();
   var logoImg = null;
-  var logoX = 0, logoY = 0;   // centre position in canvas coords
-  var logoW = 0, logoH = 0;   // rendered size in canvas coords
-  var opacity = 1;
-  var sizePct = 50;
-  var flipHState = false;
-  var flipVState = false;
-  var dragging = false;
-  var dragOffX = 0, dragOffY = 0;
+  var logoX = 0, logoY = 0;
+  var logoW = 0, logoH = 0;
+  var opacity = 1, sizePct = 50;
+  var dragging = false, dragOffX = 0, dragOffY = 0;
 
   var canvas = document.getElementById('previewCanvas');
   var ctx = canvas.getContext('2d');
 
-  // ── Load product from sessionStorage ──
-  (function loadProduct() {
+  // ── Load product ──
+  (function() {
     var raw = sessionStorage.getItem('zenan_try_product');
     if (!raw) {
-      // No product — show fallback
       document.getElementById('productName').textContent = 'No product selected';
       document.getElementById('productThumb').style.display = 'none';
-      drawEmpty();
-      return;
+      drawEmpty(); return;
     }
     var data = JSON.parse(raw);
-    productSrc = data.src;
-    productName = data.name;
+    productSrc = data.src; productName = data.name;
     document.getElementById('productName').textContent = productName;
     document.getElementById('productThumb').src = productSrc;
-
-    productImg.onload = function() { redraw(); };
-    productImg.onerror = function() { drawEmpty(); };
+    productImg.onload = redraw;
+    productImg.onerror = drawEmpty;
     productImg.src = productSrc;
   })();
 
   function drawEmpty() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#f8f9fb';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = 'bold 22px system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('No product image', canvas.width / 2, canvas.height / 2);
+    ctx.fillStyle = '#f8f9fb'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 22px system-ui,sans-serif';
+    ctx.textAlign = 'center'; ctx.fillText('No product image', canvas.width/2, canvas.height/2);
   }
 
   function redraw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // White background
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Product image — centered, fitting the canvas
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
     if (productImg.complete && productImg.naturalWidth) {
-      var pw = productImg.naturalWidth;
-      var ph = productImg.naturalHeight;
-      var scale = Math.min(canvas.width / pw, canvas.height / ph) * 0.88;
-      var dw = pw * scale;
-      var dh = ph * scale;
-      var dx = (canvas.width - dw) / 2;
-      var dy = (canvas.height - dh) / 2;
-      ctx.drawImage(productImg, dx, dy, dw, dh);
+      var s = Math.min(canvas.width / productImg.naturalWidth, canvas.height / productImg.naturalHeight) * 0.88;
+      var dw = productImg.naturalWidth * s, dh = productImg.naturalHeight * s;
+      ctx.drawImage(productImg, (canvas.width-dw)/2, (canvas.height-dh)/2, dw, dh);
     }
-
-    // Logo overlay
     if (logoImg && logoW > 0) {
       ctx.save();
       ctx.globalAlpha = opacity;
-      ctx.translate(logoX, logoY);
-      ctx.scale(flipHState ? -1 : 1, flipVState ? -1 : 1);
-      ctx.drawImage(logoImg, -logoW / 2, -logoH / 2, logoW, logoH);
+      ctx.drawImage(logoImg, logoX - logoW/2, logoY - logoH/2, logoW, logoH);
       ctx.restore();
     }
   }
 
   function computeLogoDims(pct) {
     if (!logoImg) return;
-    var maxW = canvas.width * 0.8;
-    var baseW = maxW * (pct / 100);
-    var ratio = logoImg.naturalHeight / logoImg.naturalWidth;
-    logoW = baseW;
-    logoH = baseW * ratio;
+    logoW = canvas.width * 0.8 * (pct/100);
+    logoH = logoW * (logoImg.naturalHeight / logoImg.naturalWidth);
   }
 
-  // ── File Upload ──
+  // ── Upload ──
   document.getElementById('logoInput').addEventListener('change', function(e) {
-    var file = e.target.files[0];
-    if (!file) return;
-
+    var file = e.target.files[0]; if (!file) return;
     var reader = new FileReader();
     reader.onload = function(ev) {
       var img = new Image();
       img.onload = function() {
-        logoImg = img;
-        sizePct = 50;
+        logoImg = img; sizePct = 50; opacity = 1;
         document.getElementById('sizeSlider').value = 50;
         document.getElementById('sizeVal').textContent = '50%';
-        opacity = 1;
         document.getElementById('opacitySlider').value = 100;
         document.getElementById('opacityVal').textContent = '100%';
-        flipHState = false; flipVState = false;
-
-        computeLogoDims(sizePct);
-
-        // Default: centre of canvas
-        logoX = canvas.width / 2;
-        logoY = canvas.height / 2;
-
-        redraw();
-        enableControls(true);
+        computeLogoDims(50);
+        logoX = canvas.width/2; logoY = canvas.height/2;
+        redraw(); enableControls(true);
         canvas.classList.add('has-logo');
-
-        // Show chip
         document.getElementById('logoChipName').textContent = file.name;
         document.getElementById('logoChip').classList.add('visible');
-        document.getElementById('canvasHint').innerHTML = 'Drag your logo to reposition it on the product.';
+        document.getElementById('canvasHint').innerHTML = 'Drag your logo or use the arrows to reposition it.';
       };
       img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
-    // Reset input so same file can be re-selected
     e.target.value = '';
   });
 
   function enableControls(on) {
-    ['sizeSlider','opacitySlider','flipHBtn','flipVBtn','dpadUp','dpadDown','dpadLeft','dpadRight'].forEach(function(id) {
+    ['sizeSlider','opacitySlider','dpadUp','dpadDown','dpadLeft','dpadRight'].forEach(function(id) {
       document.getElementById(id).disabled = !on;
     });
   }
 
   // ── Sliders ──
-  window.onSizeChange = function(val) {
-    sizePct = parseInt(val);
+  window.onSizeChange = function(v) {
+    sizePct = parseInt(v);
     document.getElementById('sizeVal').textContent = sizePct + '%';
-    computeLogoDims(sizePct);
-    redraw();
+    computeLogoDims(sizePct); redraw();
   };
-  window.onOpacityChange = function(val) {
-    opacity = parseInt(val) / 100;
-    document.getElementById('opacityVal').textContent = val + '%';
+  window.onOpacityChange = function(v) {
+    opacity = parseInt(v)/100;
+    document.getElementById('opacityVal').textContent = v + '%';
     redraw();
   };
 
-  // ── Flip ──
-  window.flipH = function() { flipHState = !flipHState; redraw(); };
-  window.flipV = function() { flipVState = !flipVState; redraw(); };
-
+  // ── Nudge ──
   window.nudgeLogo = function(dx, dy) {
     if (!logoImg) return;
-    logoX += dx;
-    logoY += dy;
-    redraw();
+    logoX += dx; logoY += dy; redraw();
   };
 
   // ── Reset ──
   window.resetLogo = function() {
-    logoImg = null; logoW = 0; logoH = 0;
-    flipHState = false; flipVState = false;
-    opacity = 1;
+    logoImg = null; logoW = 0; logoH = 0; opacity = 1; sizePct = 50;
     document.getElementById('opacitySlider').value = 100;
     document.getElementById('opacityVal').textContent = '100%';
     document.getElementById('sizeSlider').value = 50;
     document.getElementById('sizeVal').textContent = '50%';
     document.getElementById('logoChip').classList.remove('visible');
     document.getElementById('logoChipName').textContent = '';
-    document.getElementById('canvasHint').innerHTML = 'Upload your logo on the right — then <strong>drag it</strong> to position it anywhere on the product.';
+    document.getElementById('canvasHint').innerHTML = 'Upload your logo — then <strong>drag</strong> or use the arrows to position it.';
     canvas.classList.remove('has-logo');
-    enableControls(false);
-    redraw();
+    enableControls(false); redraw();
   };
 
   // ── Download ──
   window.downloadPreview = function() {
     try {
-      var link = document.createElement('a');
-      link.download = (productName || 'logo-preview').replace(/\s+/g, '-').toLowerCase() + '-preview.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+      var a = document.createElement('a');
+      a.download = (productName||'logo-preview').replace(/\s+/g,'-').toLowerCase()+'-preview.png';
+      a.href = canvas.toDataURL('image/png'); a.click();
     } catch(e) {
-      alert('Download blocked — your browser restricts saving cross-origin images. Please take a screenshot instead.');
+      alert('Download blocked by browser — please take a screenshot instead.');
     }
   };
 
   // ── Drag ──
-  function getCanvasPoint(e) {
-    var rect = canvas.getBoundingClientRect();
-    var scaleX = canvas.width / rect.width;
-    var scaleY = canvas.height / rect.height;
-    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    var clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    return {
-      x: (clientX - rect.left) * scaleX,
-      y: (clientY - rect.top) * scaleY
-    };
+  function pt(e) {
+    var r = canvas.getBoundingClientRect();
+    var cx = e.touches ? e.touches[0].clientX : e.clientX;
+    var cy = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: (cx-r.left)*(canvas.width/r.width), y: (cy-r.top)*(canvas.height/r.height) };
   }
-
-  function isOverLogo(px, py) {
-    if (!logoImg || logoW === 0) return false;
-    return px >= logoX - logoW / 2 - 8 && px <= logoX + logoW / 2 + 8 &&
-           py >= logoY - logoH / 2 - 8 && py <= logoY + logoH / 2 + 8;
+  function overLogo(x,y) {
+    return logoImg && logoW>0 && x>=logoX-logoW/2-8 && x<=logoX+logoW/2+8 && y>=logoY-logoH/2-8 && y<=logoY+logoH/2+8;
   }
-
-  function startDrag(e) {
-    if (!logoImg) return;
-    var pt = getCanvasPoint(e);
-    if (isOverLogo(pt.x, pt.y)) {
-      dragging = true;
-      dragOffX = pt.x - logoX;
-      dragOffY = pt.y - logoY;
-      e.preventDefault();
-    }
-  }
-  function moveDrag(e) {
-    if (!dragging) return;
-    var pt = getCanvasPoint(e);
-    logoX = pt.x - dragOffX;
-    logoY = pt.y - dragOffY;
-    redraw();
-    e.preventDefault();
-  }
-  function endDrag() { dragging = false; }
-
-  canvas.addEventListener('mousedown', startDrag);
-  canvas.addEventListener('mousemove', moveDrag);
-  canvas.addEventListener('mouseup', endDrag);
-  canvas.addEventListener('mouseleave', endDrag);
-  canvas.addEventListener('touchstart', startDrag, { passive: false });
-  canvas.addEventListener('touchmove', moveDrag, { passive: false });
-  canvas.addEventListener('touchend', endDrag);
+  canvas.addEventListener('mousedown', function(e) {
+    var p=pt(e); if(overLogo(p.x,p.y)){ dragging=true; dragOffX=p.x-logoX; dragOffY=p.y-logoY; e.preventDefault(); }
+  });
+  canvas.addEventListener('mousemove', function(e) {
+    if(!dragging) return; var p=pt(e); logoX=p.x-dragOffX; logoY=p.y-dragOffY; redraw(); e.preventDefault();
+  });
+  canvas.addEventListener('mouseup', function(){ dragging=false; });
+  canvas.addEventListener('mouseleave', function(){ dragging=false; });
+  canvas.addEventListener('touchstart', function(e){ var p=pt(e); if(overLogo(p.x,p.y)){ dragging=true; dragOffX=p.x-logoX; dragOffY=p.y-logoY; e.preventDefault(); } }, {passive:false});
+  canvas.addEventListener('touchmove', function(e){ if(!dragging)return; var p=pt(e); logoX=p.x-dragOffX; logoY=p.y-dragOffY; redraw(); e.preventDefault(); }, {passive:false});
+  canvas.addEventListener('touchend', function(){ dragging=false; });
 
 })();
 </script>
