@@ -199,6 +199,27 @@
 
     /* Flip row */
     .flip-row { display: flex; gap: 8px; margin-top: 4px; }
+
+    /* D-pad arrow controls */
+    .dpad-wrap { display: flex; flex-direction: column; align-items: center; gap: 0; margin-top: 14px; }
+    .dpad-row { display: flex; gap: 0; }
+    .dpad-btn {
+      width: 42px; height: 42px; border-radius: 8px;
+      background: rgba(255,255,255,.7); border: 1.5px solid rgba(37,88,176,.18);
+      color: var(--body); cursor: pointer; font-family: var(--font);
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s, border-color .15s, transform .1s;
+      margin: 2px;
+    }
+    .dpad-btn:hover:not(:disabled) { border-color: var(--blue); background: rgba(37,88,176,.08); color: var(--blue); transform: scale(1.1); }
+    .dpad-btn:active:not(:disabled) { transform: scale(.95); }
+    .dpad-btn:disabled { opacity: .3; cursor: not-allowed; }
+    .dpad-center {
+      width: 42px; height: 42px; margin: 2px;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(37,88,176,.25); font-size: .65rem; font-weight: 700; letter-spacing: .05em;
+    }
+    .dpad-label { font-size: .7rem; color: var(--muted); margin-top: 6px; text-align: center; }
     .flip-btn {
       flex: 1; padding: 9px 12px; border-radius: 8px; font-size: .82rem; font-weight: 700;
       background: rgba(255,255,255,.7); border: 1.5px solid rgba(37,88,176,.18);
@@ -384,6 +405,30 @@
           <input type="range" id="opacitySlider" min="10" max="100" value="100" step="1" disabled oninput="onOpacityChange(this.value)" />
         </div>
       </div>
+      <!-- D-pad nudge -->
+      <div class="dpad-wrap">
+        <div class="dpad-row">
+          <button class="dpad-btn" id="dpadUp" disabled onclick="nudgeLogo(0,-10)" title="Move up">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+          </button>
+        </div>
+        <div class="dpad-row">
+          <button class="dpad-btn" id="dpadLeft" disabled onclick="nudgeLogo(-10,0)" title="Move left">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="dpad-center">✥</div>
+          <button class="dpad-btn" id="dpadRight" disabled onclick="nudgeLogo(10,0)" title="Move right">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+        <div class="dpad-row">
+          <button class="dpad-btn" id="dpadDown" disabled onclick="nudgeLogo(0,10)" title="Move down">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+        <div class="dpad-label">Nudge logo position</div>
+      </div>
+
       <div class="flip-row" style="margin-top:14px;">
         <button class="flip-btn" id="flipHBtn" disabled onclick="flipH()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
@@ -582,10 +627,9 @@ fetch('footer.html').then(r => r.text()).then(html => { document.getElementById(
   });
 
   function enableControls(on) {
-    document.getElementById('sizeSlider').disabled = !on;
-    document.getElementById('opacitySlider').disabled = !on;
-    document.getElementById('flipHBtn').disabled = !on;
-    document.getElementById('flipVBtn').disabled = !on;
+    ['sizeSlider','opacitySlider','flipHBtn','flipVBtn','dpadUp','dpadDown','dpadLeft','dpadRight'].forEach(function(id) {
+      document.getElementById(id).disabled = !on;
+    });
   }
 
   // ── Sliders ──
@@ -604,6 +648,13 @@ fetch('footer.html').then(r => r.text()).then(html => { document.getElementById(
   // ── Flip ──
   window.flipH = function() { flipHState = !flipHState; redraw(); };
   window.flipV = function() { flipVState = !flipVState; redraw(); };
+
+  window.nudgeLogo = function(dx, dy) {
+    if (!logoImg) return;
+    logoX += dx;
+    logoY += dy;
+    redraw();
+  };
 
   // ── Reset ──
   window.resetLogo = function() {
