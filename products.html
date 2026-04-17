@@ -622,10 +622,10 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           Inquire about this product
         </button>
-        <a href="contact.html" class="btn-inquire-lg" style="background:#2558B0;color:#fff;border-color:#2558B0;text-decoration:none;margin-top:4px;">
+        <button class="btn-inquire-lg" onclick="goTryLogo()" style="background:#2558B0;color:#fff;border-color:#2558B0;margin-top:4px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
           Try Your Logo
-        </a>
+        </button>
       </div>
     </div>
   </div>
@@ -1225,6 +1225,13 @@
   function closeDetail() {
     document.getElementById('detailBackdrop').classList.remove('open');
     document.body.style.overflow = '';
+  }
+
+  function goTryLogo() {
+    var src  = document.getElementById('detailImg').src;
+    var name = document.getElementById('detailName').textContent;
+    sessionStorage.setItem('zenan_try_product', JSON.stringify({ src: src, name: name }));
+    window.location.href = 'try-logo.html';
   }
 
   function closeDetailOnBackdrop(e) {
