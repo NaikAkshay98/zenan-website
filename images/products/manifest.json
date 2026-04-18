@@ -1241,7 +1241,8 @@
       {
         "id": "17748101637464tse8t9kaem_v0",
         "itemNumber": "7500",
-        "oz": "8"
+        "oz": "8",
+        "outOfStock": true
       }
     ],
     "categories": [
