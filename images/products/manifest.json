@@ -1402,7 +1402,8 @@
       {
         "id": "17764733755944dasm8gyvt9",
         "itemNumber": "3807",
-        "oz": "13"
+        "oz": "13",
+        "outOfStock": true
       },
       {
         "id": "1776473412514io7gzgwhobe",
