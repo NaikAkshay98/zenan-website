@@ -1955,9 +1955,12 @@ function buildClientDetailsHtml(c, files) {
 }
 
 function toggleClientCard(headerEl) {
-  const card = headerEl.closest('.client-card');
-  if (!card) return;
-  card.classList.toggle('open');
+  const details = headerEl.nextElementSibling;
+  if (!details) return;
+  const isOpen = details.style.display === 'block';
+  details.style.display = isOpen ? 'none' : 'block';
+  const chevron = headerEl.querySelector('.client-chevron');
+  if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
 }
 
 function renderClients() {
