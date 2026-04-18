@@ -1204,9 +1204,12 @@
       metaHtml += `<div class="detail-meta-item">Available Capacities: <strong>${ozList.map(o=>o+'oz').join(', ')}</strong></div>`;
     }
     if (variants.some(v => v.itemNumber)) {
-      metaHtml += `<div style="margin-top:8px;display:flex;flex-direction:column;gap:3px;">` +
+      metaHtml += `<div style="margin-top:8px;display:flex;flex-direction:column;gap:5px;">` +
         variants.filter(v => v.itemNumber || v.oz).map(v =>
-          `<div class="detail-meta-item">${img.name}${v.oz ? ' '+v.oz+'oz' : ''}${v.itemNumber ? ' — #'+v.itemNumber : ''}</div>`
+          `<div class="detail-meta-item" style="display:flex;align-items:center;gap:8px;">
+            <span>${img.name}${v.oz ? ' '+v.oz+'oz' : ''}${v.itemNumber ? ' — #'+v.itemNumber : ''}</span>
+            ${v.outOfStock ? '<span style="font-size:.68rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;background:#fef2f2;color:#dc2626;border:1px solid rgba(220,38,38,.25);padding:2px 8px;border-radius:4px;white-space:nowrap;">Out of Stock</span>' : ''}
+          </div>`
         ).join('') + `</div>`;
     }
     document.getElementById('detailMeta').innerHTML = metaHtml;

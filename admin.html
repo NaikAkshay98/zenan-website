@@ -236,6 +236,14 @@
       transition: color .15s;
     }
     .variant-del:hover { color: #dc2626; }
+    .oos-btn {
+      font-size: .6rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+      padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(0,0,0,.13);
+      cursor: pointer; flex-shrink: 0; font-family: inherit;
+      background: rgba(0,0,0,.04); color: var(--muted);
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .oos-btn.active { background: rgba(220,38,38,.1); color: #dc2626; border-color: rgba(220,38,38,.3); }
     .add-variant-btn {
       align-self: flex-start; padding: 3px 10px; border-radius: 5px;
       background: transparent; border: 1.5px dashed var(--border); color: var(--muted);
@@ -842,6 +850,19 @@ function removeVariant(imgId, variantId) {
   renderGrid();
 }
 
+function toggleVariantOOS(imgId, variantId) {
+  const imgs = getImages();
+  const img = imgs.find(i => i.id === imgId);
+  if (!img) return;
+  if (!img.variants) img.variants = getVariants(img).map(v => ({...v}));
+  const v = img.variants.find(v => v.id === variantId);
+  if (!v) return;
+  v.outOfStock = !v.outOfStock;
+  saveImages(imgs);
+  renderGrid();
+  toast(v.outOfStock ? 'Marked as out of stock.' : 'Marked as in stock.', v.outOfStock ? '' : 'green');
+}
+
 // ── Delete confirm dialog
 let _pendingDeleteId = null;
 let _pendingDeleteType = 'product'; // 'product' | 'gallery'
@@ -1261,6 +1282,7 @@ function renderGrid() {
               <input class="card-edit-field card-meta-field card-oz-field" type="number"
                 value="${escHtml(String(v.oz||''))}" placeholder="12" step="0.5" min="0"
                 onchange="updateVariant('${img.id}','${v.id}','oz',this.value)" />
+              <button class="oos-btn ${v.outOfStock ? 'active' : ''}" onclick="toggleVariantOOS('${img.id}','${v.id}')" title="Toggle out of stock">${v.outOfStock ? 'Out of Stock' : 'In Stock'}</button>
               ${getVariants(img).length > 1 ? `<button class="variant-del" onclick="removeVariant('${img.id}','${v.id}')" title="Remove size">×</button>` : ''}
             </div>`).join('')}
         </div>
