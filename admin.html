@@ -311,6 +311,16 @@
     .card-meta-label { font-size: .7rem; color: var(--muted); white-space: nowrap; }
     .card-meta-field { font-size: .78rem; color: var(--body); flex: 1; min-width: 0; }
     .card-oz-field { width: 54px; flex: none; }
+    .card-note-field {
+      width: 100%; border: 1px solid var(--border); background: var(--off);
+      font-family: var(--font); color: var(--body); outline: none;
+      font-size: .75rem; border-radius: 6px; padding: 5px 8px;
+      resize: none; min-height: 48px; line-height: 1.4;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .card-note-field:focus { border-color: rgba(37,88,176,.4); box-shadow: 0 0 0 2px rgba(37,88,176,.12); background: #fff; }
+    .card-note-field::placeholder { color: #b0b8c9; }
+    .card-note-label { font-size: .63rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 3px; }
 
     /* Enable/disable toggle */
     .card-footer-row {
@@ -1291,6 +1301,10 @@ function renderGrid() {
         <div style="position:relative;">
           <button class="card-assign-btn" onclick="togglePopover(event, '${img.id}')">+ Assign Category</button>
           <div class="cat-popover" id="pop_${img.id}">${popItems}</div>
+        </div>
+        <div>
+          <div class="card-note-label">Note</div>
+          <textarea class="card-note-field" placeholder="Internal note…" onchange="updateField('${img.id}','note',this.value)">${escHtml(img.note || '')}</textarea>
         </div>
       </div>
 
