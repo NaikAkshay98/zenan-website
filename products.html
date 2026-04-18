@@ -1212,6 +1212,10 @@
           </div>`
         ).join('') + `</div>`;
     }
+    if (img.note) {
+      const safeNote = String(img.note).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      metaHtml += `<div style="margin-top:10px;padding:10px 12px;background:#f8f9fb;border:1px solid #e2e8f0;border-radius:8px;font-size:.83rem;color:#334155;line-height:1.5;">${safeNote}</div>`;
+    }
     document.getElementById('detailMeta').innerHTML = metaHtml;
 
     document.getElementById('detailInquireBtn').onclick = () => {
