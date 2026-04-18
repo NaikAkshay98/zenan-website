@@ -184,9 +184,7 @@
     .logo-chip .chip-remove { background: none; border: none; cursor: pointer; color: var(--muted); font-size: .85rem; line-height: 1; padding: 2px 4px; border-radius: 4px; transition: color .15s, background .15s; }
     .logo-chip .chip-remove:hover { color: #e53e3e; background: rgba(229,62,62,.08); }
 
-    /* Sliders + D-pad side by side */
-    .adjust-row { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
-    .slider-group { display: flex; flex-direction: column; gap: 11px; }
+    /* Adjust — size slider only */
     .slider-row { display: flex; flex-direction: column; gap: 5px; }
     .slider-header { display: flex; justify-content: space-between; align-items: center; }
     .slider-lbl { font-size: .8rem; font-weight: 600; color: var(--dark); }
@@ -210,27 +208,6 @@
     }
     input[type=range]:disabled { opacity: .3; cursor: not-allowed; }
     input[type=range]:disabled::-webkit-slider-thumb { cursor: not-allowed; }
-
-    /* D-pad */
-    .dpad-wrap { display: flex; flex-direction: column; align-items: center; }
-    .dpad-row { display: flex; }
-    .dpad-btn {
-      width: 34px; height: 34px; border-radius: 7px;
-      background: rgba(255,255,255,.7); border: 1.5px solid rgba(37,88,176,.18);
-      color: var(--body); cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background .15s, border-color .15s, transform .1s;
-      margin: 2px;
-    }
-    .dpad-btn:hover:not(:disabled) { border-color: var(--blue); background: rgba(37,88,176,.08); color: var(--blue); transform: scale(1.1); }
-    .dpad-btn:active:not(:disabled) { transform: scale(.93); }
-    .dpad-btn:disabled { opacity: .28; cursor: not-allowed; }
-    .dpad-center {
-      width: 34px; height: 34px; margin: 2px;
-      display: flex; align-items: center; justify-content: center;
-      color: rgba(37,88,176,.28); font-size: .6rem;
-    }
-    .dpad-label { font-size: .62rem; color: var(--muted); text-align: center; margin-top: 3px; }
 
     /* Action row — 3 buttons side by side */
     .action-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
@@ -285,9 +262,6 @@
       .hero { padding: 24px 5vw 14px; }
       .try-wrap { padding: 12px 5vw 40px; gap: 20px; }
       .controls-panel { position: static; }
-      .adjust-row { grid-template-columns: 1fr; }
-      .dpad-wrap { flex-direction: row; align-items: center; gap: 8px; }
-      .dpad-label { display: none; }
     }
   </style>
 </head>
@@ -369,43 +343,17 @@
 
       <div class="ctrl-divider"></div>
 
-      <!-- Sliders + D-pad side by side -->
+      <!-- Size slider -->
       <div class="ctrl-section-label">
         Adjust
         <span class="label-sub" id="adjustLogoName"></span>
       </div>
-      <div class="adjust-row">
-        <div class="slider-group">
-          <div class="slider-row">
-            <div class="slider-header">
-              <span class="slider-lbl">Size</span>
-              <span class="slider-val" id="sizeVal">50%</span>
-            </div>
-            <input type="range" id="sizeSlider" min="5" max="120" value="50" step="1" disabled oninput="onSizeChange(this.value)" />
-          </div>
+      <div class="slider-row">
+        <div class="slider-header">
+          <span class="slider-lbl">Size</span>
+          <span class="slider-val" id="sizeVal">50%</span>
         </div>
-        <div class="dpad-wrap">
-          <div class="dpad-row">
-            <button class="dpad-btn" id="dpadUp" disabled onclick="nudgeLogo(0,-10)" title="Up">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-            </button>
-          </div>
-          <div class="dpad-row">
-            <button class="dpad-btn" id="dpadLeft" disabled onclick="nudgeLogo(-10,0)" title="Left">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            </button>
-            <div class="dpad-center">✥</div>
-            <button class="dpad-btn" id="dpadRight" disabled onclick="nudgeLogo(10,0)" title="Right">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-          </div>
-          <div class="dpad-row">
-            <button class="dpad-btn" id="dpadDown" disabled onclick="nudgeLogo(0,10)" title="Down">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-          </div>
-          <div class="dpad-label">Move</div>
-        </div>
+        <input type="range" id="sizeSlider" min="5" max="120" value="50" step="1" disabled oninput="onSizeChange(this.value)" />
       </div>
 
       <div class="ctrl-divider"></div>
@@ -649,19 +597,16 @@ fetch('footer.html').then(r => r.text()).then(html => { document.getElementById(
       document.getElementById('adjustLogoName').textContent = '';
     }
     document.getElementById('sizeSlider').disabled = !hasActive;
-    ['dpadUp','dpadDown','dpadLeft','dpadRight'].forEach(function(id) {
-      document.getElementById(id).disabled = !hasActive;
-    });
   }
 
   function updateHint() {
     var hint = document.getElementById('canvasHint');
     if (logos.length === 0) {
-      hint.innerHTML = 'Upload your logo — then <strong>drag</strong> or use the arrows to position it.';
+      hint.innerHTML = 'Upload your logo — then <strong>drag</strong> it to position it.';
     } else if (logos.length === 1) {
-      hint.innerHTML = '<strong>Drag</strong> the logo on the canvas or use the arrows to reposition it.';
+      hint.innerHTML = '<strong>Drag</strong> the logo to reposition. Click empty space to deselect.';
     } else {
-      hint.innerHTML = 'Click a logo chip to select it, then <strong>drag</strong> or use the arrows to move it.';
+      hint.innerHTML = 'Click a logo to select it, then <strong>drag</strong> to move it. Click empty space to deselect.';
     }
   }
 
@@ -672,14 +617,6 @@ fetch('footer.html').then(r => r.text()).then(html => { document.getElementById(
     logo.sizePct = parseInt(v);
     document.getElementById('sizeVal').textContent = logo.sizePct + '%';
     computeDims(logo, logo.sizePct);
-    redraw();
-  };
-
-  // ── Nudge ──
-  window.nudgeLogo = function(dx, dy) {
-    if (activeIdx < 0 || activeIdx >= logos.length) return;
-    logos[activeIdx].x += dx;
-    logos[activeIdx].y += dy;
     redraw();
   };
 
@@ -731,6 +668,12 @@ fetch('footer.html').then(r => r.text()).then(html => { document.getElementById(
       dragOffX = p.x - logos[idx].x; dragOffY = p.y - logos[idx].y;
       canvas.style.cursor = 'grabbing';
       e.preventDefault();
+    } else {
+      // Click on empty space — deselect
+      activeIdx = -1;
+      renderChips();
+      updateAdjustUI();
+      redraw();
     }
   });
   canvas.addEventListener('mousemove', function(e) {
@@ -755,6 +698,11 @@ fetch('footer.html').then(r => r.text()).then(html => { document.getElementById(
       dragging = true; dragIdx = idx;
       dragOffX = p.x - logos[idx].x; dragOffY = p.y - logos[idx].y;
       e.preventDefault();
+    } else {
+      activeIdx = -1;
+      renderChips();
+      updateAdjustUI();
+      redraw();
     }
   }, {passive: false});
   canvas.addEventListener('touchmove', function(e) {
