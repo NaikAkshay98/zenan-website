@@ -1954,8 +1954,8 @@ function buildClientDetailsHtml(c, files) {
   </button>`;
 }
 
-function toggleClientCard(clientId) {
-  const card = document.querySelector(`.client-card[data-id="${clientId}"]`);
+function toggleClientCard(headerEl) {
+  const card = headerEl.closest('.client-card');
   if (!card) return;
   card.classList.toggle('open');
 }
@@ -1977,7 +1977,7 @@ function renderClients() {
     const initials = c.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
     return `
     <div class="client-card" data-id="${c.id}">
-      <div class="client-card-header" onclick="toggleClientCard('${c.id}')">
+      <div class="client-card-header" onclick="toggleClientCard(this)">
         <div class="client-avatar">${initials}</div>
         <div class="client-info">
           <div class="client-name">${escHtml(c.name)}</div>
